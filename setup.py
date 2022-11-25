@@ -28,7 +28,7 @@ setup(
     include_package_data=True,
     keywords="recipys",
     name="recipys",
-    packages=find_packages(include=["icu_benchmarks"]),
+    packages=["recipys"],
     setup_requires=setup_requirements,
     test_suite="tests",
     tests_require=[],
