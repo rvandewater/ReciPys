@@ -1,6 +1,6 @@
 import re
 
-from .ingredients import Ingredients
+from recipys.ingredients import Ingredients
 from typing import Union
 
 

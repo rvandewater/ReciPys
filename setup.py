@@ -21,7 +21,7 @@ setup(
         "Programming Language :: Python :: 3.10",
     ],
     description="A modular preprocessing package for Pandas Dataframe",
-    entry_points={"console_scripts": ["icu-benchmarks = icu_benchmarks.run:main"]},
+    entry_points={"console_scripts": ["recipys = recipys.recipe:__init__"]},
     install_requires=[],  # dependencies managed via conda for the moment
     license="MIT license",
     long_description=readme,
