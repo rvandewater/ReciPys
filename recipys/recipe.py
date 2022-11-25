@@ -6,9 +6,9 @@ from typing import Union
 
 import pandas as pd
 
-from icu_benchmarks.recipes.ingredients import Ingredients
-from icu_benchmarks.recipes.selector import select_groups
-from icu_benchmarks.recipes.step import Step
+from recipys.ingredients import Ingredients
+from recipys.selector import select_groups
+from recipys.step import Step
 
 
 class Recipe:
