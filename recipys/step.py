@@ -4,9 +4,9 @@ from typing import Union, Dict
 from scipy.sparse import isspmatrix
 from pandas.core.groupby import DataFrameGroupBy
 from sklearn.preprocessing import StandardScaler
-from icu_benchmarks.recipes.ingredients import Ingredients
+from ingredients import Ingredients
 from enum import Enum
-from icu_benchmarks.recipes.selector import (
+from selector import (
     Selector,
     all_predictors,
     all_numeric_predictors,
