@@ -22,9 +22,9 @@ from sklearn.preprocessing import (
 from sklearn.experimental import enable_iterative_imputer  # noqa: F401
 from sklearn.impute import SimpleImputer, KNNImputer, IterativeImputer, MissingIndicator
 
-from icu_benchmarks.recipes.recipe import Recipe
-from icu_benchmarks.recipes.selector import all_numeric_predictors, has_type, has_role, all_of
-from icu_benchmarks.recipes.step import StepSklearn, StepHistorical, Accumulator, StepImputeFill, StepScale, StepResampling
+from recipys.recipe import Recipe
+from recipys.selector import all_numeric_predictors, has_type, has_role, all_of
+from recipys.step import StepSklearn, StepHistorical, Accumulator, StepImputeFill, StepScale, StepResampling
 
 
 @pytest.fixture()
