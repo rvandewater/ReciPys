@@ -1,5 +1,6 @@
 # ReciPys
-![example workflow](https://github.com/rvandewater/recipys/actions/workflows/main.yml/badge.svg)
+[![CI](https://github.com/rvandewater/recipys/actions/workflows/ci.yml/badge.svg)](https://github.com/rvandewater/recipys/actions/workflows/ci.yml)
+
 The ReciPys package is a preprocessing framework operating on Pandas dataframes. 
 The operation of this package is inspired by the R-package [recipes](https://recipes.tidymodels.org/).
 This package allows the user to apply a number of extensible operations for imputation, feature generation/extraction, 
