@@ -1,5 +1,8 @@
 # ReciPys
 [![CI](https://github.com/rvandewater/recipys/actions/workflows/ci.yml/badge.svg)](https://github.com/rvandewater/recipys/actions/workflows/ci.yml)
+[![Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+![Platform](https://img.shields.io/badge/platform-linux--64%20|%20win--64%20|%20osx--64-lightgrey)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 The ReciPys package is a preprocessing framework operating on Pandas dataframes. 
 The operation of this package is inspired by the R-package [recipes](https://recipes.tidymodels.org/).
