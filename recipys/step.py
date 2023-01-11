@@ -1,3 +1,4 @@
+import torch
 from abc import abstractmethod
 from copy import deepcopy
 from typing import Union, Dict
@@ -120,14 +121,14 @@ class StepImputeFill(Step):
         return new_data
 
 class StepImputeModel(Step):
-    def __init__(self, sel=all_predictors(), imputation_model=None):
+    def __init__(self, sel=all_predictors(), model=None):
         super().__init__(sel)
         self.desc = f"Impute with pretrained imputation model"
-        self.model = imputation_model
+        self.model = model
 
     def transform(self, data):
         new_data = self._check_ingredients(data)
-        new_data[self.columns] = self.model(data[self.columns])
+        new_data[self.columns] = self.model(torch.Tensor(new_data[self.columns].values))
         return new_data
 
 
