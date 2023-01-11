@@ -119,6 +119,17 @@ class StepImputeFill(Step):
         new_data[self.columns] = data[self.columns].fillna(self.value, method=self.method, axis=0, limit=self.limit)
         return new_data
 
+class StepImputeModel(Step):
+    def __init__(self, sel=all_predictors(), imputation_model: function = None):
+        super().__init__(sel)
+        self.desc = f"Impute with pretrained imputation model"
+        self.model = imputation_model
+
+    def transform(self, data):
+        new_data = self._check_ingredients(data)
+        new_data[self.columns] = self.model(data[self.columns])
+        return new_data
+
 
 class Accumulator(Enum):
     MAX = "max"
