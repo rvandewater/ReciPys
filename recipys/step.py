@@ -120,7 +120,7 @@ class StepImputeFill(Step):
         return new_data
 
 class StepImputeModel(Step):
-    def __init__(self, sel=all_predictors(), imputation_model: function = None):
+    def __init__(self, sel=all_predictors(), imputation_model=None):
         super().__init__(sel)
         self.desc = f"Impute with pretrained imputation model"
         self.model = imputation_model
