@@ -128,7 +128,7 @@ class StepImputeModel(Step):
 
     def transform(self, data):
         new_data = self._check_ingredients(data)
-        new_data[self.columns] = self.model(torch.Tensor(new_data[self.columns].values))
+        new_data[self.columns] = self.model(new_data[self.columns + select_groups(new_data)], select_groups(new_data)).to("cpu")
         return new_data
 
 
