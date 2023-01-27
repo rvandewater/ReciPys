@@ -1,4 +1,3 @@
-import torch
 from abc import abstractmethod
 from copy import deepcopy
 from typing import Union, Dict
