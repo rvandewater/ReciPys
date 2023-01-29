@@ -119,6 +119,22 @@ class StepImputeFill(Step):
         new_data[self.columns] = data[self.columns].fillna(self.value, method=self.method, axis=0, limit=self.limit)
         return new_data
 
+class StepImputeModel(Step):
+    """Uses a pretrained imputation model to impute missing values.
+    Args:
+        model: A function that takes a dataframe and the grouping columns as input and
+            returns a dataframe with imputed values without the grouping column.
+    """
+    def __init__(self, sel=all_predictors(), model: function = None):
+        super().__init__(sel)
+        self.desc = f"Impute with pretrained imputation model"
+        self.model = model
+
+    def transform(self, data):
+        new_data = self._check_ingredients(data)
+        new_data[self.columns] = self.model(new_data[self.columns + select_groups(new_data)], select_groups(new_data))
+        return new_data
+
 
 class Accumulator(Enum):
     MAX = "max"
