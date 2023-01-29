@@ -119,15 +119,17 @@ class StepImputeFill(Step):
         new_data[self.columns] = data[self.columns].fillna(self.value, method=self.method, axis=0, limit=self.limit)
         return new_data
 
+
 class StepImputeModel(Step):
     """Uses a pretrained imputation model to impute missing values.
     Args:
         model: A function that takes a dataframe and the grouping columns as input and
             returns a dataframe with imputed values without the grouping column.
     """
-    def __init__(self, sel=all_predictors(), model: function = None):
+
+    def __init__(self, sel=all_predictors(), model=None):
         super().__init__(sel)
-        self.desc = f"Impute with pretrained imputation model"
+        self.desc = "Impute with pretrained imputation model"
         self.model = model
 
     def transform(self, data):
@@ -159,11 +161,11 @@ class StepHistorical(Step):
     """
 
     def __init__(
-        self,
-        sel: Selector = all_numeric_predictors(),
-        fun: Accumulator = Accumulator.MAX,
-        suffix: str = None,
-        role: str = "predictor",
+            self,
+            sel: Selector = all_numeric_predictors(),
+            fun: Accumulator = Accumulator.MAX,
+            suffix: str = None,
+            role: str = "predictor",
     ):
         super().__init__(sel)
 
@@ -223,12 +225,12 @@ class StepSklearn(Step):
     """
 
     def __init__(
-        self,
-        sklearn_transformer: object,
-        sel: Selector = all_predictors(),
-        columnwise: bool = False,
-        in_place: bool = True,
-        role: str = "predictor",
+            self,
+            sklearn_transformer: object,
+            sel: Selector = all_predictors(),
+            columnwise: bool = False,
+            in_place: bool = True,
+            role: str = "predictor",
     ):
         super().__init__(sel)
         self.desc = f"Use sklearn transformer {sklearn_transformer.__class__.__name__}"
@@ -311,10 +313,10 @@ class StepSklearn(Step):
 
 class StepResampling(Step):
     def __init__(
-        self,
-        new_resolution: str = "1h",
-        accumulator_dict: Dict[Selector, Accumulator] = {all_predictors(): Accumulator.LAST},
-        default_accumulator: Accumulator = Accumulator.LAST,
+            self,
+            new_resolution: str = "1h",
+            accumulator_dict: Dict[Selector, Accumulator] = {all_predictors(): Accumulator.LAST},
+            default_accumulator: Accumulator = Accumulator.LAST,
     ):
         """This class represents a step in a recipe.
 
@@ -389,11 +391,11 @@ class StepScale:
     """
 
     def __new__(
-        cls,
-        sel: Selector = all_numeric_predictors(),
-        with_mean: bool = True,
-        with_std: bool = True,
-        in_place: bool = True,
-        role: str = "predictor",
+            cls,
+            sel: Selector = all_numeric_predictors(),
+            with_mean: bool = True,
+            with_std: bool = True,
+            in_place: bool = True,
+            role: str = "predictor",
     ):
         return StepSklearn(StandardScaler(with_mean=with_mean, with_std=with_std), sel=sel, in_place=in_place, role=role)
