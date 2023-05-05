@@ -1,6 +1,8 @@
 from abc import abstractmethod
 from copy import deepcopy
 from typing import Union, Dict
+
+from pandas import concat
 from scipy.sparse import isspmatrix
 from pandas.core.groupby import DataFrameGroupBy
 from sklearn.preprocessing import StandardScaler
@@ -204,7 +206,8 @@ class StepHistorical(Step):
         else:
             raise TypeError(f"Expected Accumulator enum for function, got {self.fun.__class__}")
 
-        new_data[new_columns] = res
+        res.rename(columns=dict(zip(self.columns, new_columns)), inplace=True)
+        new_data = concat([new_data, res], axis=1)
 
         # Update roles for the newly generated columns
         for nc in new_columns:
