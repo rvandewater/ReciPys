@@ -205,9 +205,7 @@ class StepHistorical(Step):
             res = data[self.columns].expanding().var().reset_index(drop=True)
         else:
             raise TypeError(f"Expected Accumulator enum for function, got {self.fun.__class__}")
-
-        res.rename(columns=dict(zip(self.columns, new_columns)), inplace=True)
-        new_data = concat([new_data, res], axis=1)
+        new_data[new_columns] = res
 
         # Update roles for the newly generated columns
         for nc in new_columns:
@@ -402,3 +400,4 @@ class StepScale:
             role: str = "predictor",
     ):
         return StepSklearn(StandardScaler(with_mean=with_mean, with_std=with_std), sel=sel, in_place=in_place, role=role)
+
