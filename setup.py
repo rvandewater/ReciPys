@@ -5,7 +5,7 @@
 
 from setuptools import setup
 
-with open("README.md") as readme_file:
+with open("README.md", encoding="UTF-8") as readme_file:
     readme = readme_file.read()
 
 setup_requirements = ["pytest-runner"]
