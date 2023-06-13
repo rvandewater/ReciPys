@@ -1,4 +1,4 @@
-![logo](docs/figures/recipys_logo.png)
+![logo](https://github.com/rvandewater/ReciPys/blob/development/docs/figures/recipys_logo.png?raw=true)
 # 🥧ReciPys🐍
 [![CI](https://github.com/rvandewater/recipys/actions/workflows/ci.yml/badge.svg)](https://github.com/rvandewater/recipys/actions/workflows/ci.yml)
 [![Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -11,14 +11,18 @@ The operation of this package is inspired by the R-package [recipes](https://rec
 This package allows the user to apply a number of extensible operations for imputation, feature generation/extraction, 
 scaling, and encoding. 
 It operates on modified Dataframe objects from the established data science package Pandas.
-## Installation
-
+## Installation 
+You can install ReciPys from pip using:
+```
+pip install ReciPys
+```
+You can install ReciPys from source to ensure you have the latest version:
 ```
 conda env update -f environment.yml
 conda activate recipys
 pip install -e .
 ```
-> Note that the last command installs the package called `recipys`.
+> Note that the last command installs the package called `ReciPys`.
 
 ## Usage
 To define preprocessing operations, one has to supply _roles_ to the different columns of the Dataframe. 

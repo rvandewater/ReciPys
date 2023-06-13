@@ -71,6 +71,6 @@ setup(
     test_suite="tests",
     tests_require=[],
     url="https://github.com/rvandewater/recipys",
-    version="0.0.1",
+    version="0.1.0",
     zip_safe=False,
 )
