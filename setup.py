@@ -7,6 +7,7 @@ from setuptools import setup, find_packages
 
 root_path = Path(__file__).resolve().parent
 
+
 def parse_environment_yml():
     """Parse the environment.yml file and extract the package names."""
     # here we cannot use pyyaml because it is not installed yet
@@ -42,6 +43,7 @@ def parse_environment_yml():
         sanitized_dependencies.append(dependency)
     return sanitized_dependencies
 
+
 this_directory = Path(__file__).parent
 readme = (this_directory / "README.md").read_text(encoding="utf-8")
 
@@ -64,9 +66,9 @@ setup(
     long_description=readme,
     long_description_content_type='text/markdown',
     include_package_data=True,
-    keywords="ReciPys",
-    name="ReciPys",
-    packages=find_packages(include=["ReciPys"]),
+    keywords="recipies",
+    name="recipies",
+    packages=find_packages(include=["recipies"]),
     setup_requires=setup_requirements,
     test_suite="tests",
     tests_require=[],
