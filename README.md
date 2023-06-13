@@ -4,6 +4,7 @@
 [![Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 ![Platform](https://img.shields.io/badge/platform-linux--64%20|%20win--64%20|%20osx--64-lightgrey)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![PyPI version shields.io](https://img.shields.io/pypi/v/recipies.svg)](https://pypi.python.org/pypi/recipies/)
 [![arXiv](https://img.shields.io/badge/arXiv-2306.05109-b31b1b.svg)](http://arxiv.org/abs/2306.05109)
 
 The ReciPys package is a preprocessing framework operating on Pandas dataframes. 
@@ -14,15 +15,17 @@ It operates on modified Dataframe objects from the established data science pack
 ## Installation 
 You can install ReciPys from pip using:
 ```
-pip install ReciPys
+pip install recipies
 ```
+> Note that the package is called `recipies` and not `recipys` on pip due to a name clash with an existing package.
+> 
 You can install ReciPys from source to ensure you have the latest version:
 ```
 conda env update -f environment.yml
 conda activate recipys
 pip install -e .
 ```
-> Note that the last command installs the package called `ReciPys`.
+> Note that the last command installs the package called `recipies`.
 
 ## Usage
 To define preprocessing operations, one has to supply _roles_ to the different columns of the Dataframe. 
