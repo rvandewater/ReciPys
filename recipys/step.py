@@ -1,9 +1,10 @@
 from abc import abstractmethod
 from copy import deepcopy
 from typing import Union, Dict
-
+from datetime import timedelta
 from scipy.sparse import isspmatrix
-from pandas.core.groupby import DataFrameGroupBy
+import polars as pl
+import polars.dataframe.groupby as GroupBy
 from sklearn.preprocessing import StandardScaler
 from recipys.ingredients import Ingredients
 from enum import Enum
@@ -14,7 +15,7 @@ from recipys.selector import (
     select_groups,
     select_sequence,
 )
-from pandas.api.types import is_timedelta64_dtype, is_datetime64_any_dtype
+# from pandas.api.types import is_timedelta64_dtype, is_datetime64_any_dtype
 
 
 class Step:
@@ -59,7 +60,7 @@ class Step:
     def do_fit(self, data: Ingredients):
         pass
 
-    def _check_ingredients(self, data: Union[Ingredients, DataFrameGroupBy]) -> Ingredients:
+    def _check_ingredients(self, data: Union[Ingredients, ]) -> Ingredients:
         """Check input for allowed types
 
         Args:
@@ -72,7 +73,7 @@ class Step:
         Returns:
             Validated input
         """
-        if isinstance(data, DataFrameGroupBy):
+        if isinstance(data, GroupBy):
             if not self._group:
                 raise ValueError("Step does not accept grouped data.")
             data = data.obj
@@ -347,7 +348,7 @@ class StepResampling(Step):
             raise AssertionError("Sequence role has not been assigned, resampling step not possible")
         sequence_datatype = new_data.dtypes[sequence_role]
 
-        if not (is_timedelta64_dtype(sequence_datatype) or is_datetime64_any_dtype(sequence_datatype)):
+        if not (isinstance(timedelta,sequence_datatype)): #or is_datetime64_any_dtype(sequence_datatype)):
             raise ValueError(f"Expected Timedelta or Timestamp object, got {sequence_role(data).__class__}")
 
         # Dictionary with the format column: str , accumulator:str is created
@@ -371,7 +372,7 @@ class StepResampling(Step):
         new_data = data.resample(self.new_resolution, on=sequence_role).agg(col_acc_map)
 
         # Remove multi-index in case of grouped data
-        if isinstance(data, DataFrameGroupBy):
+        if isinstance(data, GroupBy):
             new_data = new_data.droplevel(select_groups(data.obj))
 
         # Remove sequence index, while keeping column

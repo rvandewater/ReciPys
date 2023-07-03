@@ -5,6 +5,7 @@ from itertools import chain
 from typing import Union
 
 import pandas as pd
+import polars as pl
 
 from recipys.ingredients import Ingredients
 from recipys.selector import select_groups
@@ -27,7 +28,7 @@ class Recipe:
 
     def __init__(
         self,
-        data: Union[pd.DataFrame, Ingredients],
+        data: Union[pl.DataFrame, Ingredients],
         outcomes: Union[str, list[str]] = None,
         predictors: Union[str, list[str]] = None,
         groups: Union[str, list[str]] = None,
@@ -97,10 +98,10 @@ class Recipe:
         self.steps.append(step)
         return self
 
-    def _check_data(self, data: Union[pd.DataFrame, Ingredients]) -> Ingredients:
+    def _check_data(self, data: Union[pl.DataFrame, Ingredients]) -> Ingredients:
         if data is None:
             data = self.data
-        elif type(data) == pd.DataFrame:
+        elif type(data) == pl.DataFrame:
             # this is only executed when prep or bake recieve a DF that is different to the original data
             # don't check the roles here, because self.data can have more roles than data (post feature generation)
             data = Ingredients(data, roles=self.data.roles, check_roles=False)
@@ -115,7 +116,7 @@ class Recipe:
                 data = data.groupby(group_vars)
         return data
 
-    def prep(self, data: Union[pd.DataFrame, Ingredients] = None, refit: bool = False) -> pd.DataFrame:
+    def prep(self, data: Union[pl.DataFrame, Ingredients] = None, refit: bool = False) -> pl.DataFrame:
         """Fits and transforms, in other words preps, the data.
 
         Args:
@@ -128,9 +129,9 @@ class Recipe:
         data = self._check_data(data)
         data = copy(data)
         data = self._apply_fit_transform(data, refit)
-        return pd.DataFrame(data)
+        return pl.DataFrame(data)
 
-    def bake(self, data: Union[pd.DataFrame, Ingredients] = None) -> pd.DataFrame:
+    def bake(self, data: Union[pl.DataFrame, Ingredients] = None) -> pl.DataFrame:
         """Transforms, or bakes, the data if it has been prepped.
 
         Args:
@@ -142,7 +143,7 @@ class Recipe:
         data = self._check_data(data)
         data = copy(data)
         data = self._apply_fit_transform(data)
-        return pd.DataFrame(data)
+        return pl.DataFrame(data)
 
     def _apply_fit_transform(self, data=None, refit=False):
         # applies transform or fit and transform (when refit or not trained yet)
@@ -159,7 +160,7 @@ class Recipe:
 
         # Print all existing roles and how many variables are assigned to each
         num_roles = Counter(chain.from_iterable(self.data.roles.values()))
-        num_roles = pd.DataFrame({"role": [r for r in num_roles.keys()], "#variables": [n for n in num_roles.values()]})
+        num_roles = pl.DataFrame({"role": [r for r in num_roles.keys()], "#variables": [n for n in num_roles.values()]})
         repr += "Inputs:\n\n" + num_roles.__repr__() + "\n\n"
 
         # Print all steps

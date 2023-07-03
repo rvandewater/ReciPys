@@ -1,12 +1,13 @@
 from copy import deepcopy
 import numpy as np
 import pandas as pd
+import polars as pl
 
 from pandas._typing import Axes, Dtype
 
 
-class Ingredients(pd.DataFrame):
-    """Wrapper around pandas.DataFrames to store columns roles (e.g., predictor)
+class Ingredients(pl.DataFrame):
+    """Wrapper around polars.DataFrames to store columns roles (e.g., predictor)
 
     Args:
         roles: roles of DataFrame columns as (list of) strings.
@@ -25,19 +26,13 @@ class Ingredients(pd.DataFrame):
     def __init__(
         self,
         data=None,
-        index: Axes = None,
-        columns: Axes = None,
-        dtype: Dtype = None,
         copy: bool = None,
         roles: dict = None,
         check_roles: bool = True,
     ):
         super().__init__(
             data,
-            index,
-            columns,
-            dtype,
-            copy,
+            schema=None
         )
 
         if isinstance(data, Ingredients) and roles is None:
@@ -61,13 +56,13 @@ class Ingredients(pd.DataFrame):
     def _constructor(self):
         return Ingredients
 
-    def to_df(self) -> pd.DataFrame:
+    def to_df(self) -> pl.DataFrame:
         """Return the underlying pandas.DataFrame.
 
         Returns:
             Self as DataFrame.
         """
-        return pd.DataFrame(self)
+        return pl.DataFrame(self)
 
     def _check_column(self, column):
         if not isinstance(column, str):

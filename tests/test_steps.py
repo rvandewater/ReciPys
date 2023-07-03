@@ -1,5 +1,5 @@
 import pytest
-import pandas as pd
+import polars as pl
 import numpy as np
 from sklearn.preprocessing import (
     Binarizer,
@@ -64,7 +64,7 @@ class TestStepResampling:
 
     def test_step_ungrouped(self, example_df):
         # Without using group role
-        pre_sampling_len = pd.Series(example_df.time).drop_duplicates(inplace=False, keep="first").size
+        pre_sampling_len = pl.Series(example_df.time).drop_duplicates(inplace=False, keep="first").size
         rec = Recipe(example_df, ["y"], ["x1", "x2"])
         rec.update_roles("time", "sequence")
         resampling_dict = {all_numeric_predictors(): Accumulator.MEAN}
@@ -95,11 +95,11 @@ class TestImputeSteps:
     def test_impute_fill(self, example_recipe_w_nan):
         example_recipe_w_nan.add_step(StepImputeFill(method="ffill"))
         res = example_recipe_w_nan.prep()
-        exp = pd.Series([0, 1, 1, 0, 0, 0, np.NaN, 0, 0, 1], dtype="float64")
+        exp = pl.Series([0, 1, 1, 0, 0, 0, np.NaN, 0, 0, 1], dtype="float64")
         assert res["x2"].equals(exp)
         example_recipe_w_nan.add_step(StepImputeFill(sel=all_numeric_predictors(), value=0))
         res = example_recipe_w_nan.prep()
-        exp = pd.Series([0, 1, 1, 0, 0, 0, 0, 0, 0, 1], dtype="float64")
+        exp = pl.Series([0, 1, 1, 0, 0, 0, 0, 0, 0, 1], dtype="float64")
         assert res["x2"].equals(exp)
 
 
@@ -126,7 +126,7 @@ class TestScaleStep:
 class TestSklearnStep:
     @pytest.fixture()
     def example_recipe_w_categorical_label(self, example_df):
-        example_df["y"] = pd.Series(["a", "b", "c", "a", "c", "b", "c", "a", "b", "c"], dtype="category")
+        example_df["y"] = pl.Series(["a", "b", "c", "a", "c", "b", "c", "a", "b", "c"], dtype="category")
         return Recipe(example_df, ["y"], ["x1", "x2", "x3", "x4"], ["id"])  # FIXME: add squence when merged
 
     def test_simple_imputer(self, example_recipe_w_nan):
@@ -256,8 +256,8 @@ class TestSklearnStep:
         assert not df["FunctionTransformer_1"].empty
 
     def test_wrong_columnwise(self, example_df):
-        example_df["y"] = pd.Series(["a", "b", "c", "a", "c", "b", "c", "a", "b", "c"], dtype="category")
-        example_df["y1"] = pd.Series(["a", "b", "c", "a", "c", "b", "c", "a", "b", "c"], dtype="category")
+        example_df["y"] = pl.Series(["a", "b", "c", "a", "c", "b", "c", "a", "b", "c"], dtype="category")
+        example_df["y1"] = pl.Series(["a", "b", "c", "a", "c", "b", "c", "a", "b", "c"], dtype="category")
         rec = Recipe(example_df, ["y", "y1"], ["x1", "x2", "x3"], ["id"])  # FIXME: add squence when merged
         rec.add_step(StepSklearn(LabelEncoder(), sel=has_role(["outcome"]), columnwise=False))
         with pytest.raises(ValueError) as exc_info:

@@ -1,15 +1,15 @@
-import pandas as pd
+import polars as pl
 from recipys.recipe import Recipe
 
 
 def test_empty_prep_return_df(example_df):
     rec = Recipe(example_df)
-    assert type(rec.prep()) == pd.DataFrame
+    assert type(rec.prep()) == pl.DataFrame
 
 
 def test_empty_bake_return_df(example_df):
     rec = Recipe(example_df)
-    assert type(rec.bake()) == pd.DataFrame
+    assert type(rec.bake()) == pl.DataFrame
 
 
 def test_init_roles(example_df):
