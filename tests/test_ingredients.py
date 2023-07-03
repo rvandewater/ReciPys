@@ -3,26 +3,26 @@ import pytest
 from recipys.ingredients import Ingredients
 
 
-def test_init_role(example_df):
-    Ingredients(example_df, roles={"y": "outcome"})
+def test_init_role(example_pd_df):
+    Ingredients(example_pd_df, roles={"y": "outcome"})
     assert True
 
 
-def test_init_role_wrong_type(example_df):
+def test_init_role_wrong_type(example_pd_df):
     with pytest.raises(TypeError) as e_info:
-        Ingredients(example_df, roles=["outcome"])
+        Ingredients(example_pd_df, roles=["outcome"])
     assert e_info.match("expected dict object")
 
 
-def test_init_role_typo(example_df):
+def test_init_role_typo(example_pd_df):
     with pytest.raises(ValueError) as e_info:
-        Ingredients(example_df, roles={"z": "outcome"})
+        Ingredients(example_pd_df, roles={"z": "outcome"})
     assert e_info.match("variable name that is not in the data")
 
 
-def test_init_role_copy(example_df):
+def test_init_role_copy(example_pd_df):
     roles = {"y": ["outcome"]}
-    ing = Ingredients(example_df, roles=roles)
+    ing = Ingredients(example_pd_df, roles=roles)
     roles["x1"] = ["predictor"]
     assert ing.roles == {"y": ["outcome"]}
 

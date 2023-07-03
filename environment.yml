@@ -1,8 +1,9 @@
-name: recipys
+name: recipys_polars
 channels:
   - conda-forge
   - anaconda
 dependencies:
+  - python=3.10.6
   - black=23.3.0
   - coverage=7.2.3
   - flake8=5.0.4
@@ -11,5 +12,8 @@ dependencies:
   - pytest=7.3.1
   - tqdm=4.64.1
   - scikit-learn=1.2.2
-  - polars=0.18.4
+  - pip=23.1
+  - pyarrow=12.0.1
+  - pip:
+    - polars==0.18.4
 

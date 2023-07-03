@@ -30,10 +30,11 @@ class Ingredients(pl.DataFrame):
         roles: dict = None,
         check_roles: bool = True,
     ):
-        super().__init__(
-            data,
-            schema=None
-        )
+        if isinstance(data, pd.DataFrame):
+            super().__init__(data,schema=None)
+        elif(isinstance(data, pl.DataFrame)):
+            raise ValueError("not yet supported")
+
 
         if isinstance(data, Ingredients) and roles is None:
             if copy is None or copy is True:
