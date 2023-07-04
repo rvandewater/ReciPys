@@ -105,7 +105,8 @@ class Recipe:
             # this is only executed when prep or bake recieve a DF that is different to the original data
             # don't check the roles here, because self.data can have more roles than data (post feature generation)
             data = Ingredients(data, roles=self.data.roles, check_roles=False)
-        if not data.columns.equals(self.data.columns):
+        #if not data.columns.equals(self.data.columns):
+        if not data.columns == self.data.columns:
             raise ValueError("Columns of data argument differs from recipe data.")
         return data
 
@@ -129,7 +130,8 @@ class Recipe:
         data = self._check_data(data)
         data = copy(data)
         data = self._apply_fit_transform(data, refit)
-        return pl.DataFrame(data)
+        #return pl.DataFrame(data)
+        return data.get_df()
 
     def bake(self, data: Union[pl.DataFrame, Ingredients] = None) -> pl.DataFrame:
         """Transforms, or bakes, the data if it has been prepped.
@@ -143,7 +145,8 @@ class Recipe:
         data = self._check_data(data)
         data = copy(data)
         data = self._apply_fit_transform(data)
-        return pl.DataFrame(data)
+        # return pl.DataFrame(data)
+        return data.get_df()
 
     def _apply_fit_transform(self, data=None, refit=False):
         # applies transform or fit and transform (when refit or not trained yet)

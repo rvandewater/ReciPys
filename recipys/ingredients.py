@@ -133,12 +133,18 @@ class Ingredients(pl.DataFrame):
     def select_dtypes(self,include=None):
         # if(isinstance(include,[str])):
         dtypes = self.get_str_dtypes()
-        selected = [key for key,value in dtypes.items() if value in include]
+        selected = [key for key, value in dtypes.items() if value in include]
         return selected
     def get_dtypes(self):
         dtypes = list(self.schema.values())
         return dtypes
     def get_str_dtypes(self):
+        """"
+            Helper function for polar dataframes to return schema with dtypes as strings
+        """
         dtypes = self.schema
         return {key:str(value) for key,value in dtypes.items()}
         # return list(map(dtypes, cast()))
+    def get_df(self):
+        # TODO: Check if preferred way to get df
+        return pl.DataFrame._from_pydf(self._df)

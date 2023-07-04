@@ -26,9 +26,9 @@ def test_no_description():
     assert e_info.match("missing 1 required positional argument")
 
 
-def test_not_ingredients(example_df):
+def test_not_ingredients(example_pl_df):
     with pytest.raises(TypeError) as e_info:
-        Selector("test step")(example_df)
+        Selector("test step")(example_pl_df)
     assert e_info.match("Expected Ingredients")
 
 
