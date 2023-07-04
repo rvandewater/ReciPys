@@ -11,7 +11,7 @@ class PolarsPd:
     def __init__(self, df: pl.DataFrame):
         self.df = df.to_pandas()
 
-@pytest.fixture()
+@pytest.fixture
 def example_pl_df():
     rand_state = np.random.RandomState(42)
     interval = pl.duration(hours=1)
@@ -33,8 +33,7 @@ def example_pl_df():
     print(df)
     return df
 
-@pytest.fixture()
-
+@pytest.fixture
 def example_pd_df():
     rand_state = np.random.RandomState(42)
     df = pd.DataFrame(
@@ -50,8 +49,8 @@ def example_pd_df():
     )
     return df
 @pytest.fixture
-def example_ingredients(example_df):
-    return Ingredients(example_df)
+def example_ingredients(example_pl_df):
+    return Ingredients(example_pl_df)
 
 
 @pytest.fixture()

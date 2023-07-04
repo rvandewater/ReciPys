@@ -1,4 +1,5 @@
 import pytest
+import polars as pl
 
 from recipys.selector import (
     Selector,
@@ -92,7 +93,9 @@ def test_has_role(example_ingredients):
 
 
 def test_has_type(example_ingredients):
-    sel = has_type("float64")
+    # sel = has_type("Float64")
+    # sel = has_type(pl.Float64)
+    sel = has_type("Float64")
     assert sel(example_ingredients) == ["y", "x1"]
 
 

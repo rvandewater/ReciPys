@@ -30,11 +30,14 @@ class Ingredients(pl.DataFrame):
         roles: dict = None,
         check_roles: bool = True,
     ):
+
         if isinstance(data, pd.DataFrame):
             super().__init__(data,schema=None)
-        elif(isinstance(data, pl.DataFrame)):
-            raise ValueError("not yet supported")
-
+        elif isinstance(data, pl.DataFrame):
+            super().__init__()
+            self._df = data._df
+        elif not isinstance(data, Ingredients):
+            raise TypeError(f"expected DataFrame, got {data.__class__}")
 
         if isinstance(data, Ingredients) and roles is None:
             if copy is None or copy is True:
@@ -44,9 +47,9 @@ class Ingredients(pl.DataFrame):
         elif roles is None:
             self.roles = {}
         elif not isinstance(roles, dict):
-            raise TypeError(f"expected dict object for roles, got {roles.__class__}")
+            raise TypeError(f"Expected dict object for roles, got {roles.__class__}")
         elif check_roles and not np.all([k in self.columns for k in roles]):
-            raise ValueError("roles contains variable name that is not in the data.")
+            raise ValueError("Roles contains variable names that are not in the data.")
         else:
             if copy is None or copy is True:
                 self.roles = deepcopy(roles)
@@ -127,3 +130,15 @@ class Ingredients(pl.DataFrame):
                     f"Attempted to update role of {column} to {new_role} but "
                     f"{column} has more than one current roles: {self.roles[column]}"
                 )
+    def select_dtypes(self,include=None):
+        # if(isinstance(include,[str])):
+        dtypes = self.get_str_dtypes()
+        selected = [key for key,value in dtypes.items() if value in include]
+        return selected
+    def get_dtypes(self):
+        dtypes = list(self.schema.values())
+        return dtypes
+    def get_str_dtypes(self):
+        dtypes = self.schema
+        return {key:str(value) for key,value in dtypes.items()}
+        # return list(map(dtypes, cast()))

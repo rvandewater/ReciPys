@@ -3,46 +3,40 @@ import pytest
 from recipys.ingredients import Ingredients
 
 
-def test_init_role(example_pd_df):
-    Ingredients(example_pd_df, roles={"y": "outcome"})
+def test_init_role(example_pl_df):
+    Ingredients(example_pl_df, roles={"y": "outcome"})
     assert True
 
-
-def test_init_role_wrong_type(example_pd_df):
+def test_init_role_wrong_type(example_pl_df):
     with pytest.raises(TypeError) as e_info:
-        Ingredients(example_pd_df, roles=["outcome"])
-    assert e_info.match("expected dict object")
+        Ingredients(example_pl_df, roles=["outcome"])
+    assert e_info.match(f"Expected dict object for roles, got {[].__class__}")
 
-
-def test_init_role_typo(example_pd_df):
+def test_init_role_typo(example_pl_df):
     with pytest.raises(ValueError) as e_info:
-        Ingredients(example_pd_df, roles={"z": "outcome"})
-    assert e_info.match("variable name that is not in the data")
-
-
-def test_init_role_copy(example_pd_df):
+        Ingredients(example_pl_df, roles={"z": "outcome"})
+    assert e_info.match("Roles contains variable names that are not in the data.")
+def test_init_role_copy(example_pl_df):
     roles = {"y": ["outcome"]}
-    ing = Ingredients(example_pd_df, roles=roles)
+    ing = Ingredients(example_pl_df, roles=roles)
     roles["x1"] = ["predictor"]
     assert ing.roles == {"y": ["outcome"]}
 
-
-def test_init_role_noncopy(example_df):
+def test_init_role_noncopy(example_pl_df):
     roles = {"y": ["outcome"]}
-    ing = Ingredients(example_df, copy=False, roles=roles)
+    ing = Ingredients(example_pl_df, copy=False, roles=roles)
     roles["x1"] = ["predictor"]
     assert ing.roles == {"x1": ["predictor"], "y": ["outcome"]}
 
-
-def test_reinit_copy(example_df):
-    ing = Ingredients(example_df, roles={"y": ["outcome"]})
+def test_reinit_copy(example_pl_df):
+    ing = Ingredients(example_pl_df, roles={"y": ["outcome"]})
     reing = Ingredients(ing)
     reing.add_role("y", "predictor")
     assert ing.roles != reing.roles
 
 
-def test_reinit_noncopy(example_df):
-    ing = Ingredients(example_df, roles={"y": ["outcome"]})
+def test_reinit_noncopy(example_pl_df):
+    ing = Ingredients(example_pl_df, roles={"y": ["outcome"]})
     reing = Ingredients(ing, copy=False)
     reing.add_role("y", "predictor")
     assert ing.roles == reing.roles

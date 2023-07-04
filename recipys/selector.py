@@ -2,6 +2,7 @@ import re
 
 from recipys.ingredients import Ingredients
 from typing import Union
+from polars import DataType
 
 
 class Selector:
@@ -16,12 +17,12 @@ class Selector:
     """
 
     def __init__(
-        self,
-        description: str,
-        names: Union[str, list[str]] = None,
-        roles: Union[str, list[str]] = None,
-        types: Union[str, list[str]] = None,
-        pattern: re.Pattern = None,
+            self,
+            description: str,
+            names: Union[str, list[str]] = None,
+            roles: Union[str, list[str]] = None,
+            types: Union[str, list[str]] = None,
+            pattern: re.Pattern = None,
     ):
         self.description = description
         self.set_names(names)
@@ -52,6 +53,8 @@ class Selector:
             roles: column data types to select
         """
         self.types = enlist_str(roles)
+        # self.types = enlist_dt(roles)
+
 
     def set_pattern(self, pattern: re.Pattern):
         """Set the pattern to search with this Selector
@@ -77,14 +80,16 @@ class Selector:
         if not isinstance(ingr, Ingredients):
             raise TypeError(f"Expected Ingredients, got {ingr.__class__}")
 
-        vars = ingr.columns.tolist()
+        vars = ingr.columns
+        # Pandas
+        # vars = ingr.columns.tolist()
 
         if self.roles is not None:
             sel_roles = [v for v, r in ingr.roles.items() if intersection(r, self.roles)]
             vars = intersection(vars, sel_roles)
 
         if self.types is not None:
-            sel_types = ingr.select_dtypes(include=self.types).columns.tolist()
+            sel_types = ingr.select_dtypes(include=self.types) #.columns.tolist()
             vars = intersection(vars, sel_types)
 
         if self.names is not None:
@@ -97,6 +102,30 @@ class Selector:
 
     def __repr__(self):
         return self.description
+
+
+def enlist_dt(x: Union[DataType, list[DataType], None]) -> Union[list[DataType], None]:
+    """Wrap a pl datatype in a list if it isn't a list yet
+
+    Args:
+        x: object to wrap.
+
+    Raises:
+        TypeError: If neither a datatype nor a list of datatypes is passed
+
+    Returns:
+        _description_
+    """
+    if isinstance(x, DataType):
+        return [x]
+    elif isinstance(x, list):
+        if not all(isinstance(i, DataType) for i in x):
+            raise TypeError("Only lists of datatypes are allowed.")
+        return x
+    elif x is None:
+        return x
+    else:
+        raise TypeError(f"Expected a pl datatype, got {x.__class__}")
 
 
 def enlist_str(x: Union[str, list[str], None]) -> Union[list[str], None]:
@@ -250,7 +279,8 @@ def all_numeric_predictors() -> Selector:
         Object representing the selection rule.
     """
     sel = all_predictors()
-    sel.set_types(["int16", "int32", "int64", "float16", "float32", "float64"])
+    # sel.set_types(["int16", "int32", "int64", "float16", "float32", "float64"])
+    sel.set_types(["Int16", "Int32", "Int64", "Float32", "Float64"])
     sel.description = "all numeric predictors"
     return sel
 
