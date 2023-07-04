@@ -4,7 +4,7 @@ from typing import Union, Dict
 from datetime import timedelta
 from scipy.sparse import isspmatrix
 import polars as pl
-import polars.dataframe.groupby as GroupBy
+from polars.dataframe.groupby import GroupBy
 from sklearn.preprocessing import StandardScaler
 from recipys.ingredients import Ingredients
 from enum import Enum
@@ -76,7 +76,7 @@ class Step:
         if isinstance(data, GroupBy):
             if not self._group:
                 raise ValueError("Step does not accept grouped data.")
-            data = data.obj
+            data = data.apply(lambda df: df)
         if not isinstance(data, Ingredients):
             raise ValueError(f"Expected Ingredients object, got {data.__class__}")
         return data
@@ -186,6 +186,7 @@ class StepHistorical(Step):
         Raises:
             TypeError: If the function is not of type Accumulator
         """
+
         new_data = self._check_ingredients(data)
 
         new_columns = [c + "_" + self.suffix for c in self.columns]
@@ -193,7 +194,10 @@ class StepHistorical(Step):
         if self.fun is Accumulator.MAX:
             res = data[self.columns].cummax(skipna=True)
         elif self.fun is Accumulator.MIN:
-            res = data[self.columns].cummin(skipna=True)
+            # res = data[self.columns].cummin(skipna=True)
+            # res = data.select(pl.col[self.columns].cummin(skipna=True).alias(new_columns))
+            res = new_data.select([pl.col(self.columns).cummin()])
+
         elif self.fun is Accumulator.MEAN:
             # Reset index, as we get back a multi-index, and we want a simple rolling index
             res = data[self.columns].expanding().mean().reset_index(drop=True)

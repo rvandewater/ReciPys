@@ -1,6 +1,6 @@
 from __future__ import annotations
 from collections import Counter
-from copy import copy
+from copy import copy, deepcopy
 from itertools import chain
 from typing import Union
 
@@ -128,6 +128,7 @@ class Recipe:
             Transformed data.
         """
         data = self._check_data(data)
+        # Todo: check why the roles dissapear after copying
         data = copy(data)
         data = self._apply_fit_transform(data, refit)
         #return pl.DataFrame(data)
@@ -143,7 +144,7 @@ class Recipe:
             Transformed data.
         """
         data = self._check_data(data)
-        data = copy(data)
+        original_data = deepcopy(data)
         data = self._apply_fit_transform(data)
         # return pl.DataFrame(data)
         return data.get_df()
