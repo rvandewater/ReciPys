@@ -28,44 +28,44 @@ from recipys.step import StepSklearn, StepHistorical, Accumulator, StepImputeFil
 
 
 @pytest.fixture()
-def example_recipe(example_df):
-    return Recipe(example_df, ["y"], ["x1", "x2", "x3", "x4"], ["id"])  # FIXME: add squence when merged
+def example_recipe(example_pl_df):
+    return Recipe(example_pl_df, ["y"], ["x1", "x2", "x3", "x4"], ["id"])  # FIXME: add squence when merged
 
 
 @pytest.fixture()
-def example_recipe_w_nan(example_df):
-    example_df.loc[[2, 4, 6], "x2"] = np.nan
-    return Recipe(example_df, ["y"], ["x1", "x2", "x3", "x4"], ["id"])  # FIXME: add squence when merged
+def example_recipe_w_nan(example_pl_df):
+    example_pl_df.loc[[2, 4, 6], "x2"] = np.nan
+    return Recipe(example_pl_df, ["y"], ["x1", "x2", "x3", "x4"], ["id"])  # FIXME: add squence when merged
 
 
-def test_no_group_for_group_step(example_df):
-    rec = Recipe(example_df, ["y"], ["x1", "x2"])
+def test_no_group_for_group_step(example_pl_df):
+    rec = Recipe(example_pl_df, ["y"], ["x1", "x2"])
     rec.add_step(StepImputeFill(value=0))
     rec.prep()
 
 
 class TestStepResampling:
-    def test_step_grouped(self, example_df):
+    def test_step_grouped(self, example_pl_df):
         # Using group role
-        pre_sampling_len = example_df.shape[0]
-        rec = Recipe(example_df, ["y"], ["x1", "x2"], ["id"], ["time"])
+        pre_sampling_len = example_pl_df.shape[0]
+        rec = Recipe(example_pl_df, ["y"], ["x1", "x2"], ["id"], ["time"])
         resampling_dict = {all_numeric_predictors(): Accumulator.MEAN}
         rec.add_step(StepResampling("2h", accumulator_dict=resampling_dict))
         df = rec.bake()
         assert df.shape[0] == pre_sampling_len / 2
 
-    def test_step_wo_selectors(self, example_df):
+    def test_step_wo_selectors(self, example_pl_df):
         # Using group role and without supplying any selectors
-        pre_sampling_len = example_df.shape[0]
-        rec = Recipe(example_df, ["y"], ["x1", "x2"], ["id"], ["time"])
+        pre_sampling_len = example_pl_df.shape[0]
+        rec = Recipe(example_pl_df, ["y"], ["x1", "x2"], ["id"], ["time"])
         rec.add_step(StepResampling("2h"))
         df = rec.bake()
         assert df.shape[0] == pre_sampling_len / 2
 
-    def test_step_ungrouped(self, example_df):
+    def test_step_ungrouped(self, example_pl_df):
         # Without using group role
-        pre_sampling_len = pl.Series(example_df.time).drop_duplicates(inplace=False, keep="first").size
-        rec = Recipe(example_df, ["y"], ["x1", "x2"])
+        pre_sampling_len = pl.Series(example_pl_df.time).drop_duplicates(inplace=False, keep="first").size
+        rec = Recipe(example_pl_df, ["y"], ["x1", "x2"])
         rec.update_roles("time", "sequence")
         resampling_dict = {all_numeric_predictors(): Accumulator.MEAN}
         rec.add_step(StepResampling("2h", accumulator_dict=resampling_dict))
@@ -74,8 +74,8 @@ class TestStepResampling:
 
 
 class TestStepHistorical:
-    def test_step(self, example_df):
-        rec = Recipe(example_df, ["y"], ["x1", "x2"], ["id"])
+    def test_step(self, example_pl_df):
+        rec = Recipe(example_pl_df, ["y"], ["x1", "x2"], ["id"])
         rec.add_step(StepHistorical(sel=all_of(["x1", "x2"]), fun=Accumulator.MIN, suffix="min"))
         rec.add_step(StepHistorical(sel=all_of(["x1", "x2"]), fun=Accumulator.MAX, suffix="max"))
         rec.add_step(StepHistorical(sel=all_of(["x1", "x2"]), fun=Accumulator.MEAN, suffix="mean"))
@@ -125,9 +125,9 @@ class TestScaleStep:
 
 class TestSklearnStep:
     @pytest.fixture()
-    def example_recipe_w_categorical_label(self, example_df):
-        example_df["y"] = pl.Series(["a", "b", "c", "a", "c", "b", "c", "a", "b", "c"], dtype="category")
-        return Recipe(example_df, ["y"], ["x1", "x2", "x3", "x4"], ["id"])  # FIXME: add squence when merged
+    def example_recipe_w_categorical_label(self, example_pl_df):
+        example_pl_df["y"] = pl.Series(["a", "b", "c", "a", "c", "b", "c", "a", "b", "c"], dtype="category")
+        return Recipe(example_pl_df, ["y"], ["x1", "x2", "x3", "x4"], ["id"])  # FIXME: add squence when merged
 
     def test_simple_imputer(self, example_recipe_w_nan):
         example_recipe_w_nan.add_step(StepSklearn(SimpleImputer(strategy="constant", fill_value=0)))
@@ -255,10 +255,10 @@ class TestSklearnStep:
         # FIXME assert correct number of new columns
         assert not df["FunctionTransformer_1"].empty
 
-    def test_wrong_columnwise(self, example_df):
-        example_df["y"] = pl.Series(["a", "b", "c", "a", "c", "b", "c", "a", "b", "c"], dtype="category")
-        example_df["y1"] = pl.Series(["a", "b", "c", "a", "c", "b", "c", "a", "b", "c"], dtype="category")
-        rec = Recipe(example_df, ["y", "y1"], ["x1", "x2", "x3"], ["id"])  # FIXME: add squence when merged
+    def test_wrong_columnwise(self, example_pl_df):
+        example_pl_df["y"] = pl.Series(["a", "b", "c", "a", "c", "b", "c", "a", "b", "c"], dtype="category")
+        example_pl_df["y1"] = pl.Series(["a", "b", "c", "a", "c", "b", "c", "a", "b", "c"], dtype="category")
+        rec = Recipe(example_pl_df, ["y", "y1"], ["x1", "x2", "x3"], ["id"])  # FIXME: add squence when merged
         rec.add_step(StepSklearn(LabelEncoder(), sel=has_role(["outcome"]), columnwise=False))
         with pytest.raises(ValueError) as exc_info:
             rec.prep()
