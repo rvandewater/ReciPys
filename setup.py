@@ -3,7 +3,7 @@
 
 """The setup script."""
 from pathlib import Path
-from setuptools import setup, find_packages
+from setuptools import setup
 
 root_path = Path(__file__).resolve().parent
 
