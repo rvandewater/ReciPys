@@ -196,7 +196,9 @@ class StepHistorical(Step):
         elif self.fun is Accumulator.MIN:
             # res = data[self.columns].cummin(skipna=True)
             # res = data.select(pl.col[self.columns].cummin(skipna=True).alias(new_columns))
-            res = new_data.select([pl.col(self.columns).cummin()])
+            res = new_data.select([pl.col(select_groups(new_data)),pl.col(self.columns).cummin()])
+            # res = data.apply(lambda x -> [pl.col(self.columns).cummin()])
+            res = new_data.select(pl.col[self.columns])
 
         elif self.fun is Accumulator.MEAN:
             # Reset index, as we get back a multi-index, and we want a simple rolling index
@@ -209,8 +211,8 @@ class StepHistorical(Step):
             res = data[self.columns].expanding().var().reset_index(drop=True)
         else:
             raise TypeError(f"Expected Accumulator enum for function, got {self.fun.__class__}")
-        new_data[new_columns] = res
-
+        # new_data[new_columns] = res
+        new_data = new_data.join(res, how="left", suffix=self.suffix, on=self.columns)
         # Update roles for the newly generated columns
         for nc in new_columns:
             new_data.update_role(nc, self.role)
