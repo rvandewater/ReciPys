@@ -111,9 +111,9 @@ class Step:
 
 class StepImputeFill(Step):
     """Uses pandas' internal `nafill` function to replace missing values.
-    
     See `pandas.DataFrame.nafill` for a description of the arguments.
     """
+
     def __init__(self, sel=all_predictors(), value=None, method=None, limit=None):
         super().__init__(sel)
         self.desc = f"Impute with {method if method else value}"
@@ -130,9 +130,10 @@ class StepImputeFill(Step):
 class StepImputeFastZeroFill(Step):
     """Quick variant of pandas' internal `nafill(value=0)` for grouped dataframes.
     """
+
     def __init__(self, sel=all_predictors()):
         super().__init__(sel)
-        self.desc = f"Impute quickly with 0"
+        self.desc = "Impute quickly with 0"
 
     def transform(self, data):
         new_data = self._check_ingredients(data)
@@ -148,9 +149,10 @@ class StepImputeFastForwardFill(Step):
 
     Note: this variant does not allow for setting a limit.
     """
+
     def __init__(self, sel=all_predictors()):
         super().__init__(sel)
-        self.desc = f"Impute with fast ffill"
+        self.desc = "Impute with fast ffill"
 
     def transform(self, data):
         new_data = self._check_ingredients(data)
@@ -164,7 +166,7 @@ class StepImputeFastForwardFill(Step):
         
         new_data[self.columns] = new_data[self.columns].ffill()
         for col in self.columns:
-            new_data.loc[nofill[col].to_numpy()==0, col] = np.nan
+            new_data.loc[nofill[col].to_numpy() == 0, col] = np.nan
 
         return new_data
 
@@ -210,11 +212,11 @@ class StepHistorical(Step):
     """
 
     def __init__(
-        self,
-        sel: Selector = all_numeric_predictors(),
-        fun: Accumulator = Accumulator.MAX,
-        suffix: str = None,
-        role: str = "predictor",
+            self,
+            sel: Selector = all_numeric_predictors(),
+            fun: Accumulator = Accumulator.MAX,
+            suffix: str = None,
+            role: str = "predictor",
     ):
         super().__init__(sel)
 
@@ -273,12 +275,12 @@ class StepSklearn(Step):
     """
 
     def __init__(
-        self,
-        sklearn_transformer: object,
-        sel: Selector = all_predictors(),
-        columnwise: bool = False,
-        in_place: bool = True,
-        role: str = "predictor",
+            self,
+            sklearn_transformer: object,
+            sel: Selector = all_predictors(),
+            columnwise: bool = False,
+            in_place: bool = True,
+            role: str = "predictor",
     ):
         super().__init__(sel)
         self.desc = f"Use sklearn transformer {sklearn_transformer.__class__.__name__}"
@@ -361,10 +363,10 @@ class StepSklearn(Step):
 
 class StepResampling(Step):
     def __init__(
-        self,
-        new_resolution: str = "1h",
-        accumulator_dict: Dict[Selector, Accumulator] = {all_predictors(): Accumulator.LAST},
-        default_accumulator: Accumulator = Accumulator.LAST,
+            self,
+            new_resolution: str = "1h",
+            accumulator_dict: Dict[Selector, Accumulator] = {all_predictors(): Accumulator.LAST},
+            default_accumulator: Accumulator = Accumulator.LAST,
     ):
         """This class represents a step in a recipe.
 
@@ -439,11 +441,11 @@ class StepScale:
     """
 
     def __new__(
-        cls,
-        sel: Selector = all_numeric_predictors(),
-        with_mean: bool = True,
-        with_std: bool = True,
-        in_place: bool = True,
-        role: str = "predictor",
+            cls,
+            sel: Selector = all_numeric_predictors(),
+            with_mean: bool = True,
+            with_std: bool = True,
+            in_place: bool = True,
+            role: str = "predictor",
     ):
         return StepSklearn(StandardScaler(with_mean=with_mean, with_std=with_std), sel=sel, in_place=in_place, role=role)
