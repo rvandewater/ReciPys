@@ -24,7 +24,8 @@ class Recipe:
         groups: names of columns in data that should be assigned the 'group' role
         sequence: names of columns in data that should be assigned the 'sequence' role
     """
-
+    columns = None
+    roles = None
     def __init__(
         self,
         data: Union[pd.DataFrame, Ingredients],
@@ -35,7 +36,8 @@ class Recipe:
     ):
         self.data = Ingredients(data)
         self.steps = []
-
+        self.roles = self.data.roles
+        self.columns = self.data.columns
         if outcomes:
             self.update_roles(outcomes, "outcome")
         if predictors:
@@ -103,8 +105,8 @@ class Recipe:
         elif type(data) == pd.DataFrame:
             # this is only executed when prep or bake recieve a DF that is different to the original data
             # don't check the roles here, because self.data can have more roles than data (post feature generation)
-            data = Ingredients(data, roles=self.data.roles, check_roles=False)
-        if not data.columns.equals(self.data.columns):
+            data = Ingredients(data, roles=self.roles, check_roles=False)
+        if not data.columns.equals(self.columns):
             raise ValueError("Columns of data argument differs from recipe data.")
         return data
 
