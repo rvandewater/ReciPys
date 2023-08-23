@@ -158,7 +158,10 @@ class StepImputeFastForwardFill(Step):
         # Use cumsum (which is optimised for grouped frames) to figure out which
         # values should be left at NaN, then ffill on the ungrouped dataframe.
         # Adopted from: https://stackoverflow.com/questions/36871783/fillna-forward-fill-on-a-large-dataframe-efficiently-with-groupby
-        nofill = pd.notnull(new_data).groupby(data.keys).cumsum()
+        nofill = new_data.copy()
+        nofill[self.columns] = pd.notnull(nofill[self.columns])
+        nofill = nofill.groupby(data.keys).cumsum()
+        
         new_data[self.columns] = new_data[self.columns].ffill()
         for col in self.columns:
             new_data.loc[nofill[col].to_numpy()==0, col] = np.nan
