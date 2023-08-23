@@ -168,3 +168,24 @@ class Recipe:
             repr += str(step) + "\n"
 
         return repr
+    def fit(self, data: Union[pd.DataFrame, Ingredients] = None, refit=False) -> Recipe:
+        """Fits the recipe to the data.
+
+        Args:
+            data: Data to fit. Defaults to None.
+
+        Returns:
+            self
+        """
+        data = self._check_data(data)
+        data = copy(data)
+        for step in self.steps:
+            data = self._apply_group(data, step)
+            if refit or not step.trained:
+                data = step.fit(data)
+        return self
+    def cache(self):
+        """Prepares the recipe for caching"""
+        if(self.data):
+            del self.data
+        return self
