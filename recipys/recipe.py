@@ -186,6 +186,6 @@ class Recipe:
         return self
     def cache(self):
         """Prepares the recipe for caching"""
-        if(self.data):
+        if self.data is not None:
             del self.data
         return self
