@@ -128,8 +128,7 @@ class StepImputeFill(Step):
 
 
 class StepImputeFastZeroFill(Step):
-    """Quick variant of pandas' internal `nafill(value=0)` for grouped dataframes.
-    """
+    """Quick variant of pandas' internal `nafill(value=0)` for grouped dataframes."""
 
     def __init__(self, sel=all_predictors()):
         super().__init__(sel)
@@ -158,12 +157,12 @@ class StepImputeFastForwardFill(Step):
         new_data = self._check_ingredients(data)
 
         # Use cumsum (which is optimised for grouped frames) to figure out which
-        # values should be left at NaN, then ffill on the ungrouped dataframe.
-        # Adopted from: https://stackoverflow.com/questions/36871783/fillna-forward-fill-on-a-large-dataframe-efficiently-with-groupby
+        # values should be left at NaN, then ffill on the ungrouped dataframe. Adopted from:
+        # https://stackoverflow.com/questions/36871783/fillna-forward-fill-on-a-large-dataframe-efficiently-with-groupby
         nofill = new_data.copy()
         nofill[self.columns] = pd.notnull(nofill[self.columns])
         nofill = nofill.groupby(data.keys).cumsum()
-        
+
         new_data[self.columns] = new_data[self.columns].ffill()
         for col in self.columns:
             new_data.loc[nofill[col].to_numpy() == 0, col] = np.nan
@@ -212,11 +211,11 @@ class StepHistorical(Step):
     """
 
     def __init__(
-            self,
-            sel: Selector = all_numeric_predictors(),
-            fun: Accumulator = Accumulator.MAX,
-            suffix: str = None,
-            role: str = "predictor",
+        self,
+        sel: Selector = all_numeric_predictors(),
+        fun: Accumulator = Accumulator.MAX,
+        suffix: str = None,
+        role: str = "predictor",
     ):
         super().__init__(sel)
 
@@ -275,12 +274,12 @@ class StepSklearn(Step):
     """
 
     def __init__(
-            self,
-            sklearn_transformer: object,
-            sel: Selector = all_predictors(),
-            columnwise: bool = False,
-            in_place: bool = True,
-            role: str = "predictor",
+        self,
+        sklearn_transformer: object,
+        sel: Selector = all_predictors(),
+        columnwise: bool = False,
+        in_place: bool = True,
+        role: str = "predictor",
     ):
         super().__init__(sel)
         self.desc = f"Use sklearn transformer {sklearn_transformer.__class__.__name__}"
@@ -363,10 +362,10 @@ class StepSklearn(Step):
 
 class StepResampling(Step):
     def __init__(
-            self,
-            new_resolution: str = "1h",
-            accumulator_dict: Dict[Selector, Accumulator] = {all_predictors(): Accumulator.LAST},
-            default_accumulator: Accumulator = Accumulator.LAST,
+        self,
+        new_resolution: str = "1h",
+        accumulator_dict: Dict[Selector, Accumulator] = {all_predictors(): Accumulator.LAST},
+        default_accumulator: Accumulator = Accumulator.LAST,
     ):
         """This class represents a step in a recipe.
 
@@ -403,7 +402,7 @@ class StepResampling(Step):
         # Dictionary with the format column: str , accumulator:str is created
         col_acc_map = {}
         # Go through supplied Selector, Accumulator pairs
-        for (selector, accumulator) in self.acc_dict.items():
+        for selector, accumulator in self.acc_dict.items():
             selected_columns = selector(new_data)
             # Add variables associated with selector with supplied accumulator
             col_acc_map.update({col: accumulator.value for col in selected_columns})
@@ -441,11 +440,11 @@ class StepScale:
     """
 
     def __new__(
-            cls,
-            sel: Selector = all_numeric_predictors(),
-            with_mean: bool = True,
-            with_std: bool = True,
-            in_place: bool = True,
-            role: str = "predictor",
+        cls,
+        sel: Selector = all_numeric_predictors(),
+        with_mean: bool = True,
+        with_std: bool = True,
+        in_place: bool = True,
+        role: str = "predictor",
     ):
         return StepSklearn(StandardScaler(with_mean=with_mean, with_std=with_std), sel=sel, in_place=in_place, role=role)
