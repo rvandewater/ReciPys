@@ -24,8 +24,10 @@ class Recipe:
         groups: names of columns in data that should be assigned the 'group' role
         sequence: names of columns in data that should be assigned the 'sequence' role
     """
+
     columns = None
     roles = None
+
     def __init__(
         self,
         data: Union[pd.DataFrame, Ingredients],
