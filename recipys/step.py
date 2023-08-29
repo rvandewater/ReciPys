@@ -429,7 +429,7 @@ class StepResampling(Step):
         return new_data
 
 
-class StepScale(Step):
+class StepScale:
     """Provides a wrapper for a scaling with StepSklearn.
 
     Args:
@@ -457,7 +457,6 @@ class StepFunction(Step):
         super().__init__(sel=sel)
         self.function = function
         self._trained = True
-
 
     def transform(self, data: Ingredients) -> Ingredients:
         new_data = self._check_ingredients(data)
