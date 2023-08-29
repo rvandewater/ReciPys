@@ -211,11 +211,11 @@ class StepHistorical(Step):
     """
 
     def __init__(
-        self,
-        sel: Selector = all_numeric_predictors(),
-        fun: Accumulator = Accumulator.MAX,
-        suffix: str = None,
-        role: str = "predictor",
+            self,
+            sel: Selector = all_numeric_predictors(),
+            fun: Accumulator = Accumulator.MAX,
+            suffix: str = None,
+            role: str = "predictor",
     ):
         super().__init__(sel)
 
@@ -274,12 +274,12 @@ class StepSklearn(Step):
     """
 
     def __init__(
-        self,
-        sklearn_transformer: object,
-        sel: Selector = all_predictors(),
-        columnwise: bool = False,
-        in_place: bool = True,
-        role: str = "predictor",
+            self,
+            sklearn_transformer: object,
+            sel: Selector = all_predictors(),
+            columnwise: bool = False,
+            in_place: bool = True,
+            role: str = "predictor",
     ):
         super().__init__(sel)
         self.desc = f"Use sklearn transformer {sklearn_transformer.__class__.__name__}"
@@ -362,10 +362,10 @@ class StepSklearn(Step):
 
 class StepResampling(Step):
     def __init__(
-        self,
-        new_resolution: str = "1h",
-        accumulator_dict: Dict[Selector, Accumulator] = {all_predictors(): Accumulator.LAST},
-        default_accumulator: Accumulator = Accumulator.LAST,
+            self,
+            new_resolution: str = "1h",
+            accumulator_dict: Dict[Selector, Accumulator] = {all_predictors(): Accumulator.LAST},
+            default_accumulator: Accumulator = Accumulator.LAST,
     ):
         """This class represents a step in a recipe.
 
@@ -429,7 +429,7 @@ class StepResampling(Step):
         return new_data
 
 
-class StepScale:
+class StepScale(Step):
     """Provides a wrapper for a scaling with StepSklearn.
 
     Args:
@@ -440,11 +440,26 @@ class StepScale:
     """
 
     def __new__(
-        cls,
-        sel: Selector = all_numeric_predictors(),
-        with_mean: bool = True,
-        with_std: bool = True,
-        in_place: bool = True,
-        role: str = "predictor",
+            cls,
+            sel: Selector = all_numeric_predictors(),
+            with_mean: bool = True,
+            with_std: bool = True,
+            in_place: bool = True,
+            role: str = "predictor",
     ):
         return StepSklearn(StandardScaler(with_mean=with_mean, with_std=with_std), sel=sel, in_place=in_place, role=role)
+
+
+class StepFunction(Step):
+
+    def __init__(self, sel: Selector, function):
+        super().__init__(sel=sel)
+        self.function = function
+
+    def do_fit(self, data: Ingredients):
+        self.function.fit(data)
+
+    def transform(self, data: Ingredients) -> Ingredients:
+        new_data = self._check_ingredients(data)
+        new_data = self.function(new_data)
+        return new_data
