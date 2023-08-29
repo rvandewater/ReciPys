@@ -451,13 +451,13 @@ class StepScale(Step):
 
 
 class StepFunction(Step):
+    """Provides a wrapper for a simple transformation function, without fitting."""
 
     def __init__(self, sel: Selector, function):
         super().__init__(sel=sel)
         self.function = function
+        self._trained = True
 
-    def do_fit(self, data: Ingredients):
-        self.function.fit(data)
 
     def transform(self, data: Ingredients) -> Ingredients:
         new_data = self._check_ingredients(data)
