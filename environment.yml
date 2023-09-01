@@ -3,13 +3,13 @@ channels:
   - conda-forge
   - anaconda
 dependencies:
-  - black=22.10.0
-  - coverage=6.5.0
+  - black=23.3.0
+  - coverage=7.2.3
   - flake8=5.0.4
-  - numpy=1.23.4
-  - pandas=1.5.1
-  - pytest=7.2.0
+  - numpy=1.24.3
+  - pandas=2.0.0
+  - pytest=7.3.1
   - tqdm=4.64.1
-  - scikit-learn=1.1.3
+  - scikit-learn=1.2.2
 
 

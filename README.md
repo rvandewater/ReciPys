@@ -1,19 +1,31 @@
-# ReciPys
+![logo](https://github.com/rvandewater/ReciPys/blob/development/docs/figures/recipys_logo.png?raw=true)
+# 🥧ReciPys🐍
 [![CI](https://github.com/rvandewater/recipys/actions/workflows/ci.yml/badge.svg)](https://github.com/rvandewater/recipys/actions/workflows/ci.yml)
+[![Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+![Platform](https://img.shields.io/badge/platform-linux--64%20|%20win--64%20|%20osx--64-lightgrey)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![PyPI version shields.io](https://img.shields.io/pypi/v/recipies.svg)](https://pypi.python.org/pypi/recipies/)
+[![arXiv](https://img.shields.io/badge/arXiv-2306.05109-b31b1b.svg)](http://arxiv.org/abs/2306.05109)
 
 The ReciPys package is a preprocessing framework operating on Pandas dataframes. 
 The operation of this package is inspired by the R-package [recipes](https://recipes.tidymodels.org/).
 This package allows the user to apply a number of extensible operations for imputation, feature generation/extraction, 
 scaling, and encoding. 
 It operates on modified Dataframe objects from the established data science package Pandas.
-## Installation
-
+## Installation 
+You can install ReciPys from pip using:
+```
+pip install recipies
+```
+> Note that the package is called `recipies` and not `recipys` on pip due to a name clash with an existing package.
+> 
+You can install ReciPys from source to ensure you have the latest version:
 ```
 conda env update -f environment.yml
 conda activate recipys
 pip install -e .
 ```
-> Note that the last command installs the package called `recipys`.
+> Note that the last command installs the package called `recipies`.
 
 ## Usage
 To define preprocessing operations, one has to supply _roles_ to the different columns of the Dataframe. 
@@ -24,6 +36,26 @@ Resampling the time resolution, A number of imputation methods, and a wrapper fo
 We believe to have covered any basic preprocessing needs for prepared datasets.
 Any missing step can be added by following the step interface.
 
+# 📄Paper
+
+If you use this code in your research, please cite the following publication:
+
+```
+@article{vandewaterYetAnotherICUBenchmark2023,
+	title = {Yet Another ICU Benchmark: A Flexible Multi-Center Framework for Clinical ML},
+	shorttitle = {Yet Another ICU Benchmark},
+	url = {http://arxiv.org/abs/2306.05109},
+	language = {en},
+	urldate = {2023-06-09},
+	publisher = {arXiv},
+	author = {van de Water, Robin and Schmidt, Hendrik and Elbers, Paul and Thoral, Patrick and Arnrich, Bert and Rockenschaub, Patrick},
+	month = jun,
+	year = {2023},
+	note = {arXiv:2306.05109 [cs]},
+	keywords = {Computer Science - Machine Learning},
+}
+```
+This paper can also be found on arxiv: https://arxiv.org/pdf/2306.05109.pdf
 
 
 
