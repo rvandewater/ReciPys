@@ -6,9 +6,9 @@ import polars as pl
 from pandas._typing import Axes, Dtype
 
 
-class Ingredients(pl.DataFrame):
+class Ingredients:
     """Wrapper around polars.DataFrames to store columns roles (e.g., predictor)
-
+        Due to the workings of polars, we do not subclass pl.dataframe anymore, but instead store the dataframe as an attribute.
     Args:
         roles: roles of DataFrame columns as (list of) strings.
             Defaults to None.
@@ -30,6 +30,7 @@ class Ingredients(pl.DataFrame):
         roles: dict = None,
         check_roles: bool = True,
     ):
+        self.data = data
 
         if isinstance(data, pd.DataFrame):
             super().__init__(data,schema=None)
@@ -48,8 +49,8 @@ class Ingredients(pl.DataFrame):
             self.roles = {}
         elif not isinstance(roles, dict):
             raise TypeError(f"Expected dict object for roles, got {roles.__class__}")
-        elif check_roles and not np.all([k in self.columns for k in roles]):
-            raise ValueError("Roles contains variable names that are not in the data.")
+        elif check_roles and not all(set(v).issubset(set(self.data.columns)) for k,v in roles.items()):
+            raise ValueError(f"Roles contains variable names that are not in the data {list(roles.values())} {self.data.columns}.")
         else:
             if copy is None or copy is True:
                 self.roles = deepcopy(roles)
@@ -59,6 +60,10 @@ class Ingredients(pl.DataFrame):
     @property
     def _constructor(self):
         return Ingredients
+
+    @property
+    def columns(self):
+        return self.data.columns
 
     def to_df(self) -> pl.DataFrame:
         """Return the underlying pandas.DataFrame.
@@ -142,9 +147,18 @@ class Ingredients(pl.DataFrame):
         """"
             Helper function for polar dataframes to return schema with dtypes as strings
         """
-        dtypes = self.schema
+        dtypes = self.data.schema
         return {key:str(value) for key,value in dtypes.items()}
         # return list(map(dtypes, cast()))
     def get_df(self):
         # TODO: Check if preferred way to get df
-        return pl.DataFrame._from_pydf(self._df)
+        return self.data
+
+    def groupby(self,by):
+        self.data.group_by(by)
+
+    def __getitem__(self, idx):
+        return self.data[idx]
+
+    def __setitem__(self, idx, val):
+        self.data[idx] = val

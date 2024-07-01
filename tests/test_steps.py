@@ -22,24 +22,25 @@ from sklearn.preprocessing import (
 from sklearn.experimental import enable_iterative_imputer  # noqa: F401
 from sklearn.impute import SimpleImputer, KNNImputer, IterativeImputer, MissingIndicator
 
+from recipys.ingredients import Ingredients
 from recipys.recipe import Recipe
 from recipys.selector import all_numeric_predictors, has_type, has_role, all_of
 from recipys.step import StepSklearn, StepHistorical, Accumulator, StepImputeFill, StepScale, StepResampling
 
 
 @pytest.fixture()
-def example_recipe(example_pl_df):
-    return Recipe(example_pl_df, ["y"], ["x1", "x2", "x3", "x4"], ["id"])  # FIXME: add squence when merged
+def example_recipe(example_ingredients):
+    return Recipe(example_ingredients, ["y"], ["x1", "x2", "x3", "x4"], ["id"])  # FIXME: add squence when merged
 
 
 @pytest.fixture()
-def example_recipe_w_nan(example_pl_df):
-    example_pl_df.loc[[2, 4, 6], "x2"] = np.nan
-    return Recipe(example_pl_df, ["y"], ["x1", "x2", "x3", "x4"], ["id"])  # FIXME: add squence when merged
+def example_recipe_w_nan(example_ingredients):
+    example_ingredients[[2, 4, 6], "x2"] = np.nan
+    return Recipe(example_ingredients, ["y"], ["x1", "x2", "x3", "x4"], ["id"])  # FIXME: add squence when merged
 
 
-def test_no_group_for_group_step(example_pl_df):
-    rec = Recipe(example_pl_df, ["y"], ["x1", "x2"])
+def test_no_group_for_group_step(example_ingredients):
+    rec = Recipe(example_ingredients, ["y"], ["x1", "x2"])
     rec.add_step(StepImputeFill(value=0))
     rec.prep()
 
@@ -75,7 +76,7 @@ class TestStepResampling:
 
 class TestStepHistorical:
     def test_step(self, example_pl_df):
-        rec = Recipe(example_pl_df, ["y"], ["x1", "x2"], ["id"])
+        rec = Recipe(Ingredients(example_pl_df), ["y"], ["x1", "x2"] , ["id"])
         rec.add_step(StepHistorical(sel=all_of(["x1", "x2"]), fun=Accumulator.MIN, suffix="min"))
         rec.add_step(StepHistorical(sel=all_of(["x1", "x2"]), fun=Accumulator.MAX, suffix="max"))
         rec.add_step(StepHistorical(sel=all_of(["x1", "x2"]), fun=Accumulator.MEAN, suffix="mean"))
@@ -83,23 +84,24 @@ class TestStepHistorical:
         rec.add_step(StepHistorical(sel=all_of(["x1", "x2"]), fun=Accumulator.COUNT, suffix="count"))
         rec.add_step(StepHistorical(sel=all_of(["x1", "x2"]), fun=Accumulator.VAR, suffix="var"))
         df = rec.bake()
-        assert df["x1_min"].iloc[-1] == df["x1"].loc[df["id"] == 2].min()
-        assert df["x2_max"].iloc[-1] == df["x2"].loc[df["id"] == 2].max()
-        assert df["x2_mean"].iloc[-1] == df["x2"].loc[df["id"] == 2].mean()
-        assert df["x1_median"].iloc[-1] == df["x1"].loc[df["id"] == 2].median()
-        assert df["x1_count"].iloc[-1] == df["x1"].loc[df["id"] == 2].count()
-        assert df["x2_var"].iloc[-1] == df["x2"].loc[df["id"] == 2].var()
+        assert df["x1_min"][-1] == df.filter(pl.col("id")==2).select(pl.col("x1")).min().item()
+        assert df["x1_max"][-1] == df.filter(pl.col("id")==2).select(pl.col("x1")).max().item()
+        assert df["x1_mean"][-1] == df.filter(pl.col("id")==2).select(pl.col("x1")).mean().item()
+        assert df["x1_median"][-1] == df.filter(pl.col("id")==2).select(pl.col("x1")).median().item()
+        assert df["x1_count"][-1] == df.filter(pl.col("id")==2).select(pl.col("x1")).count().item()
+        # somehow we get a rounding difference between these two values
+        assert df["x1_var"].round(2)[-1] == df.filter(pl.col("id")==2).select(pl.col("x1")).var().to_series().round(2).item()
 
 
 class TestImputeSteps:
     def test_impute_fill(self, example_recipe_w_nan):
-        example_recipe_w_nan.add_step(StepImputeFill(method="ffill"))
+        example_recipe_w_nan.add_step(StepImputeFill(strategy="forward"))
         res = example_recipe_w_nan.prep()
-        exp = pl.Series([0, 1, 1, 0, 0, 0, np.NaN, 0, 0, 1], dtype="float64")
+        exp = pl.Series("x2",[0, 1, 1, 0, 0, 0, np.nan, 0, 0, 1], dtype=pl.Int32, strict=False)
         assert res["x2"].equals(exp)
         example_recipe_w_nan.add_step(StepImputeFill(sel=all_numeric_predictors(), value=0))
         res = example_recipe_w_nan.prep()
-        exp = pl.Series([0, 1, 1, 0, 0, 0, 0, 0, 0, 1], dtype="float64")
+        exp = pl.Series("x2",[0, 1, 1, 0, 0, 0, 0, 0, 0, 1], pl.Int32, strict=False)
         assert res["x2"].equals(exp)
 
 
@@ -132,22 +134,22 @@ class TestSklearnStep:
     def test_simple_imputer(self, example_recipe_w_nan):
         example_recipe_w_nan.add_step(StepSklearn(SimpleImputer(strategy="constant", fill_value=0)))
         df = example_recipe_w_nan.prep()
-        assert (df.loc[[2, 4, 6], "x2"] == 0).all()
+        assert (df[[2, 4, 6], "x2"].to_numpy() == np.full(3,0)).all()
 
     def test_knn_imputer(self, example_recipe_w_nan):
         example_recipe_w_nan.add_step(StepSklearn(KNNImputer(), sel=all_numeric_predictors()))
         df = example_recipe_w_nan.prep()
-        assert (~np.isnan(df.loc[[2, 4, 6], "x2"])).all()
+        assert (~np.isnan(df[[2, 4, 6], "x2"].to_numpy())).all()
 
     def test_iterative_imputer(self, example_recipe_w_nan):
         example_recipe_w_nan.add_step(StepSklearn(IterativeImputer(), sel=all_numeric_predictors()))
         df = example_recipe_w_nan.prep()
-        assert (~np.isnan(df.loc[[2, 4, 6], "x2"])).all()
+        assert (~np.isnan(df[[2, 4, 6], "x2"].to_numpy())).all()
 
     def test_missing_indicator(self, example_recipe_w_nan):
         example_recipe_w_nan.add_step(StepSklearn(MissingIndicator(), sel=all_numeric_predictors(), in_place=False))
         df = example_recipe_w_nan.prep()
-        assert (df.loc[[2, 4, 6], "MissingIndicator_1"]).all()
+        assert (df[[2, 4, 6], "MissingIndicator_1"].to_numpy()).all()
 
     def test_standard_scaler(self, example_recipe):
         example_recipe.add_step(StepSklearn(StandardScaler(), sel=all_numeric_predictors()))

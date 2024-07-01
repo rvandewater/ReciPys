@@ -4,7 +4,7 @@ from typing import Union, Dict
 from datetime import timedelta
 from scipy.sparse import isspmatrix
 import polars as pl
-from polars.dataframe.groupby import GroupBy
+from polars.dataframe.group_by import GroupBy
 from sklearn.preprocessing import StandardScaler
 from recipys.ingredients import Ingredients
 from enum import Enum
@@ -76,7 +76,7 @@ class Step:
         if isinstance(data, GroupBy):
             if not self._group:
                 raise ValueError("Step does not accept grouped data.")
-            data = data.apply(lambda df: df)
+            # data = data.apply(lambda df: df)
         if not isinstance(data, Ingredients):
             raise ValueError(f"Expected Ingredients object, got {data.__class__}")
         return data
@@ -109,16 +109,18 @@ class Step:
 
 
 class StepImputeFill(Step):
-    def __init__(self, sel=all_predictors(), value=None, method=None, limit=None):
+    def __init__(self, sel=all_predictors(), value=None, strategy=None, limit=None):
         super().__init__(sel)
-        self.desc = f"Impute with {method if method else value}"
+        self.desc = f"Impute with {strategy if strategy else value}"
         self.value = value
-        self.method = method
+        self.strategy = strategy
         self.limit = limit
 
     def transform(self, data):
         new_data = self._check_ingredients(data)
-        new_data[self.columns] = data[self.columns].fillna(self.value, method=self.method, axis=0, limit=self.limit)
+        selected_cols = pl.col(self.columns)
+        new_data.data = data.data.with_columns(
+            pl.col(self.columns).fill_null(self.value, strategy=self.strategy, limit=self.limit).over(select_groups(data)))
         return new_data
 
 
@@ -188,32 +190,30 @@ class StepHistorical(Step):
         """
 
         new_data = self._check_ingredients(data)
+        self.suffix = "_" + self.suffix
+        new_columns = [c + self.suffix for c in self.columns]
 
-        new_columns = [c + "_" + self.suffix for c in self.columns]
-
+        selected = new_data.data
+        selected_cols = pl.col(self.columns)
+        id = select_groups(new_data)
         if self.fun is Accumulator.MAX:
-            res = data[self.columns].cummax(skipna=True)
+            res = selected.with_columns(selected_cols.cum_max().over(id).name.suffix(self.suffix))
         elif self.fun is Accumulator.MIN:
-            # res = data[self.columns].cummin(skipna=True)
-            # res = data.select(pl.col[self.columns].cummin(skipna=True).alias(new_columns))
-            res = new_data.select([pl.col(select_groups(new_data)),pl.col(self.columns).cummin()])
-            # res = data.apply(lambda x -> [pl.col(self.columns).cummin()])
-            res = new_data.select(pl.col[self.columns])
-
+            res = selected.with_columns(selected_cols.cum_min().over(id).name.suffix(self.suffix))
         elif self.fun is Accumulator.MEAN:
-            # Reset index, as we get back a multi-index, and we want a simple rolling index
-            res = data[self.columns].expanding().mean().reset_index(drop=True)
+            res = selected.with_columns(selected_cols.rolling_mean(window_size=selected.height, min_periods=0)
+                                  .over(id).name.suffix(self.suffix))
         elif self.fun is Accumulator.MEDIAN:
-            res = data[self.columns].expanding().median().reset_index(drop=True)
+            res = selected.with_columns(selected_cols.rolling_median(window_size=selected.height, min_periods=0)
+                                  .over(id).name.suffix(self.suffix))
         elif self.fun is Accumulator.COUNT:
-            res = data[self.columns].expanding().count().reset_index(drop=True)
+            res = selected.with_columns(selected_cols.cum_count().over(id).name.suffix(self.suffix))
         elif self.fun is Accumulator.VAR:
-            res = data[self.columns].expanding().var().reset_index(drop=True)
+            res = selected.with_columns(selected_cols.rolling_var(window_size=selected.height, min_periods=0)
+                                  .over(id).name.suffix(self.suffix))
         else:
             raise TypeError(f"Expected Accumulator enum for function, got {self.fun.__class__}")
-        # new_data[new_columns] = res
-        new_data = new_data.join(res, how="left", suffix=self.suffix, on=self.columns)
-        # Update roles for the newly generated columns
+        new_data.data = res
         for nc in new_columns:
             new_data.update_role(nc, self.role)
 

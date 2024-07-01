@@ -15,5 +15,5 @@ dependencies:
   - pip=23.1
   - pyarrow=12.0.1
   - pip:
-    - polars==0.18.4
+    - polars==1.0.0
 

@@ -28,13 +28,13 @@ class Recipe:
 
     def __init__(
         self,
-        data: Union[pl.DataFrame, Ingredients],
+        data: Ingredients,
         outcomes: Union[str, list[str]] = None,
         predictors: Union[str, list[str]] = None,
         groups: Union[str, list[str]] = None,
         sequences: Union[str, list[str]] = None,
     ):
-        self.data = Ingredients(data)
+        self.data = data
         self.steps = []
 
         if outcomes:
@@ -114,7 +114,7 @@ class Recipe:
         if step.group:
             group_vars = select_groups(data)
             if len(group_vars) > 0:
-                data = data.groupby(group_vars)
+                data.groupby(group_vars)
         return data
 
     def prep(self, data: Union[pl.DataFrame, Ingredients] = None, refit: bool = False) -> pl.DataFrame:
@@ -144,11 +144,10 @@ class Recipe:
             Transformed data.
         """
         data = self._check_data(data)
-        original_data = deepcopy(data)
+        # original_data = deepcopy(data)
         data = self._apply_fit_transform(data)
         # return pl.DataFrame(data)
-        return data.get_df()
-
+        return data.data
     def _apply_fit_transform(self, data=None, refit=False):
         # applies transform or fit and transform (when refit or not trained yet)
         for step in self.steps:

@@ -85,6 +85,9 @@ class Selector:
         # vars = ingr.columns.tolist()
 
         if self.roles is not None:
+            # for v, r in ingr.roles.items():
+            #     print(v, r)
+            #     print(intersection(r, self.roles))
             sel_roles = [v for v, r in ingr.roles.items() if intersection(r, self.roles)]
             vars = intersection(vars, sel_roles)
 
