@@ -263,7 +263,6 @@ def has_type(types: Union[str, list[str]]) -> Selector:
     """
     return Selector(description=f"types: {types}", types=types)
 
-
 def all_predictors() -> Selector:
     """Define selector for all predictor columns
 

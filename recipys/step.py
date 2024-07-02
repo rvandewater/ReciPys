@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from copy import deepcopy
 from typing import Union, Dict
-from datetime import timedelta
+# from datetime import timedelta, time
 from scipy.sparse import isspmatrix
 import polars as pl
 from polars.dataframe.group_by import GroupBy
@@ -119,8 +119,13 @@ class StepImputeFill(Step):
     def transform(self, data):
         new_data = self._check_ingredients(data)
         selected_cols = pl.col(self.columns)
-        new_data.data = data.data.with_columns(
-            pl.col(self.columns).fill_null(self.value, strategy=self.strategy, limit=self.limit).over(select_groups(data)))
+        groups = select_groups(new_data)
+        if len(select_groups(new_data))>0:
+            new_data.data = data.data.with_columns(
+                pl.col(self.columns).fill_null(self.value, strategy=self.strategy, limit=self.limit).over(select_groups(new_data)))
+        else:
+            new_data.data = data.data.with_columns(
+                pl.col(self.columns).fill_null(self.value, strategy=self.strategy, limit=self.limit))
         return new_data
 
 
@@ -260,6 +265,7 @@ class StepSklearn(Step):
             }
         else:
             try:
+                print(data[self.columns])
                 self.sklearn_transformer.fit(data[self.columns])
             except ValueError as e:
                 if "should be a 1d array" in str(e) or "Multioutput target data is not supported" in str(e):
@@ -288,7 +294,8 @@ class StepSklearn(Step):
                     if self.in_place
                     else [f"{self.sklearn_transformer.__class__.__name__}_{col}_{i + 1}" for i in range(new_cols.shape[1])]
                 )
-                new_data[col_names] = new_cols
+                updated_cols = pl.from_numpy(new_cols, schema=col_names)
+                new_data.data = new_data.data.with_columns(updated_cols)
         else:
             new_cols = self.sklearn_transformer.transform(new_data[self.columns])
             if isspmatrix(new_cols):
@@ -325,10 +332,7 @@ class StepResampling(Step):
         accumulator_dict: Dict[Selector, Accumulator] = {all_predictors(): Accumulator.LAST},
         default_accumulator: Accumulator = Accumulator.LAST,
     ):
-        """This class represents a step in a recipe.
-
-        Steps are transformations to be executed on selected columns of a DataFrame.
-        They fit a transformer to the selected columns and afterwards transform the data with the fitted transformer.
+        """This class represents a resampling step in a recipe.
 
         Args:
             new_resolution: Resolution to resample to.
@@ -354,7 +358,8 @@ class StepResampling(Step):
             raise AssertionError("Sequence role has not been assigned, resampling step not possible")
         sequence_datatype = new_data.dtypes[sequence_role]
 
-        if not (isinstance(timedelta,sequence_datatype)): #or is_datetime64_any_dtype(sequence_datatype)):
+        # if not (isinstance(pl.datatypes.TemporalType,sequence_datatype)): #or is_datetime64_any_dtype(sequence_datatype)):
+        if not (sequence_datatype.is_temporal()):  # or is_datetime64_any_dtype(sequence_datatype)):
             raise ValueError(f"Expected Timedelta or Timestamp object, got {sequence_role(data).__class__}")
 
         # Dictionary with the format column: str , accumulator:str is created
@@ -369,21 +374,27 @@ class StepResampling(Step):
         col_acc_map.update(
             {
                 col: self.default_accumulator.value
-                for col in new_data.columns.difference(col_acc_map.keys())
+                for col in set(new_data.columns).difference(col_acc_map.keys())
                 if col not in select_sequence(new_data)
             }
         )
+        # acc_col_map = dict((v, k) for k, v in col_acc_map.items())
+        from collections import defaultdict
 
+        acc_col_map = defaultdict(list)
+        for k, v in col_acc_map.items():
+            acc_col_map[v].append(k)
+
+        grouping_role = select_groups(new_data)[0]
         # Resampling with the functions defined in col_acc_map
-        new_data = data.resample(self.new_resolution, on=sequence_role).agg(col_acc_map)
-
-        # Remove multi-index in case of grouped data
-        if isinstance(data, GroupBy):
-            new_data = new_data.droplevel(select_groups(data.obj))
-
-        # Remove sequence index, while keeping column
-        new_data = new_data.reset_index(drop=False)
-
+        print(acc_col_map)
+        print(acc_col_map["mean"])
+        new_data.set_df(new_data.get_df().sort(grouping_role, sequence_role).set_sorted(sequence_role))
+        new_data.set_df(new_data.get_df().upsample(every=self.new_resolution, time_column=sequence_role, group_by=grouping_role)
+                        .with_columns(pl.col(acc_col_map["last"]).fill_null(strategy="forward"))
+                        .with_columns(pl.col(acc_col_map["mean"]).fill_null(strategy="mean"))
+                        .with_columns(pl.col(acc_col_map["max"]).fill_null(strategy="max"))
+                       .with_columns(pl.col(grouping_role).fill_null(strategy="forward")))
         return new_data
 
 

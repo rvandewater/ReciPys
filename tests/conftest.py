@@ -3,7 +3,7 @@ import numpy as np
 import polars as pl
 from recipys.recipe import Recipe
 from recipys.ingredients import Ingredients
-from datetime import time
+from datetime import datetime, MINYEAR
 import pandas as pd
 
 @pl.api.register_dataframe_namespace("pd")
@@ -15,9 +15,8 @@ class PolarsPd:
 def example_pl_df():
     rand_state = np.random.RandomState(42)
     interval = pl.duration(hours=1)
-    timecolumn = pl.concat([pl.time_range(time(0, 0, 0), time(5, 0, 0), "1h", eager=True),
-              pl.time_range(time(0, 0, 0), time(3, 0, 0), "1h", eager=True)])
-
+    timecolumn = pl.concat([pl.datetime_range(datetime(MINYEAR, 1, 1,0), datetime(MINYEAR, 1, 1,5), "1h", eager=True),
+              pl.datetime_range(datetime(MINYEAR, 1, 1,0), datetime(MINYEAR, 1, 1,3), "1h", eager=True)])
 
     df = pl.DataFrame(
         {
@@ -30,7 +29,6 @@ def example_pl_df():
             "x4": pl.Series(["x", "y", "y", "x", "y", "y", "x", "x", "y", "x"],dtype=pl.Categorical),
         }
     )
-    print(df)
     return df
 
 @pytest.fixture

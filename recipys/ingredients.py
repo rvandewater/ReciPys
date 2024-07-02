@@ -2,8 +2,8 @@ from copy import deepcopy
 import numpy as np
 import pandas as pd
 import polars as pl
-
 from pandas._typing import Axes, Dtype
+from typing import overload
 
 
 class Ingredients:
@@ -30,27 +30,36 @@ class Ingredients:
         roles: dict = None,
         check_roles: bool = True,
     ):
-        self.data = data
 
         if isinstance(data, pd.DataFrame):
-            super().__init__(data,schema=None)
+            self.data = pl.DataFrame(data)
+            # super().__init__(data,schema=None)
         elif isinstance(data, pl.DataFrame):
-            super().__init__()
-            self._df = data._df
+            # super().__init__()
+            # self._df = data._df
+            self.data = data
         elif not isinstance(data, Ingredients):
             raise TypeError(f"expected DataFrame, got {data.__class__}")
+        self.schema = data.schema
+        self.dtypes = self.schema
 
         if isinstance(data, Ingredients) and roles is None:
             if copy is None or copy is True:
                 self.roles = deepcopy(data.roles)
             else:
                 self.roles = data.roles
+            self.data = data.data
+            self.schema = data.schema
+            self.dtypes = self.schema
         elif roles is None:
             self.roles = {}
         elif not isinstance(roles, dict):
             raise TypeError(f"Expected dict object for roles, got {roles.__class__}")
-        elif check_roles and not all(set(v).issubset(set(self.data.columns)) for k,v in roles.items()):
+        elif check_roles and not all(set(k).issubset(set(self.data.columns)) for k,v in roles.items()):
             raise ValueError(f"Roles contains variable names that are not in the data {list(roles.values())} {self.data.columns}.")
+        # Todo: do we want to allow ingredients without grouping columns?
+        # elif check_roles and select_groups(self) == []:
+        #     raise ValueError("Roles are given but no groups are found in the data.")
         else:
             if copy is None or copy is True:
                 self.roles = deepcopy(roles)
@@ -153,12 +162,16 @@ class Ingredients:
     def get_df(self):
         # TODO: Check if preferred way to get df
         return self.data
-
+    def set_df(self,df):
+        self.data = df
     def groupby(self,by):
         self.data.group_by(by)
 
-    def __getitem__(self, idx):
-        return self.data[idx]
-
     def __setitem__(self, idx, val):
         self.data[idx] = val
+
+    @overload
+    def __getitem__(self, list: list[str]) -> pl.DataFrame:
+        return self.data[list]
+    def __getitem__(self, idx:int) -> pl.Series:
+        return self.data[idx]

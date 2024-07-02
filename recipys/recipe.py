@@ -34,6 +34,11 @@ class Recipe:
         groups: Union[str, list[str]] = None,
         sequences: Union[str, list[str]] = None,
     ):
+        if not isinstance(data, Ingredients):
+            try:
+                data = Ingredients(data)
+            except:
+                raise (f"Expected Ingredients, got {data.__class__}")
         self.data = data
         self.steps = []
 
