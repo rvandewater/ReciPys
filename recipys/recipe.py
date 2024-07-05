@@ -40,6 +40,7 @@ class Recipe:
                 raise (f"Expected Ingredients, got {data.__class__}")
         self.data = data
         self.steps = []
+        self.original_columns = copy(data.columns)
 
         if outcomes:
             self.update_roles(outcomes, "outcome")
@@ -110,8 +111,9 @@ class Recipe:
             # don't check the roles here, because self.data can have more roles than data (post feature generation)
             data = Ingredients(data, roles=self.data.roles, check_roles=False)
         #if not data.columns.equals(self.data.columns):
-        if not data.columns == self.data.columns:
-            raise ValueError("Columns of data argument differs from recipe data.")
+        if not data.columns == self.original_columns:
+            raise ValueError(f"Columns of data argument differs from recipe data: "
+                             f"{[x for x in data.columns if x not in self.original_columns]}.")
         return data
 
     def _apply_group(self, data, step):
