@@ -108,9 +108,10 @@ class TestImputeSteps:
 
 
 class TestScaleStep:
-    def test_scale_step_default(self, example_recipe):
-        example_recipe.add_step(StepScale())
-        res = example_recipe.prep()
+    def test_scale_step_default(self, example_recipe_w_nan):
+        print(example_recipe_w_nan.data.data)
+        example_recipe_w_nan.add_step(StepScale())
+        res = example_recipe_w_nan.prep()
         assert abs(res["x1"].mean()) < 0.00001
         assert abs(res["x2"].mean()) < 0.00001
 
@@ -149,9 +150,9 @@ class TestSklearnStep:
         assert (~np.isnan(df[[2, 4, 6], "x2"].to_numpy())).all()
 
     def test_missing_indicator(self, example_recipe_w_nan):
-        example_recipe_w_nan.add_step(StepSklearn(MissingIndicator(), sel=all_numeric_predictors(), in_place=False))
+        example_recipe_w_nan.add_step(StepSklearn(MissingIndicator(features="all"), sel=all_numeric_predictors(), in_place=False))
         df = example_recipe_w_nan.prep()
-        assert (df[[2, 4, 6], "MissingIndicator_1"].to_numpy()).all()
+        assert (df[[2, 4, 6], "MissingIndicator_x2"].to_numpy()).all()
 
     def test_standard_scaler(self, example_recipe):
         example_recipe.add_step(StepSklearn(StandardScaler(), sel=all_numeric_predictors()))

@@ -15,7 +15,6 @@ from recipys.selector import (
     select_sequence,
 )
 
-
 class Step:
     """This class represents a step in a recipe.
 
@@ -292,6 +291,8 @@ class StepSklearn(Step):
                     if self.in_place
                     else [f"{self.sklearn_transformer.__class__.__name__}_{col}_{i + 1}" for i in range(new_cols.shape[1])]
                 )
+                if isinstance(col_names,str):
+                    col_names = [col_names]
                 updated_cols = pl.from_numpy(new_cols, schema=col_names)
                 new_data.data = new_data.data.with_columns(updated_cols)
         else:
@@ -306,7 +307,10 @@ class StepSklearn(Step):
             col_names = (
                 self.columns
                 if self.in_place
-                else [f"{self.sklearn_transformer.__class__.__name__}_{i + 1}" for i in range(new_cols.shape[1])]
+                else [f"{self.sklearn_transformer.__class__.__name__}_{self.columns[i]}" for i in range(new_cols.shape[1])]
+                if new_cols.shape[1] == len(self.columns)
+                else
+                    [f"{self.sklearn_transformer.__class__.__name__}_{i + 1}" for i in range(new_cols.shape[1])]
             )
             if new_cols.shape[1] != len(col_names):
                 raise ValueError(
@@ -396,8 +400,9 @@ class StepResampling(Step):
         return new_data
 
 
-class StepScale:
+class StepScale(StepSklearn):
     """Provides a wrapper for a scaling with StepSklearn.
+    Note that because SKlearn transforms None (nulls) to NaN, we have to revert.
 
     Args:
        with_mean: Defaults to True. If True, center the data before scaling.
@@ -406,12 +411,29 @@ class StepScale:
        role (str, optional): Defaults to 'predictor'. Incase new columns are added, set their role to role.
     """
 
-    def __new__(
-        cls,
-        sel: Selector = all_numeric_predictors(),
-        with_mean: bool = True,
-        with_std: bool = True,
-        in_place: bool = True,
-        role: str = "predictor",
-    ):
-        return StepSklearn(StandardScaler(with_mean=with_mean, with_std=with_std), sel=sel, in_place=in_place, role=role)
+    # def __new__(
+    #     cls,
+    #     sel: Selector = all_numeric_predictors(),
+    #     with_mean: bool = True,
+    #     with_std: bool = True,
+    #     in_place: bool = True,
+    #     role: str = "predictor",
+    # ):
+    #     return super(StepScale,self).StandardScaler(with_mean=with_mean, with_std=with_std), sel=sel, in_place=in_place, role=role)
+    def __init__(self,
+                 sel=all_numeric_predictors(),
+                 with_mean: bool = True,
+                 with_std: bool = True,
+                 *args, **kwargs):
+        super().__init__(sklearn_transformer=StandardScaler(with_mean=with_mean,with_std=with_std), sel=sel,
+                         in_place=True, *args, **kwargs)
+        self.desc = "Scale with StandardScaler"
+
+
+    def transform(self, data: Ingredients) -> Ingredients:
+        data = super().transform(data)
+        # Revert null to nan conversion done by sklearn
+        data.set_df(data.get_df().with_columns(pl.col(self.columns).fill_nan(None)))
+        return data
+
+

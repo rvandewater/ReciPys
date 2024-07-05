@@ -12,11 +12,18 @@ def test_empty_bake_return_df(example_pl_df):
     rec = Recipe(example_pl_df)
     assert type(rec.bake()) == pl.DataFrame
 
+def test_prep_bake(example_pl_df, example_recipe):
+    example2 = example_pl_df.clone()
+    # example2 = example2.select(pl.exclude("x1"))
+
+    output1 = example_recipe.prep(example_pl_df)
+    output2 = example_recipe.bake(example2)
 
 def test_init_roles(example_pl_df):
-    rec = Recipe(example_pl_df, ["y"], ["x1", "x2", "x3"], ["id"])  # FIXME: add squence when merged
+    rec = Recipe(example_pl_df, ["y"], ["x1", "x2", "x3"], ["id"], ["time"])
     assert rec.data.roles["y"] == ["outcome"]
     assert rec.data.roles["x1"] == ["predictor"]
     assert rec.data.roles["x2"] == ["predictor"]
     assert rec.data.roles["x3"] == ["predictor"]
+    assert rec.data.roles["time"] == ["sequence"]
     assert rec.data.roles["id"] == ["group"]
