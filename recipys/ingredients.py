@@ -2,7 +2,6 @@ from copy import deepcopy
 import numpy as np
 import pandas as pd
 import polars as pl
-from pandas._typing import Axes, Dtype
 from typing import overload
 
 

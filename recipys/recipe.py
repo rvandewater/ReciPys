@@ -4,7 +4,6 @@ from copy import copy, deepcopy
 from itertools import chain
 from typing import Union
 
-import pandas as pd
 import polars as pl
 
 from recipys.ingredients import Ingredients

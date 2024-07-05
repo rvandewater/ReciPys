@@ -1,7 +1,6 @@
 from abc import abstractmethod
 from copy import deepcopy
 from typing import Union, Dict
-# from datetime import timedelta, time
 from scipy.sparse import isspmatrix
 import polars as pl
 from polars.dataframe.group_by import GroupBy
@@ -15,7 +14,6 @@ from recipys.selector import (
     select_groups,
     select_sequence,
 )
-# from pandas.api.types import is_timedelta64_dtype, is_datetime64_any_dtype
 
 
 class Step:
