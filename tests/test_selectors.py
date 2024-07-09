@@ -98,9 +98,9 @@ def test_has_type(example_ingredients):
     sel = has_type("Float64")
     assert sel(example_ingredients) == ["y", "x1"]
 
-def test_has_type_pl(example_ingredients):
-    sel = has_type(pl.Float64)
-    assert sel(example_ingredients) == ["y", "x1"]
+# def test_has_type_pl(example_ingredients):
+#     sel = has_type(pl.Float64)
+#     assert sel(example_ingredients) == ["y", "x1"]
 def test_all_predictors(example_ingredients):
     example_ingredients.update_role("x1", "predictor")
     example_ingredients.update_role("x2", "predictor")

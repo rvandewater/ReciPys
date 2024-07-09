@@ -262,7 +262,7 @@ class StepSklearn(Step):
             }
         else:
             try:
-                print(data[self.columns])
+                # print(data[self.columns])
                 self.sklearn_transformer.fit(data[self.columns])
             except ValueError as e:
                 if "should be a 1d array" in str(e) or "Multioutput target data is not supported" in str(e):
@@ -389,8 +389,8 @@ class StepResampling(Step):
 
         grouping_role = select_groups(new_data)[0]
         # Resampling with the functions defined in col_acc_map
-        print(acc_col_map)
-        print(acc_col_map["mean"])
+        # print(acc_col_map)
+        # print(acc_col_map["mean"])
         new_data.set_df(new_data.get_df().sort(grouping_role, sequence_role).set_sorted(sequence_role))
         new_data.set_df(new_data.get_df().upsample(every=self.new_resolution, time_column=sequence_role, group_by=grouping_role)
                         .with_columns(pl.col(acc_col_map["last"]).fill_null(strategy="forward"))

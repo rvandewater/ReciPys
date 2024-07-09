@@ -53,7 +53,6 @@ class TestStepResampling:
         resampling_dict = {all_numeric_predictors(): Accumulator.MEAN}
         rec.add_step(StepResampling("2h", accumulator_dict=resampling_dict))
         df = rec.bake()
-        print(df)
         assert df.shape[0] == pre_sampling_len / 2
 
     def test_step_wo_selectors(self, example_pl_df):
@@ -109,7 +108,6 @@ class TestImputeSteps:
 
 class TestScaleStep:
     def test_scale_step_default(self, example_recipe_w_nan):
-        print(example_recipe_w_nan.data.data)
         example_recipe_w_nan.add_step(StepScale())
         res = example_recipe_w_nan.prep()
         assert abs(res["x1"].mean()) < 0.00001
@@ -197,8 +195,8 @@ class TestSklearnStep:
             )
         )
         df = example_recipe.prep()
-        assert (df["KBinsDiscretizer_1"].is_in([0, 1])).all()
-        assert (df["KBinsDiscretizer_2"].is_in([0, 1])).all()
+        assert (df["KBinsDiscretizer_x1"].is_in([0, 1])).all()
+        assert (df["KBinsDiscretizer_x2"].is_in([0, 1])).all()
 
     def test_quantile_transformer(self, example_recipe):
         example_recipe.add_step(StepSklearn(QuantileTransformer(n_quantiles=10), sel=all_numeric_predictors()))
@@ -210,7 +208,7 @@ class TestSklearnStep:
         example_recipe.add_step(StepSklearn(OrdinalEncoder(), sel=has_type([str(pl.Categorical(ordering="physical"))]), in_place=False))
         df = example_recipe.prep()
         # FIXME assert correct number of new columns
-        assert ((0 <= df["OrdinalEncoder_1"]) & (df["OrdinalEncoder_1"] <= 2)).all()
+        assert ((0 <= df["OrdinalEncoder_x3"]) & (df["OrdinalEncoder_x4"] <= 2)).all()
 
     def test_onehot_encoder(self, example_recipe):
         example_recipe.add_step(StepSklearn(OneHotEncoder(sparse=False), sel=has_type([str(pl.Categorical(ordering="physical"))]), in_place=False))
@@ -252,13 +250,13 @@ class TestSklearnStep:
         example_recipe.add_step(StepSklearn(PowerTransformer(), sel=all_numeric_predictors(), in_place=False))
         df = example_recipe.prep()
         # FIXME assert correct number of new columns
-        assert not df["PowerTransformer_1"].is_empty()
+        assert not df["PowerTransformer_x1"].is_empty()
 
     def test_function_transformer(self, example_recipe):
         example_recipe.add_step(StepSklearn(FunctionTransformer(np.log1p), sel=all_numeric_predictors(), in_place=False))
         df = example_recipe.prep()
         # FIXME assert correct number of new columns
-        assert not df["FunctionTransformer_1"].is_empty()
+        assert not df["FunctionTransformer_x1"].is_empty()
 
     def test_wrong_columnwise(self, example_pl_df):
         example_pl_df = example_pl_df.with_columns(y=pl.Series(["a", "b", "c", "a", "c", "b", "c", "a", "b", "c"], dtype=pl.Categorical))

@@ -4,7 +4,6 @@ from recipys.recipe import Recipe
 
 def test_empty_prep_return_df(example_pl_df):
     rec = Recipe(example_pl_df)
-    # assert type(rec.prep()) == pl.DataFrame
     assert type(rec.prep()) == pl.DataFrame
 
 
@@ -12,12 +11,11 @@ def test_empty_bake_return_df(example_pl_df):
     rec = Recipe(example_pl_df)
     assert type(rec.bake()) == pl.DataFrame
 
-def test_prep_bake(example_pl_df, example_recipe):
+def test_prep_bake_same_result(example_pl_df, example_recipe):
     example2 = example_pl_df.clone()
-    # example2 = example2.select(pl.exclude("x1"))
-
     output1 = example_recipe.prep(example_pl_df)
     output2 = example_recipe.bake(example2)
+    assert output1.equals(output2)
 
 def test_init_roles(example_pl_df):
     rec = Recipe(example_pl_df, ["y"], ["x1", "x2", "x3"], ["id"], ["time"])
