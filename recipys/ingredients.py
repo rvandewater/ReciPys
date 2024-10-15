@@ -3,10 +3,15 @@ import numpy as np
 import pandas as pd
 import polars as pl
 from typing import overload
+from pandas._typing import Axes, Dtype
+from enum import Enum
 
+class Backend(Enum):
+    POLARS = "polars"
+    PANDAS = "pandas"
 
 class Ingredients:
-    """Wrapper around polars.DataFrames to store columns roles (e.g., predictor)
+    """Wrapper around either polars.DataFrame to store columns roles (e.g., predictor)
         Due to the workings of polars, we do not subclass pl.dataframe anymore, but instead store the dataframe as an attribute.
     Args:
         roles: roles of DataFrame columns as (list of) strings.
@@ -24,23 +29,40 @@ class Ingredients:
 
     def __init__(
         self,
-        data=None,
+        data: pl.DataFrame | pd.DataFrame = None,
         copy: bool = None,
         roles: dict = None,
         check_roles: bool = True,
+        backend: Backend = Backend.POLARS,
     ):
 
-        if isinstance(data, pd.DataFrame):
-            self.data = pl.DataFrame(data)
-            # super().__init__(data,schema=None)
-        elif isinstance(data, pl.DataFrame):
-            # super().__init__()
-            # self._df = data._df
-            self.data = data
-        elif not isinstance(data, Ingredients):
-            raise TypeError(f"expected DataFrame, got {data.__class__}")
+        if backend == Backend.POLARS:
+            if isinstance(data, pd.DataFrame):
+                    self.data = pl.DataFrame(data)
+            elif isinstance(data, pl.DataFrame):
+                self.data = data
+            elif isinstance(data, Ingredients):
+                if copy is None or copy is True:
+                    self.roles = deepcopy(data.roles)
+                else:
+                    self.roles = data.roles
+            else:
+                raise TypeError(f"expected DataFrame, got {data.__class__}")
+        elif backend == Backend.PANDAS:
+            if isinstance(data, pd.DataFrame):
+                self.data = data
+            elif isinstance(data, pl.DataFrame):
+                self.data = data.to_pandas()
+            elif isinstance(data, Ingredients):
+                if copy is None or copy is True:
+                    self.roles = deepcopy(data.roles)
+                else:
+                    self.roles = data.roles
+            else:
+                raise TypeError(f"expected DataFrame, got {data.__class__}")
         self.schema = data.schema
         self.dtypes = self.schema
+        self.backend = backend
 
         if isinstance(data, Ingredients) and roles is None:
             if copy is None or copy is True:
@@ -73,13 +95,27 @@ class Ingredients:
     def columns(self):
         return self.data.columns
 
-    def to_df(self) -> pl.DataFrame:
-        """Return the underlying pandas.DataFrame.
+    def to_df(self, output_format = None) -> pl.DataFrame:
+        """Return the underlying DataFrame.
+
 
         Returns:
             Self as DataFrame.
         """
-        return pl.DataFrame(self)
+        if output_format == Backend.POLARS:
+            if self.backend == Backend.POLARS:
+                return self.data
+            else:
+                return pl.DataFrame(self.data)
+        elif output_format == Backend.PANDAS:
+            if self.backend == Backend.POLARS:
+                return self.data.to_pandas()
+            else:
+                return self.data
+        else:
+            return self.data
+
+
 
     def _check_column(self, column):
         if not isinstance(column, str):
@@ -159,18 +195,25 @@ class Ingredients:
         return {key:str(value) for key,value in dtypes.items()}
         # return list(map(dtypes, cast()))
     def get_df(self):
-        # TODO: Check if preferred way to get df
-        return self.data
+        return self.to_df()
+
     def set_df(self,df):
         self.data = df
+
     def groupby(self,by):
-        self.data.group_by(by)
+        if self.backend == Backend.POLARS:
+            self.data.group_by(by)
+        else:
+            self.data.groupby(by)
 
     def __setitem__(self, idx, val):
         self.data[idx] = val
-
     @overload
     def __getitem__(self, list: list[str]) -> pl.DataFrame:
         return self.data[list]
+
     def __getitem__(self, idx:int) -> pl.Series:
         return self.data[idx]
+
+
+
