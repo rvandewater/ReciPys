@@ -4,6 +4,7 @@ from copy import copy, deepcopy
 from itertools import chain
 from typing import Union
 
+import pandas as pd
 import polars as pl
 
 from recipys.ingredients import Ingredients
@@ -27,7 +28,7 @@ class Recipe:
 
     def __init__(
         self,
-        data: Ingredients,
+        data: Ingredients | pl.DataFrame | pd.DataFrame,
         outcomes: Union[str, list[str]] = None,
         predictors: Union[str, list[str]] = None,
         groups: Union[str, list[str]] = None,
@@ -106,7 +107,7 @@ class Recipe:
     def _check_data(self, data: Union[pl.DataFrame, Ingredients]) -> Ingredients:
         if data is None:
             data = self.data
-        elif type(data) == pl.DataFrame:
+        elif type(data) == pl.DataFrame or type(data) == pd.DataFrame:
             # this is only executed when prep or bake recieve a DF that is different to the original data
             # don't check the roles here, because self.data can have more roles than data (post feature generation)
             data = Ingredients(data, roles=self.data.roles, check_roles=False)
@@ -123,7 +124,7 @@ class Recipe:
                 data.groupby(group_vars)
         return data
 
-    def prep(self, data: Union[pl.DataFrame, Ingredients] = None, refit: bool = False) -> pl.DataFrame:
+    def prep(self, data: Union[pl.DataFrame | pd.DataFrame, Ingredients] = None, refit: bool = False) -> pl.DataFrame | pd.DataFrame:
         """Fits and transforms, in other words preps, the data.
 
         Args:
@@ -140,7 +141,7 @@ class Recipe:
         #return pl.DataFrame(data)
         return data.get_df()
 
-    def bake(self, data: Union[pl.DataFrame, Ingredients] = None) -> pl.DataFrame:
+    def bake(self, data: Union[pl.DataFrame | pd.DataFrame, Ingredients] = None) -> pl.DataFrame | pd.DataFrame:
         """Transforms, or bakes, the data if it has been prepped.
 
         Args:
@@ -154,6 +155,7 @@ class Recipe:
         data = self._apply_fit_transform(data)
         # return pl.DataFrame(data)
         return data.data
+
     def _apply_fit_transform(self, data=None, refit=False):
         # applies transform or fit and transform (when refit or not trained yet)
         for step in self.steps:

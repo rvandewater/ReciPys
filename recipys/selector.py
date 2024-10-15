@@ -1,9 +1,8 @@
 import re
-
 from recipys.ingredients import Ingredients
 from typing import Union
 from polars import DataType
-
+from recipys.constants import Backend
 
 class Selector:
     """Class responsible for selecting the variables affected by a recipe step
@@ -80,7 +79,7 @@ class Selector:
         if not isinstance(ingr, Ingredients):
             raise TypeError(f"Expected Ingredients, got {ingr.__class__}")
 
-        vars = ingr.columns
+        vars = list(ingr.columns)
         # Pandas
         # vars = ingr.columns.tolist()
 
@@ -92,7 +91,7 @@ class Selector:
             vars = intersection(vars, sel_roles)
 
         if self.types is not None:
-            sel_types = ingr.select_dtypes(include=self.types) #.columns.tolist()
+            sel_types = list(ingr.select_dtypes(include=self.types)) #.columns.tolist()
             vars = intersection(vars, sel_types)
 
         if self.names is not None:
@@ -120,7 +119,7 @@ def enlist_dt(x: Union[DataType, list[DataType], None]) -> Union[list[DataType],
         _description_
     """
     if isinstance(x, DataType):
-        return [x]
+            return [x]
     elif isinstance(x, list):
         if not all(isinstance(i, DataType) for i in x):
             raise TypeError("Only lists of datatypes are allowed.")
@@ -274,15 +273,17 @@ def all_predictors() -> Selector:
     return sel
 
 
-def all_numeric_predictors() -> Selector:
+def all_numeric_predictors(backend=backend.POLARS) -> Selector:
     """Define selector for all numerical predictor columns
 
     Returns:
         Object representing the selection rule.
     """
     sel = all_predictors()
-    # sel.set_types(["int16", "int32", "int64", "float16", "float32", "float64"])
-    sel.set_types(["Int16", "Int32", "Int64", "Float32", "Float64"])
+    if backend == Backend.POLARS:
+        sel.set_types(["Int8", "Int16", "Int32", "Int64", "Float32", "Float64"])
+    else:
+        sel.set_types(["int16", "int32", "int64", "float16", "float32", "float64"])
     sel.description = "all numeric predictors"
     return sel
 

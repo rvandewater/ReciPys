@@ -1,14 +1,10 @@
 from copy import deepcopy
-import numpy as np
 import pandas as pd
 import polars as pl
 from typing import overload
-from pandas._typing import Axes, Dtype
-from enum import Enum
 
-class Backend(Enum):
-    POLARS = "polars"
-    PANDAS = "pandas"
+from recipys.constants import Backend
+
 
 class Ingredients:
     """Wrapper around either polars.DataFrame to store columns roles (e.g., predictor)
@@ -205,6 +201,9 @@ class Ingredients:
             self.data.group_by(by)
         else:
             self.data.groupby(by)
+
+    def get_backend(self):
+        return self.backend
 
     def __setitem__(self, idx, val):
         self.data[idx] = val
