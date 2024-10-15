@@ -3,6 +3,8 @@ import pandas as pd
 import polars as pl
 from typing import overload
 
+from pandas.io.sql import get_schema
+
 from recipys.constants import Backend
 
 
@@ -31,34 +33,24 @@ class Ingredients:
         check_roles: bool = True,
         backend: Backend = Backend.POLARS,
     ):
-
-        if backend == Backend.POLARS:
-            if isinstance(data, pd.DataFrame):
-                    self.data = pl.DataFrame(data)
-            elif isinstance(data, pl.DataFrame):
-                self.data = data
-            elif isinstance(data, Ingredients):
-                if copy is None or copy is True:
-                    self.roles = deepcopy(data.roles)
-                else:
-                    self.roles = data.roles
-            else:
-                raise TypeError(f"expected DataFrame, got {data.__class__}")
-        elif backend == Backend.PANDAS:
-            if isinstance(data, pd.DataFrame):
-                self.data = data
-            elif isinstance(data, pl.DataFrame):
-                self.data = data.to_pandas()
-            elif isinstance(data, Ingredients):
-                if copy is None or copy is True:
-                    self.roles = deepcopy(data.roles)
-                else:
-                    self.roles = data.roles
-            else:
-                raise TypeError(f"expected DataFrame, got {data.__class__}")
-        self.schema = data.schema
-        self.dtypes = self.schema
         self.backend = backend
+        if isinstance(data, pd.DataFrame) or isinstance(data, pl.DataFrame):
+            if backend == Backend.POLARS:
+                if isinstance(data, pd.DataFrame):
+                        self.data = pl.DataFrame(data)
+                elif isinstance(data, pl.DataFrame):
+                    self.data = data
+                else:
+                    raise TypeError(f"Expected DataFrame, got {data.__class__}")
+            elif backend == Backend.PANDAS:
+                if isinstance(data, pd.DataFrame):
+                    self.data = data
+                if isinstance(data, pl.DataFrame):
+                    self.data = data.to_pandas()
+            else:
+                raise ValueError(f"Backend {backend} not supported.")
+            self.schema = self.get_schema()
+            self.dtypes = self.get_schema()
 
         if isinstance(data, Ingredients) and roles is None:
             if copy is None or copy is True:
@@ -68,6 +60,7 @@ class Ingredients:
             self.data = data.data
             self.schema = data.schema
             self.dtypes = self.schema
+
         elif roles is None:
             self.roles = {}
         elif not isinstance(roles, dict):
@@ -183,13 +176,21 @@ class Ingredients:
     def get_dtypes(self):
         dtypes = list(self.schema.values())
         return dtypes
+
     def get_str_dtypes(self):
         """"
             Helper function for polar dataframes to return schema with dtypes as strings
         """
-        dtypes = self.data.schema
+        dtypes = self.get_schema()
         return {key:str(value) for key,value in dtypes.items()}
         # return list(map(dtypes, cast()))
+
+    def get_schema(self):
+        if self.backend == Backend.POLARS:
+            return self.data.schema
+        else:
+            return self.data.dtypes
+
     def get_df(self):
         return self.to_df()
 
@@ -200,13 +201,21 @@ class Ingredients:
         if self.backend == Backend.POLARS:
             self.data.group_by(by)
         else:
-            self.data.groupby(by)
+            return self.data.groupby(by)
 
     def get_backend(self):
         return self.backend
 
     def __setitem__(self, idx, val):
-        self.data[idx] = val
+        if self.backend == Backend.POLARS:
+            self.data[idx] = val
+        else:
+            if isinstance(idx, tuple):
+                rows, column = idx
+                self.data[column][rows] = val
+            else:
+                self.data[idx] = val
+
     @overload
     def __getitem__(self, list: list[str]) -> pl.DataFrame:
         return self.data[list]

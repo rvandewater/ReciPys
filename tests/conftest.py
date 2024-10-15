@@ -5,6 +5,7 @@ from recipys.recipe import Recipe
 from recipys.ingredients import Ingredients
 from datetime import datetime, MINYEAR
 import pandas as pd
+from recipys.constants import Backend
 
 @pl.api.register_dataframe_namespace("pd")
 class PolarsPd:
@@ -14,9 +15,15 @@ class PolarsPd:
 @pytest.fixture
 def example_pl_df():
     rand_state = np.random.RandomState(42)
-    interval = pl.duration(hours=1)
-    timecolumn = pl.concat([pl.datetime_range(datetime(MINYEAR, 1, 1,0), datetime(MINYEAR, 1, 1,5), "1h", eager=True),
-              pl.datetime_range(datetime(MINYEAR, 1, 1,0), datetime(MINYEAR, 1, 1,3), "1h", eager=True)])
+    # interval = pl.duration(hours=1)
+    # timecolumn = pl.concat([
+    #     pl.duration(hours=1).repeat_by(6),
+    #     pl.duration(hours=1).repeat_by(4)
+    # ])
+    # timecolumn = pl.arange(0, 5,eager=True)
+    timecolumn = pl.from_pandas(pd.to_timedelta(np.concatenate((np.arange(6), np.arange(4))), unit="h"))
+    #pl.concat([pl.datetime_range(datetime(MINYEAR, 1, 1,0), datetime(MINYEAR, 1, 1,5), "1h", eager=True),
+              #pl.datetime_range(datetime(MINYEAR, 1, 1,0), datetime(MINYEAR, 1, 1,3), "1h", eager=True)])
 
     df = pl.DataFrame(
         {
@@ -46,15 +53,34 @@ def example_pd_df():
         }
     )
     return df
+
+@pytest.fixture(params=["example_pl_df", "example_pd_df"])
+def example_df(request):
+    return request.getfixturevalue(request.param)
+
 @pytest.fixture
-def example_ingredients(example_pl_df):
+def example_pl_ingredients(example_pl_df):
     return Ingredients(example_pl_df)
 
+@pytest.fixture
+def example_pd_ingredients(example_pd_df):
+    return Ingredients(example_pd_df, backend=Backend.PANDAS)
+
+
+@pytest.fixture(params=["example_pl_ingredients", "example_pd_ingredients"])
+def example_ingredients(request):
+    return request.getfixturevalue(request.param)
+# @pytest.fixture
+# def example_ingredients(example_pl_df):
+#     return Ingredients(example_pl_df, backend=Backend.PANDAS)
 
 @pytest.fixture()
-def example_recipe(example_pl_df):
+def example_pl_recipe(example_pl_df):
     return Recipe(example_pl_df, ["y"], ["x1", "x2", "x3", "x4"], ["id"], ["time"])
 
+@pytest.fixture()
+def example_pd_recipe(example_pd_df):
+    return Recipe(example_pd_df, ["y"], ["x1", "x2", "x3", "x4"], ["id"], ["time"])
 
 @pytest.fixture()
 def example_recipe_w_nan(example_df):

@@ -273,7 +273,7 @@ def all_predictors() -> Selector:
     return sel
 
 
-def all_numeric_predictors(backend=backend.POLARS) -> Selector:
+def all_numeric_predictors(backend=Backend.POLARS) -> Selector:
     """Define selector for all numerical predictor columns
 
     Returns:

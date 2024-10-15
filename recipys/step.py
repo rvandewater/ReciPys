@@ -1,10 +1,19 @@
 from abc import abstractmethod
 from copy import deepcopy
 from typing import Union, Dict
+
+from pandas.core.groupby import DataFrameGroupBy
 from scipy.sparse import isspmatrix
 import polars as pl
 from polars.dataframe.group_by import GroupBy
+from scipy.sparse import isspmatrix
+
+import pandas as pd
+import numpy as np
 from sklearn.preprocessing import StandardScaler
+
+from pandas.api.types import is_timedelta64_dtype, is_datetime64_any_dtype
+
 from recipys.ingredients import Ingredients
 from enum import Enum
 from recipys.selector import (
@@ -14,6 +23,7 @@ from recipys.selector import (
     select_groups,
     select_sequence,
 )
+from recipys.constants import Backend
 
 class Step:
     """This class represents a step in a recipe.
@@ -57,7 +67,7 @@ class Step:
     def do_fit(self, data: Ingredients):
         pass
 
-    def _check_ingredients(self, data: Union[Ingredients, ]) -> Ingredients:
+    def _check_ingredients(self, data: Union[Ingredients, GroupBy | DataFrameGroupBy]) -> Ingredients:
         """Check input for allowed types
 
         Args:
@@ -70,7 +80,7 @@ class Step:
         Returns:
             Validated input
         """
-        if isinstance(data, GroupBy):
+        if isinstance(data, GroupBy) or isinstance(data, DataFrameGroupBy):
             if not self._group:
                 raise ValueError("Step does not accept grouped data.")
             # data = data.apply(lambda df: df)
@@ -117,12 +127,66 @@ class StepImputeFill(Step):
         new_data = self._check_ingredients(data)
         selected_cols = pl.col(self.columns)
         groups = select_groups(new_data)
-        if len(select_groups(new_data))>0:
-            new_data.data = data.data.with_columns(
-                pl.col(self.columns).fill_null(self.value, strategy=self.strategy, limit=self.limit).over(select_groups(new_data)))
+        if data.get_backend() == Backend.POLARS:
+            if len(groups)>0:
+                new_data.data = data.data.with_columns(
+                    pl.col(self.columns).fill_null(self.value, strategy=self.strategy, limit=self.limit).over(groups))
+            else:
+                new_data.data = data.data.with_columns(
+                    pl.col(self.columns).fill_null(self.value, strategy=self.strategy, limit=self.limit))
         else:
-            new_data.data = data.data.with_columns(
-                pl.col(self.columns).fill_null(self.value, strategy=self.strategy, limit=self.limit))
+            # Pandas syntax
+            self.strategy = "ffill" if self.strategy == "forward" else self.strategy
+            self.strategy = "bfill" if self.strategy == "backward" else self.strategy
+            if len(groups) > 0:
+                df = new_data.groupby(groups)
+            else:
+                df = new_data.get_df()
+                # [self.columns] = data.groupby(groups)[self.columns].fillna(self.value, method=self.strategy, limit=self.limit)
+            new_data.set_df(df[self.columns].fillna(self.value, method=self.strategy, limit=self.limit))
+        return new_data
+
+
+class StepImputeFastZeroFill(Step):
+    """Quick variant of pandas' internal `nafill(value=0)` for grouped dataframes."""
+
+    def __init__(self, sel=all_predictors()):
+        super().__init__(sel)
+        self.desc = "Impute quickly with 0"
+
+    def transform(self, data):
+        new_data = self._check_ingredients(data)
+
+        # Ignore grouping as grouping does not matter for zero fill.
+        new_data[self.columns] = new_data[self.columns].fillna(0)
+
+        return new_data
+
+
+class StepImputeFastForwardFill(Step):
+    """Quick variant of pandas' internal `nafill(method='ffill')` for grouped dataframes.
+
+    Note: this variant does not allow for setting a limit.
+    """
+
+    def __init__(self, sel=all_predictors()):
+        super().__init__(sel)
+        self.desc = "Impute with fast ffill"
+
+    def transform(self, data):
+        new_data = self._check_ingredients(data)
+
+        # Use cumsum (which is optimised for grouped frames) to figure out which
+        # values should be left at NaN, then ffill on the ungrouped dataframe. Adopted from:
+        # https://stackoverflow.com/questions/36871783/fillna-forward-fill-on-a-large-dataframe-efficiently-with-groupby
+        nofill = new_data.copy()
+        nofill[self.columns] = pd.notnull(nofill[self.columns])
+        nofill = nofill.groupby(data.keys).cumsum()
+
+        new_data[self.columns] = new_data[self.columns].ffill()
+        for col in self.columns:
+            new_data.loc[nofill[col].to_numpy() == 0, col] = np.nan
+
         return new_data
 
 
@@ -140,7 +204,8 @@ class StepImputeModel(Step):
 
     def transform(self, data):
         new_data = self._check_ingredients(data)
-        new_data[self.columns] = self.model(new_data[self.columns + select_groups(new_data)], select_groups(new_data))
+        if data.get_backend() == Backend.POLARS:
+            new_data[self.columns] = self.model(new_data[self.columns + select_groups(new_data)], select_groups(new_data))
         return new_data
 
 
@@ -198,23 +263,42 @@ class StepHistorical(Step):
         selected = new_data.data
         selected_cols = pl.col(self.columns)
         id = select_groups(new_data)
-        if self.fun is Accumulator.MAX:
-            res = selected.with_columns(selected_cols.cum_max().over(id).name.suffix(self.suffix))
-        elif self.fun is Accumulator.MIN:
-            res = selected.with_columns(selected_cols.cum_min().over(id).name.suffix(self.suffix))
-        elif self.fun is Accumulator.MEAN:
-            res = selected.with_columns(selected_cols.rolling_mean(window_size=selected.height, min_periods=0)
-                                  .over(id).name.suffix(self.suffix))
-        elif self.fun is Accumulator.MEDIAN:
-            res = selected.with_columns(selected_cols.rolling_median(window_size=selected.height, min_periods=0)
-                                  .over(id).name.suffix(self.suffix))
-        elif self.fun is Accumulator.COUNT:
-            res = selected.with_columns(selected_cols.cum_count().over(id).name.suffix(self.suffix))
-        elif self.fun is Accumulator.VAR:
-            res = selected.with_columns(selected_cols.rolling_var(window_size=selected.height, min_periods=0)
-                                  .over(id).name.suffix(self.suffix))
+        if data.get_backend() == Backend.POLARS:
+            if self.fun is Accumulator.MAX:
+                res = selected.with_columns(selected_cols.cum_max().over(id).name.suffix(self.suffix))
+            elif self.fun is Accumulator.MIN:
+                res = selected.with_columns(selected_cols.cum_min().over(id).name.suffix(self.suffix))
+            elif self.fun is Accumulator.MEAN:
+                res = selected.with_columns(selected_cols.rolling_mean(window_size=selected.height, min_periods=0)
+                                      .over(id).name.suffix(self.suffix))
+            elif self.fun is Accumulator.MEDIAN:
+                res = selected.with_columns(selected_cols.rolling_median(window_size=selected.height, min_periods=0)
+                                      .over(id).name.suffix(self.suffix))
+            elif self.fun is Accumulator.COUNT:
+                res = selected.with_columns(selected_cols.cum_count().over(id).name.suffix(self.suffix))
+            elif self.fun is Accumulator.VAR:
+                res = selected.with_columns(selected_cols.rolling_var(window_size=selected.height, min_periods=0)
+                                      .over(id).name.suffix(self.suffix))
+            else:
+                raise TypeError(f"Expected Accumulator enum for function, got {self.fun.__class__}")
         else:
-            raise TypeError(f"Expected Accumulator enum for function, got {self.fun.__class__}")
+            if self.fun is Accumulator.MAX:
+                res = data[self.columns].cummax(skipna=True)
+            elif self.fun is Accumulator.MIN:
+                res = data[self.columns].cummin(skipna=True)
+            elif self.fun is Accumulator.MEAN:
+                # Reset index, as we get back a multi-index, and we want a simple rolling index
+                res = data[self.columns].expanding().mean().reset_index(drop=True)
+            elif self.fun is Accumulator.MEDIAN:
+                res = data[self.columns].expanding().median().reset_index(drop=True)
+            elif self.fun is Accumulator.COUNT:
+                res = data[self.columns].expanding().count().reset_index(drop=True)
+            elif self.fun is Accumulator.VAR:
+                res = data[self.columns].expanding().var().reset_index(drop=True)
+            else:
+                raise TypeError(f"Expected Accumulator enum for function, got {self.fun.__class__}")
+            new_data[new_columns] = res
+
         new_data.data = res
         for nc in new_columns:
             new_data.update_role(nc, self.role)
@@ -291,10 +375,15 @@ class StepSklearn(Step):
                     if self.in_place
                     else [f"{self.sklearn_transformer.__class__.__name__}_{col}_{i + 1}" for i in range(new_cols.shape[1])]
                 )
-                if isinstance(col_names,str):
-                    col_names = [col_names]
-                updated_cols = pl.from_numpy(new_cols, schema=col_names)
-                new_data.data = new_data.data.with_columns(updated_cols)
+                if data.get_backend() == Backend.POLARS:
+                    if isinstance(col_names,str):
+                        col_names = [col_names]
+                    updated_cols = pl.from_numpy(new_cols, schema=col_names)
+                    new_data.data = new_data.data.with_columns(updated_cols)
+                else:
+                    df = new_data.get_df()
+                    df[col_names] = new_cols
+                    new_data.set_df(df)
         else:
             new_cols = self.sklearn_transformer.transform(new_data[self.columns])
             if isspmatrix(new_cols):
@@ -361,7 +450,9 @@ class StepResampling(Step):
         sequence_datatype = new_data.dtypes[sequence_role]
 
         # if not (isinstance(pl.datatypes.TemporalType,sequence_datatype)): #or is_datetime64_any_dtype(sequence_datatype)):
-        if not (sequence_datatype.is_temporal()):  # or is_datetime64_any_dtype(sequence_datatype)):
+        if data.get_backend() == Backend.POLARS and not (sequence_datatype.is_temporal()):  # or is_datetime64_any_dtype(sequence_datatype)):
+            raise ValueError(f"Expected Timedelta or Timestamp object, got {sequence_role(data).__class__}")
+        if data.get_backend() == Backend.PANDAS and not (is_timedelta64_dtype(sequence_datatype) or is_datetime64_any_dtype(sequence_datatype)):
             raise ValueError(f"Expected Timedelta or Timestamp object, got {sequence_role(data).__class__}")
 
         # Dictionary with the format column: str , accumulator:str is created
@@ -381,22 +472,33 @@ class StepResampling(Step):
             }
         )
         # acc_col_map = dict((v, k) for k, v in col_acc_map.items())
-        from collections import defaultdict
+        if data.get_backend() == Backend.POLARS:
+            from collections import defaultdict
 
-        acc_col_map = defaultdict(list)
-        for k, v in col_acc_map.items():
-            acc_col_map[v].append(k)
+            acc_col_map = defaultdict(list)
+            for k, v in col_acc_map.items():
+                acc_col_map[v].append(k)
 
-        grouping_role = select_groups(new_data)[0]
-        # Resampling with the functions defined in col_acc_map
-        # print(acc_col_map)
-        # print(acc_col_map["mean"])
-        new_data.set_df(new_data.get_df().sort(grouping_role, sequence_role).set_sorted(sequence_role))
-        new_data.set_df(new_data.get_df().upsample(every=self.new_resolution, time_column=sequence_role, group_by=grouping_role)
-                        .with_columns(pl.col(acc_col_map["last"]).fill_null(strategy="forward"))
-                        .with_columns(pl.col(acc_col_map["mean"]).fill_null(strategy="mean"))
-                        .with_columns(pl.col(acc_col_map["max"]).fill_null(strategy="max"))
-                       .with_columns(pl.col(grouping_role).fill_null(strategy="forward")))
+            grouping_role = select_groups(new_data)[0]
+            # Resampling with the functions defined in col_acc_map
+            # print(acc_col_map)
+            # print(acc_col_map["mean"])
+            new_data.set_df(new_data.get_df().sort(grouping_role, sequence_role).set_sorted(sequence_role))
+            new_data.set_df(new_data.get_df().upsample(every=self.new_resolution, time_column=sequence_role, group_by=grouping_role)
+                            .with_columns(pl.col(acc_col_map["last"]).fill_null(strategy="forward"))
+                            .with_columns(pl.col(acc_col_map["mean"]).fill_null(strategy="mean"))
+                            .with_columns(pl.col(acc_col_map["max"]).fill_null(strategy="max"))
+                           .with_columns(pl.col(grouping_role).fill_null(strategy="forward")))
+        else:
+            # Resampling with the functions defined in col_acc_map
+            new_data = data.set_df(data.get_df().resample(self.new_resolution, on=sequence_role).agg(col_acc_map))
+
+            # Remove multi-index in case of grouped data
+            if isinstance(data.get_df(), DataFrameGroupBy):
+                new_data = new_data.set_df(new_data.get_df().droplevel(select_groups(data.get_df().obj)))
+
+            # Remove sequence index, while keeping column
+            new_data = new_data.set_df(new_data.get_df().reset_index(drop=False))
         return new_data
 
 
@@ -433,7 +535,10 @@ class StepScale(StepSklearn):
     def transform(self, data: Ingredients) -> Ingredients:
         data = super().transform(data)
         # Revert null to nan conversion done by sklearn
-        data.set_df(data.get_df().with_columns(pl.col(self.columns).fill_nan(None)))
+        if data.get_backend() == Backend.POLARS:
+            data.set_df(data.get_df().with_columns(pl.col(self.columns).fill_nan(None)))
+        # else:
+        #     data.set_df(data.get_df()[self.columns].fillna(value=None))
         return data
 
 

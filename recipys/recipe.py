@@ -104,7 +104,7 @@ class Recipe:
         self.steps.append(step)
         return self
 
-    def _check_data(self, data: Union[pl.DataFrame, Ingredients]) -> Ingredients:
+    def _check_data(self, data: Union[pl.DataFrame | pd.DataFrame, Ingredients]) -> Ingredients:
         if data is None:
             data = self.data
         elif type(data) == pl.DataFrame or type(data) == pd.DataFrame:
@@ -112,7 +112,7 @@ class Recipe:
             # don't check the roles here, because self.data can have more roles than data (post feature generation)
             data = Ingredients(data, roles=self.data.roles, check_roles=False)
         #if not data.columns.equals(self.data.columns):
-        if not data.columns == self.original_columns:
+        if not set(data.columns) == set(self.original_columns):
             raise ValueError(f"Columns of data argument differs from recipe data: "
                              f"{[x for x in data.columns if x not in self.original_columns]}.")
         return data
@@ -180,3 +180,6 @@ class Recipe:
             repr += str(step) + "\n"
 
         return repr
+
+    def get_backend(self):
+        return self.data.get_backend()
