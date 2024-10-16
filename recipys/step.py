@@ -3,7 +3,6 @@ from copy import deepcopy
 from typing import Union, Dict
 
 from pandas.core.groupby import DataFrameGroupBy
-from scipy.sparse import isspmatrix
 import polars as pl
 from polars.dataframe.group_by import GroupBy
 from scipy.sparse import isspmatrix
@@ -116,6 +115,10 @@ class Step:
 
 
 class StepImputeFill(Step):
+    """For Pandas: yses pandas' internal `nafill` function to replace missing values.
+    See `pandas.DataFrame.nafill` for a description of the arguments.
+    """
+
     def __init__(self, sel=all_predictors(), value=None, strategy=None, limit=None):
         super().__init__(sel)
         self.desc = f"Impute with {strategy if strategy else value}"
@@ -157,6 +160,48 @@ class StepImputeFastZeroFill(Step):
     def transform(self, data):
         new_data = self._check_ingredients(data)
 
+        # Ignore grouping as grouping does not matter for zero fill.
+        new_data[self.columns] = new_data[self.columns].fillna(0)
+
+        return new_data
+
+
+class StepImputeFastForwardFill(Step):
+    """Quick variant of pandas' internal `nafill(method='ffill')` for grouped dataframes.
+
+    Note: this variant does not allow for setting a limit.
+    """
+
+    def __init__(self, sel=all_predictors()):
+        super().__init__(sel)
+        self.desc = "Impute with fast ffill"
+
+    def transform(self, data):
+        new_data = self._check_ingredients(data)
+
+        # Use cumsum (which is optimised for grouped frames) to figure out which
+        # values should be left at NaN, then ffill on the ungrouped dataframe. Adopted from:
+        # https://stackoverflow.com/questions/36871783/fillna-forward-fill-on-a-large-dataframe-efficiently-with-groupby
+        nofill = new_data.copy()
+        nofill[self.columns] = pd.notnull(nofill[self.columns])
+        nofill = nofill.groupby(data.keys).cumsum()
+
+        new_data[self.columns] = new_data[self.columns].ffill()
+        for col in self.columns:
+            new_data.loc[nofill[col].to_numpy() == 0, col] = np.nan
+
+        return new_data
+
+
+class StepImputeFastZeroFill(Step):
+    """Quick variant of pandas' internal `nafill(value=0)` for grouped dataframes."""
+
+    def __init__(self, sel=all_predictors()):
+        super().__init__(sel)
+        self.desc = "Impute quickly with 0"
+
+    def transform(self, data):
+        new_data = self._check_ingredients(data)
         # Ignore grouping as grouping does not matter for zero fill.
         new_data[self.columns] = new_data[self.columns].fillna(0)
 
@@ -321,12 +366,12 @@ class StepSklearn(Step):
     """
 
     def __init__(
-        self,
-        sklearn_transformer: object,
-        sel: Selector = all_predictors(),
-        columnwise: bool = False,
-        in_place: bool = True,
-        role: str = "predictor",
+            self,
+            sklearn_transformer: object,
+            sel: Selector = all_predictors(),
+            columnwise: bool = False,
+            in_place: bool = True,
+            role: str = "predictor",
     ):
         super().__init__(sel)
         self.desc = f"Use sklearn transformer {sklearn_transformer.__class__.__name__}"
@@ -461,7 +506,7 @@ class StepResampling(Step):
         # Dictionary with the format column: str , accumulator:str is created
         col_acc_map = {}
         # Go through supplied Selector, Accumulator pairs
-        for (selector, accumulator) in self.acc_dict.items():
+        for selector, accumulator in self.acc_dict.items():
             selected_columns = selector(new_data)
             # Add variables associated with selector with supplied accumulator
             col_acc_map.update({col: accumulator.value for col in selected_columns})
@@ -553,3 +598,17 @@ class StepScale(StepSklearn):
         return data
 
 
+
+
+class StepFunction(Step):
+    """Provides a wrapper for a simple transformation function, without fitting."""
+
+    def __init__(self, sel: Selector, function):
+        super().__init__(sel=sel)
+        self.function = function
+        self._trained = True
+
+    def transform(self, data: Ingredients) -> Ingredients:
+        new_data = self._check_ingredients(data)
+        new_data = self.function(new_data)
+        return new_data

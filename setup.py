@@ -3,7 +3,7 @@
 
 """The setup script."""
 from pathlib import Path
-from setuptools import setup, find_packages
+from setuptools import setup
 
 root_path = Path(__file__).resolve().parent
 
@@ -70,11 +70,12 @@ setup(
 #parse_environment_yml(),
     license="MIT license",
     long_description=readme,
-    long_description_content_type='text/markdown',
+    long_description_content_type="text/markdown",
     include_package_data=True,
     keywords=["recipies", "pandas", "dataframe", "polars","preprocessing","recipys"],
     name="recipies",
     # packages=find_packages(include=["recipys"]),
+    packages=["recipys"],
     setup_requires=setup_requirements,
     test_suite="tests",
     tests_require=[],

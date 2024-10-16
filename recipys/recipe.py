@@ -26,6 +26,9 @@ class Recipe:
         sequence: names of columns in data that should be assigned the 'sequence' role
     """
 
+    columns = None
+    roles = None
+
     def __init__(
         self,
         data: Ingredients | pl.DataFrame | pd.DataFrame,
@@ -43,6 +46,8 @@ class Recipe:
         self.data = data
         self.steps = []
         self.original_columns = copy(data.columns)
+        self.roles = self.data.roles
+        self.columns = self.data.columns
 
         if outcomes:
             self.update_roles(outcomes, "outcome")
@@ -155,7 +160,7 @@ class Recipe:
         # original_data = deepcopy(data)
         data = self._apply_fit_transform(data)
         # return pl.DataFrame(data)
-        return data.data
+        return data.get_df()
 
     def _apply_fit_transform(self, data=None, refit=False):
         # applies transform or fit and transform (when refit or not trained yet)
@@ -184,3 +189,9 @@ class Recipe:
 
     def get_backend(self):
         return self.data.get_backend()
+
+    def cache(self):
+        """Prepares the recipe for caching"""
+        if self.data is not None:
+            del self.data
+        return self
