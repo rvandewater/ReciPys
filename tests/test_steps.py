@@ -365,7 +365,7 @@ class TestSklearnStep:
         backend = example_recipe.get_backend()
         example_recipe.add_step(
             StepSklearn(
-                OneHotEncoder(sparse=False),
+                OneHotEncoder(sparse_output=False),
                 sel=has_type([str(pl.Categorical(ordering="physical")) if backend == backend.POLARS else "category"]),
                 in_place=False,
             )
@@ -460,7 +460,7 @@ class TestSklearnStep:
         backend = example_recipe.get_backend()
         example_recipe.add_step(
             StepSklearn(
-                OneHotEncoder(sparse=False),
+                OneHotEncoder(sparse_output=False),
                 sel=has_type([str(pl.Categorical(ordering="physical")) if backend == backend.POLARS else "category"]),
                 in_place=True,
             )
@@ -469,15 +469,15 @@ class TestSklearnStep:
             example_recipe.prep()
         assert "in_place=False" in str(exc_info.value)
 
-    def test_sparse_error(self, example_recipe):
+    def test_sparse_output_error(self, example_recipe):
         backend = example_recipe.get_backend()
         example_recipe.add_step(
             StepSklearn(
-                OneHotEncoder(sparse=True),
+                OneHotEncoder(sparse_output=True),
                 sel=has_type([str(pl.Categorical(ordering="physical")) if backend == backend.POLARS else "category"]),
                 in_place=False,
             )
         )
         with pytest.raises(TypeError) as exc_info:
             example_recipe.prep()
-        assert "sparse=False" in str(exc_info.value)
+        assert "sparse_output=False" in str(exc_info.value)

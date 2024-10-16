@@ -447,7 +447,7 @@ class StepSklearn(Step):
                 raise TypeError(
                     "The sklearn transformer returns a sparse matrix, "
                     "but recipes expects a dense numpy representation. "
-                    "Try setting sparse=False or similar in the transformer initilisation."
+                    "Try setting sparse_output=False or similar in the transformer initialization."
                 )
 
             col_names = (
