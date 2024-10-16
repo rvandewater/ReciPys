@@ -28,7 +28,8 @@ from sklearn.impute import SimpleImputer, KNNImputer, IterativeImputer, MissingI
 from recipys.ingredients import Ingredients
 from recipys.recipe import Recipe
 from recipys.selector import all_numeric_predictors, has_type, has_role, all_of
-from recipys.step import StepSklearn, StepHistorical, Accumulator, StepImputeFill, StepScale, StepResampling
+from recipys.step import StepSklearn, StepHistorical, Accumulator, StepImputeFill, StepScale, StepResampling, \
+    StepImputeFastZeroFill, StepImputeFastForwardFill
 from recipys.constants import Backend
 
 @pytest.fixture()
@@ -140,6 +141,32 @@ class TestImputeSteps:
         exp = pl.Series("x2",imputed_list, pl.Int32, strict=False) if backend == Backend.POLARS \
             else pd.Series(imputed_list, dtype="float64")
         assert res["x2"].equals(exp)
+
+    def test_fast_zero_fill(self, example_recipe_w_nan):
+        backend = example_recipe_w_nan.get_backend()
+        example_recipe_w_nan.add_step(StepImputeFastZeroFill(sel=all_numeric_predictors(backend)))
+        if backend == Backend.POLARS:
+            with pytest.raises(ValueError) as e_info:
+                res = example_recipe_w_nan.prep()
+            assert e_info.match("Backend.POLARS not supported by this step.")
+        else:
+            res = example_recipe_w_nan.prep()
+            imputed_list = [0, 1, 0, 0, 0, 0, 0, 0, 0, 1]
+            exp = pd.Series(imputed_list, dtype="float64")
+            assert res["x2"].equals(exp)
+
+    def test_fast_forward_fill(self, example_recipe_w_nan):
+        backend = example_recipe_w_nan.get_backend()
+        example_recipe_w_nan.add_step(StepImputeFastForwardFill(sel=all_numeric_predictors(backend)))
+        if backend == Backend.POLARS:
+            with pytest.raises(ValueError) as e_info:
+                res = example_recipe_w_nan.prep()
+            assert e_info.match("Backend.POLARS not supported by this step.")
+        else:
+            res = example_recipe_w_nan.prep()
+            imputed_list = [0, 1, 1, 0, 0, 0, np.nan, 0, 0, 1]
+            exp = pd.Series(imputed_list, dtype="float64")
+            assert res["x2"].equals(exp)
 
 
 class TestScaleStep:

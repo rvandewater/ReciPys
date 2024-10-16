@@ -37,11 +37,12 @@ class Step:
         columns: List with the names of the selected columns.
     """
 
-    def __init__(self, sel: Selector = all_predictors()):
+    def __init__(self, sel: Selector = all_predictors(), supported_backends: list[Backend] = [Backend.POLARS, Backend.PANDAS]):
         self.sel = sel
         self.columns = []
         self._trained = False
         self._group = True
+        self.supported_backends = supported_backends
 
     @property
     def trained(self) -> bool:
@@ -79,6 +80,8 @@ class Step:
         Returns:
             Validated input
         """
+        if self.supported_backends is not None and data.get_backend() not in self.supported_backends:
+            raise ValueError(f"{data.get_backend()} not supported by this step.")
         if isinstance(data, GroupBy) or isinstance(data, DataFrameGroupBy):
             if not self._group:
                 raise ValueError("Step does not accept grouped data.")
@@ -154,7 +157,7 @@ class StepImputeFastZeroFill(Step):
     """Quick variant of pandas' internal `nafill(value=0)` for grouped dataframes."""
 
     def __init__(self, sel=all_predictors()):
-        super().__init__(sel)
+        super().__init__(sel, supported_backends=[Backend.PANDAS])
         self.desc = "Impute quickly with 0"
 
     def transform(self, data):
@@ -173,7 +176,7 @@ class StepImputeFastForwardFill(Step):
     """
 
     def __init__(self, sel=all_predictors()):
-        super().__init__(sel)
+        super().__init__(sel, supported_backends=[Backend.PANDAS])
         self.desc = "Impute with fast ffill"
 
     def transform(self, data):
@@ -182,57 +185,58 @@ class StepImputeFastForwardFill(Step):
         # Use cumsum (which is optimised for grouped frames) to figure out which
         # values should be left at NaN, then ffill on the ungrouped dataframe. Adopted from:
         # https://stackoverflow.com/questions/36871783/fillna-forward-fill-on-a-large-dataframe-efficiently-with-groupby
-        nofill = new_data.copy()
+        df = new_data.get_df()
+        nofill = df.copy()
         nofill[self.columns] = pd.notnull(nofill[self.columns])
-        nofill = nofill.groupby(data.keys).cumsum()
+        nofill = nofill.groupby(select_groups(new_data))[self.columns].cumsum()
 
-        new_data[self.columns] = new_data[self.columns].ffill()
+        df[self.columns] = df[self.columns].ffill()
         for col in self.columns:
-            new_data.loc[nofill[col].to_numpy() == 0, col] = np.nan
-
+            df.loc[nofill[col].to_numpy() == 0, col] = np.nan
+        new_data.set_df(df)
         return new_data
 
 
-class StepImputeFastZeroFill(Step):
-    """Quick variant of pandas' internal `nafill(value=0)` for grouped dataframes."""
-
-    def __init__(self, sel=all_predictors()):
-        super().__init__(sel)
-        self.desc = "Impute quickly with 0"
-
-    def transform(self, data):
-        new_data = self._check_ingredients(data)
-        # Ignore grouping as grouping does not matter for zero fill.
-        new_data[self.columns] = new_data[self.columns].fillna(0)
-
-        return new_data
-
-
-class StepImputeFastForwardFill(Step):
-    """Quick variant of pandas' internal `nafill(method='ffill')` for grouped dataframes.
-
-    Note: this variant does not allow for setting a limit.
-    """
-
-    def __init__(self, sel=all_predictors()):
-        super().__init__(sel)
-        self.desc = "Impute with fast ffill"
-
-    def transform(self, data):
-        new_data = self._check_ingredients(data)
-
-        # Use cumsum (which is optimised for grouped frames) to figure out which
-        # values should be left at NaN, then ffill on the ungrouped dataframe. Adopted from:
-        # https://stackoverflow.com/questions/36871783/fillna-forward-fill-on-a-large-dataframe-efficiently-with-groupby
-        nofill = new_data.copy()
-        nofill[self.columns] = pd.notnull(nofill[self.columns])
-        nofill = nofill.groupby(data.keys).cumsum()
-
-        new_data[self.columns] = new_data[self.columns].ffill()
-        for col in self.columns:
-            new_data.loc[nofill[col].to_numpy() == 0, col] = np.nan
-
-        return new_data
+# class StepImputeFastZeroFill(Step):
+#     """Quick variant of pandas' internal `nafill(value=0)` for grouped dataframes."""
+#
+#     def __init__(self, sel=all_predictors()):
+#         super().__init__(sel)
+#         self.desc = "Impute quickly with 0"
+#
+#     def transform(self, data):
+#         new_data = self._check_ingredients(data)
+#         # Ignore grouping as grouping does not matter for zero fill.
+#         new_data[self.columns] = new_data[self.columns].fillna(0)
+#
+#         return new_data
+#
+#
+# class StepImputeFastForwardFill(Step):
+#     """Quick variant of pandas' internal `nafill(method='ffill')` for grouped dataframes.
+#
+#     Note: this variant does not allow for setting a limit.
+#     """
+#
+#     def __init__(self, sel=all_predictors()):
+#         super().__init__(sel)
+#         self.desc = "Impute with fast ffill"
+#
+#     def transform(self, data):
+#         new_data = self._check_ingredients(data)
+#
+#         # Use cumsum (which is optimised for grouped frames) to figure out which
+#         # values should be left at NaN, then ffill on the ungrouped dataframe. Adopted from:
+#         # https://stackoverflow.com/questions/36871783/fillna-forward-fill-on-a-large-dataframe-efficiently-with-groupby
+#         nofill = new_data.copy()
+#         nofill[self.columns] = pd.notnull(nofill[self.columns])
+#         nofill = nofill.groupby(data.keys).cumsum()
+#
+#         new_data[self.columns] = new_data[self.columns].ffill()
+#         for col in self.columns:
+#             new_data.loc[nofill[col].to_numpy() == 0, col] = np.nan
+#
+#         return new_data
 
 
 class StepImputeModel(Step):
