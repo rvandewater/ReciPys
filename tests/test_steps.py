@@ -28,9 +28,18 @@ from sklearn.impute import SimpleImputer, KNNImputer, IterativeImputer, MissingI
 from recipys.ingredients import Ingredients
 from recipys.recipe import Recipe
 from recipys.selector import all_numeric_predictors, has_type, has_role, all_of
-from recipys.step import StepSklearn, StepHistorical, Accumulator, StepImputeFill, StepScale, StepResampling, \
-    StepImputeFastZeroFill, StepImputeFastForwardFill
+from recipys.step import (
+    StepSklearn,
+    StepHistorical,
+    Accumulator,
+    StepImputeFill,
+    StepScale,
+    StepResampling,
+    StepImputeFastZeroFill,
+    StepImputeFastForwardFill,
+)
 from recipys.constants import Backend
+
 
 @pytest.fixture()
 def example_recipe(example_ingredients):
@@ -55,7 +64,12 @@ class TestStepResampling:
         pre_sampling_len = example_df.shape[0]
         if isinstance(example_df, pl.DataFrame):
             backend = Backend.POLARS
-            timecolumn = pl.concat([pl.datetime_range(datetime(MINYEAR, 1, 1,0), datetime(MINYEAR, 1, 1,5), "1h", eager=True), pl.datetime_range(datetime(MINYEAR, 1, 1,0), datetime(MINYEAR, 1, 1,3), "1h", eager=True)])
+            timecolumn = pl.concat(
+                [
+                    pl.datetime_range(datetime(MINYEAR, 1, 1, 0), datetime(MINYEAR, 1, 1, 5), "1h", eager=True),
+                    pl.datetime_range(datetime(MINYEAR, 1, 1, 0), datetime(MINYEAR, 1, 1, 3), "1h", eager=True),
+                ]
+            )
             example_df = example_df.with_columns(time=timecolumn)
         else:
             backend = Backend.PANDAS
@@ -70,7 +84,12 @@ class TestStepResampling:
         pre_sampling_len = example_df.shape[0]
         if isinstance(example_df, pl.DataFrame):
             backend = Backend.POLARS
-            timecolumn = pl.concat([pl.datetime_range(datetime(MINYEAR, 1, 1,0), datetime(MINYEAR, 1, 1,5), "1h", eager=True), pl.datetime_range(datetime(MINYEAR, 1, 1,0), datetime(MINYEAR, 1, 1,3), "1h", eager=True)])
+            timecolumn = pl.concat(
+                [
+                    pl.datetime_range(datetime(MINYEAR, 1, 1, 0), datetime(MINYEAR, 1, 1, 5), "1h", eager=True),
+                    pl.datetime_range(datetime(MINYEAR, 1, 1, 0), datetime(MINYEAR, 1, 1, 3), "1h", eager=True),
+                ]
+            )
             example_df = example_df.with_columns(time=timecolumn)
         else:
             backend = Backend.PANDAS
@@ -83,7 +102,12 @@ class TestStepResampling:
     def test_step_ungrouped(self, example_df):
         # Without using group role
         if isinstance(example_df, pl.DataFrame):
-            timecolumn = pl.concat([pl.datetime_range(datetime(MINYEAR, 1, 1,0), datetime(MINYEAR, 1, 1,5), "1h", eager=True), pl.datetime_range(datetime(MINYEAR, 1, 1,0), datetime(MINYEAR, 1, 1,3), "1h", eager=True)])
+            timecolumn = pl.concat(
+                [
+                    pl.datetime_range(datetime(MINYEAR, 1, 1, 0), datetime(MINYEAR, 1, 1, 5), "1h", eager=True),
+                    pl.datetime_range(datetime(MINYEAR, 1, 1, 0), datetime(MINYEAR, 1, 1, 3), "1h", eager=True),
+                ]
+            )
             example_df = example_df.with_columns(time=timecolumn)
             example_df = example_df.drop("id")
             example_df = example_df.unique(subset="time")
@@ -102,7 +126,7 @@ class TestStepResampling:
 
 class TestStepHistorical:
     def test_step(self, example_df):
-        rec = Recipe(Ingredients(example_df), ["y"], ["x1", "x2"] , ["id"])
+        rec = Recipe(Ingredients(example_df), ["y"], ["x1", "x2"], ["id"])
         rec.add_step(StepHistorical(sel=all_of(["x1", "x2"]), fun=Accumulator.MIN, suffix="min"))
         rec.add_step(StepHistorical(sel=all_of(["x1", "x2"]), fun=Accumulator.MAX, suffix="max"))
         rec.add_step(StepHistorical(sel=all_of(["x1", "x2"]), fun=Accumulator.MEAN, suffix="mean"))
@@ -111,13 +135,16 @@ class TestStepHistorical:
         rec.add_step(StepHistorical(sel=all_of(["x1", "x2"]), fun=Accumulator.VAR, suffix="var"))
         df = rec.bake()
         if rec.get_backend() == Backend.POLARS:
-            assert df["x1_min"][-1] == df.filter(pl.col("id")==2).select(pl.col("x1")).min().item()
-            assert df["x1_max"][-1] == df.filter(pl.col("id")==2).select(pl.col("x1")).max().item()
-            assert df["x1_mean"][-1] == df.filter(pl.col("id")==2).select(pl.col("x1")).mean().item()
-            assert df["x1_median"][-1] == df.filter(pl.col("id")==2).select(pl.col("x1")).median().item()
-            assert df["x1_count"][-1] == df.filter(pl.col("id")==2).select(pl.col("x1")).count().item()
+            assert df["x1_min"][-1] == df.filter(pl.col("id") == 2).select(pl.col("x1")).min().item()
+            assert df["x1_max"][-1] == df.filter(pl.col("id") == 2).select(pl.col("x1")).max().item()
+            assert df["x1_mean"][-1] == df.filter(pl.col("id") == 2).select(pl.col("x1")).mean().item()
+            assert df["x1_median"][-1] == df.filter(pl.col("id") == 2).select(pl.col("x1")).median().item()
+            assert df["x1_count"][-1] == df.filter(pl.col("id") == 2).select(pl.col("x1")).count().item()
             # somehow we get a rounding difference between these two values
-            assert df["x1_var"].round(2)[-1] == df.filter(pl.col("id")==2).select(pl.col("x1")).var().to_series().round(2).item()
+            assert (
+                df["x1_var"].round(2)[-1]
+                == df.filter(pl.col("id") == 2).select(pl.col("x1")).var().to_series().round(2).item()
+            )
         else:
             assert df["x1_min"].iloc[-1] == df["x1"].loc[df["id"] == 2].min()
             assert df["x2_max"].iloc[-1] == df["x2"].loc[df["id"] == 2].max()
@@ -126,20 +153,27 @@ class TestStepHistorical:
             assert df["x1_count"].iloc[-1] == df["x1"].loc[df["id"] == 2].count()
             assert df["x2_var"].iloc[-1] == df["x2"].loc[df["id"] == 2].var()
 
+
 class TestImputeSteps:
     def test_impute_fill(self, example_recipe_w_nan):
         example_recipe_w_nan.add_step(StepImputeFill(strategy="forward"))
         backend = example_recipe_w_nan.get_backend()
         res = example_recipe_w_nan.prep()
         nan_list = [0, 1, 1, 0, 0, 0, np.nan, 0, 0, 1]
-        exp = pl.Series("x2",nan_list, dtype=pl.Int32, strict=False) if backend == Backend.POLARS \
+        exp = (
+            pl.Series("x2", nan_list, dtype=pl.Int32, strict=False)
+            if backend == Backend.POLARS
             else pd.Series(nan_list, dtype="float64")
+        )
         assert res["x2"].equals(exp)
         example_recipe_w_nan.add_step(StepImputeFill(sel=all_numeric_predictors(backend), value=0))
         res = example_recipe_w_nan.prep()
         imputed_list = [0, 1, 1, 0, 0, 0, 0, 0, 0, 1]
-        exp = pl.Series("x2",imputed_list, pl.Int32, strict=False) if backend == Backend.POLARS \
+        exp = (
+            pl.Series("x2", imputed_list, pl.Int32, strict=False)
+            if backend == Backend.POLARS
             else pd.Series(imputed_list, dtype="float64")
+        )
         assert res["x2"].equals(exp)
 
     def test_fast_zero_fill(self, example_recipe_w_nan):
@@ -177,7 +211,9 @@ class TestScaleStep:
         assert abs(res["x2"].mean()) < 0.00001
 
     def test_scale_step_w_args(self, example_recipe):
-        example_recipe.add_step(StepScale(all_numeric_predictors(backend=example_recipe.get_backend()), with_mean=False, with_std=False))
+        example_recipe.add_step(
+            StepScale(all_numeric_predictors(backend=example_recipe.get_backend()), with_mean=False, with_std=False)
+        )
         res = example_recipe.prep()
         assert abs(res["x1"].mean()) > 1
         assert abs(res["x1"].var()) > 1.5
@@ -193,7 +229,9 @@ class TestSklearnStep:
     @pytest.fixture()
     def example_recipe_w_categorical_label(self, example_df):
         if isinstance(example_df, pl.DataFrame):
-            example_df = example_df.with_columns(y=pl.Series(["a", "b", "c", "a", "c", "b", "c", "a", "b", "c"], dtype=pl.Categorical))
+            example_df = example_df.with_columns(
+                y=pl.Series(["a", "b", "c", "a", "c", "b", "c", "a", "b", "c"], dtype=pl.Categorical)
+            )
         else:
             example_df["y"] = pd.Categorical(["a", "b", "c", "a", "c", "b", "c", "a", "b", "c"])
         return Recipe(Ingredients(example_df), ["y"], ["x1", "x2", "x3", "x4"], ["id"])  # FIXME: add squence when merged
@@ -202,25 +240,43 @@ class TestSklearnStep:
         backend = example_recipe_w_nan.get_backend()
         example_recipe_w_nan.add_step(StepSklearn(SimpleImputer(strategy="constant", fill_value=0)))
         df = example_recipe_w_nan.prep()
-        assert (df[[2, 4, 6], "x2"].to_numpy() == np.full(3,0)).all() if backend == backend.POLARS else (df.loc[[2, 4, 6], "x2"] == 0).all()
+        assert (
+            (df[[2, 4, 6], "x2"].to_numpy() == np.full(3, 0)).all()
+            if backend == backend.POLARS
+            else (df.loc[[2, 4, 6], "x2"] == 0).all()
+        )
 
     def test_knn_imputer(self, example_recipe_w_nan):
         backend = example_recipe_w_nan.get_backend()
         example_recipe_w_nan.add_step(StepSklearn(KNNImputer(), sel=all_numeric_predictors(backend)))
         df = example_recipe_w_nan.prep()
-        assert (~np.isnan(df[[2, 4, 6], "x2"].to_numpy())).all() if backend == backend.POLARS else (~np.isnan(df.loc[[2, 4, 6], "x2"])).all()
+        assert (
+            (~np.isnan(df[[2, 4, 6], "x2"].to_numpy())).all()
+            if backend == backend.POLARS
+            else (~np.isnan(df.loc[[2, 4, 6], "x2"])).all()
+        )
 
     def test_iterative_imputer(self, example_recipe_w_nan):
         backend = example_recipe_w_nan.get_backend()
         example_recipe_w_nan.add_step(StepSklearn(IterativeImputer(), sel=all_numeric_predictors(backend)))
         df = example_recipe_w_nan.prep()
-        assert (~np.isnan(df[[2, 4, 6], "x2"].to_numpy())).all() if backend == backend.POLARS else (~np.isnan(df.loc[[2, 4, 6], "x2"])).all()
+        assert (
+            (~np.isnan(df[[2, 4, 6], "x2"].to_numpy())).all()
+            if backend == backend.POLARS
+            else (~np.isnan(df.loc[[2, 4, 6], "x2"])).all()
+        )
 
     def test_missing_indicator(self, example_recipe_w_nan):
         backend = example_recipe_w_nan.get_backend()
-        example_recipe_w_nan.add_step(StepSklearn(MissingIndicator(features="all"), sel=all_numeric_predictors(backend), in_place=False))
+        example_recipe_w_nan.add_step(
+            StepSklearn(MissingIndicator(features="all"), sel=all_numeric_predictors(backend), in_place=False)
+        )
         df = example_recipe_w_nan.prep()
-        assert (df[[2, 4, 6], "MissingIndicator_x2"].to_numpy()).all() if backend == backend.POLARS else (df.loc[[2, 4, 6], "MissingIndicator_x2"]).all()
+        assert (
+            (df[[2, 4, 6], "MissingIndicator_x2"].to_numpy()).all()
+            if backend == backend.POLARS
+            else (df.loc[[2, 4, 6], "MissingIndicator_x2"]).all()
+        )
 
     def test_standard_scaler(self, example_recipe):
         backend = example_recipe.get_backend()
@@ -267,29 +323,53 @@ class TestSklearnStep:
         backend = example_recipe.get_backend()
         example_recipe.add_step(
             StepSklearn(
-                KBinsDiscretizer(n_bins=2, strategy="uniform", encode="ordinal"), sel=all_numeric_predictors(backend=example_recipe.get_backend()), in_place=False
+                KBinsDiscretizer(n_bins=2, strategy="uniform", encode="ordinal"),
+                sel=all_numeric_predictors(backend=example_recipe.get_backend()),
+                in_place=False,
             )
         )
         df = example_recipe.prep()
-        assert (df["KBinsDiscretizer_x1"].is_in([0, 1])).all() if backend == Backend.POLARS else (df["KBinsDiscretizer_x1"].isin([0, 1])).all()
-        assert (df["KBinsDiscretizer_x2"].is_in([0, 1])).all() if backend == Backend.POLARS else (df["KBinsDiscretizer_x2"].isin([0, 1])).all()
+        assert (
+            (df["KBinsDiscretizer_x1"].is_in([0, 1])).all()
+            if backend == Backend.POLARS
+            else (df["KBinsDiscretizer_x1"].isin([0, 1])).all()
+        )
+        assert (
+            (df["KBinsDiscretizer_x2"].is_in([0, 1])).all()
+            if backend == Backend.POLARS
+            else (df["KBinsDiscretizer_x2"].isin([0, 1])).all()
+        )
 
     def test_quantile_transformer(self, example_recipe):
-        example_recipe.add_step(StepSklearn(QuantileTransformer(n_quantiles=10), sel=all_numeric_predictors(example_recipe.get_backend())))
+        example_recipe.add_step(
+            StepSklearn(QuantileTransformer(n_quantiles=10), sel=all_numeric_predictors(example_recipe.get_backend()))
+        )
         df = example_recipe.prep()
         assert ((0 <= df["x1"]) & (df["x1"] <= 1)).all()
         assert ((0 <= df["x2"]) & (df["x2"] <= 1)).all()
 
     def test_ordinal_encoder(self, example_recipe):
         backend = example_recipe.get_backend()
-        example_recipe.add_step(StepSklearn(OrdinalEncoder(), sel=has_type([str(pl.Categorical(ordering="physical")) if backend == backend.POLARS else "category"]), in_place=False))
+        example_recipe.add_step(
+            StepSklearn(
+                OrdinalEncoder(),
+                sel=has_type([str(pl.Categorical(ordering="physical")) if backend == backend.POLARS else "category"]),
+                in_place=False,
+            )
+        )
         df = example_recipe.prep()
         # FIXME assert correct number of new columns
         assert ((0 <= df["OrdinalEncoder_x3"]) & (df["OrdinalEncoder_x4"] <= 2)).all()
 
     def test_onehot_encoder(self, example_recipe):
         backend = example_recipe.get_backend()
-        example_recipe.add_step(StepSklearn(OneHotEncoder(sparse=False), sel=has_type([str(pl.Categorical(ordering="physical")) if backend == backend.POLARS else "category"]), in_place=False))
+        example_recipe.add_step(
+            StepSklearn(
+                OneHotEncoder(sparse=False),
+                sel=has_type([str(pl.Categorical(ordering="physical")) if backend == backend.POLARS else "category"]),
+                in_place=False,
+            )
+        )
         df = example_recipe.prep()
         if backend == backend.POLARS:
             assert (df["OneHotEncoder_1"].is_in([0, 1])).all()
@@ -346,15 +426,27 @@ class TestSklearnStep:
 
     def test_function_transformer(self, example_recipe):
         backend = example_recipe.get_backend()
-        example_recipe.add_step(StepSklearn(FunctionTransformer(np.log1p), sel=all_numeric_predictors(example_recipe.get_backend()), in_place=False))
+        example_recipe.add_step(
+            StepSklearn(
+                FunctionTransformer(np.log1p), sel=all_numeric_predictors(example_recipe.get_backend()), in_place=False
+            )
+        )
         df = example_recipe.prep()
         # FIXME assert correct number of new columns
-        assert not df["FunctionTransformer_x1"].is_empty() if backend == Backend.POLARS else not df["FunctionTransformer_x1"].empty
+        assert (
+            not df["FunctionTransformer_x1"].is_empty()
+            if backend == Backend.POLARS
+            else not df["FunctionTransformer_x1"].empty
+        )
 
     def test_wrong_columnwise(self, example_df):
         if isinstance(example_df, pl.DataFrame):
-            example_df = example_df.with_columns(y=pl.Series(["a", "b", "c", "a", "c", "b", "c", "a", "b", "c"], dtype=pl.Categorical))
-            example_df = example_df.with_columns(y1=pl.Series(["a", "b", "c", "a", "c", "b", "c", "a", "b", "c"], dtype=pl.Categorical))
+            example_df = example_df.with_columns(
+                y=pl.Series(["a", "b", "c", "a", "c", "b", "c", "a", "b", "c"], dtype=pl.Categorical)
+            )
+            example_df = example_df.with_columns(
+                y1=pl.Series(["a", "b", "c", "a", "c", "b", "c", "a", "b", "c"], dtype=pl.Categorical)
+            )
         else:
             example_df["y"] = pd.Categorical(["a", "b", "c", "a", "c", "b", "c", "a", "b", "c"])
             example_df["y1"] = pd.Categorical(["a", "b", "c", "a", "c", "b", "c", "a", "b", "c"])
@@ -366,14 +458,26 @@ class TestSklearnStep:
 
     def test_wrong_in_place(self, example_recipe):
         backend = example_recipe.get_backend()
-        example_recipe.add_step(StepSklearn(OneHotEncoder(sparse=False), sel=has_type([str(pl.Categorical(ordering="physical")) if backend == backend.POLARS else "category"]), in_place=True))
+        example_recipe.add_step(
+            StepSklearn(
+                OneHotEncoder(sparse=False),
+                sel=has_type([str(pl.Categorical(ordering="physical")) if backend == backend.POLARS else "category"]),
+                in_place=True,
+            )
+        )
         with pytest.raises(ValueError) as exc_info:
             example_recipe.prep()
         assert "in_place=False" in str(exc_info.value)
 
     def test_sparse_error(self, example_recipe):
         backend = example_recipe.get_backend()
-        example_recipe.add_step(StepSklearn(OneHotEncoder(sparse=True), sel=has_type([str(pl.Categorical(ordering="physical")) if backend == backend.POLARS else "category"]), in_place=False))
+        example_recipe.add_step(
+            StepSklearn(
+                OneHotEncoder(sparse=True),
+                sel=has_type([str(pl.Categorical(ordering="physical")) if backend == backend.POLARS else "category"]),
+                in_place=False,
+            )
+        )
         with pytest.raises(TypeError) as exc_info:
             example_recipe.prep()
         assert "sparse=False" in str(exc_info.value)

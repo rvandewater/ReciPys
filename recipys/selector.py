@@ -4,6 +4,7 @@ from typing import Union
 from polars import DataType
 from recipys.constants import Backend
 
+
 class Selector:
     """Class responsible for selecting the variables affected by a recipe step
 
@@ -16,12 +17,12 @@ class Selector:
     """
 
     def __init__(
-            self,
-            description: str,
-            names: Union[str, list[str]] = None,
-            roles: Union[str, list[str]] = None,
-            types: Union[str, list[str]] = None,
-            pattern: re.Pattern = None,
+        self,
+        description: str,
+        names: Union[str, list[str]] = None,
+        roles: Union[str, list[str]] = None,
+        types: Union[str, list[str]] = None,
+        pattern: re.Pattern = None,
     ):
         self.description = description
         self.set_names(names)
@@ -53,7 +54,6 @@ class Selector:
         """
         self.types = enlist_str(roles)
         # self.types = enlist_dt(roles)
-
 
     def set_pattern(self, pattern: re.Pattern):
         """Set the pattern to search with this Selector
@@ -91,7 +91,7 @@ class Selector:
             vars = intersection(vars, sel_roles)
 
         if self.types is not None:
-            sel_types = list(ingr.select_dtypes(include=self.types)) #.columns.tolist()
+            sel_types = list(ingr.select_dtypes(include=self.types))  # .columns.tolist()
             vars = intersection(vars, sel_types)
 
         if self.names is not None:
@@ -119,7 +119,7 @@ def enlist_dt(x: Union[DataType, list[DataType], None]) -> Union[list[DataType],
         _description_
     """
     if isinstance(x, DataType):
-            return [x]
+        return [x]
     elif isinstance(x, list):
         if not all(isinstance(i, DataType) for i in x):
             raise TypeError("Only lists of datatypes are allowed.")
@@ -261,6 +261,7 @@ def has_type(types: Union[str, list[str]]) -> Selector:
         Object representing the selection rule.
     """
     return Selector(description=f"types: {types}", types=types)
+
 
 def all_predictors() -> Selector:
     """Define selector for all predictor columns

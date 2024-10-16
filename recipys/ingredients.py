@@ -2,15 +2,13 @@ from copy import deepcopy
 import pandas as pd
 import polars as pl
 from typing import overload
-
-from pandas.io.sql import get_schema
-
 from recipys.constants import Backend
 
 
 class Ingredients:
     """Wrapper around either polars.DataFrame to store columns roles (e.g., predictor)
-        Due to the workings of polars, we do not subclass pl.dataframe anymore, but instead store the dataframe as an attribute.
+        Due to the workings of polars, we do not subclass pl.dataframe anymore,
+        but instead store the dataframe as an attribute.
     Args:
         roles: roles of DataFrame columns as (list of) strings.
             Defaults to None.
@@ -41,13 +39,13 @@ class Ingredients:
             elif isinstance(data, Ingredients):
                 self.backend = data.get_backend()
             else:
-                raise ValueError(f"Backend not specified and could not be inferred from data.")
+                raise ValueError("Backend not specified and could not be inferred from data.")
         else:
             self.backend = backend
         if isinstance(data, pd.DataFrame) or isinstance(data, pl.DataFrame):
             if self.backend == Backend.POLARS:
                 if isinstance(data, pd.DataFrame):
-                        self.data = pl.DataFrame(data)
+                    self.data = pl.DataFrame(data)
                 elif isinstance(data, pl.DataFrame):
                     self.data = data
                 else:
@@ -75,8 +73,10 @@ class Ingredients:
             self.roles = {}
         elif not isinstance(roles, dict):
             raise TypeError(f"Expected dict object for roles, got {roles.__class__}")
-        elif check_roles and not all(set(k).issubset(set(self.data.columns)) for k,v in roles.items()):
-            raise ValueError(f"Roles contains variable names that are not in the data {list(roles.values())} {self.data.columns}.")
+        elif check_roles and not all(set(k).issubset(set(self.data.columns)) for k, v in roles.items()):
+            raise ValueError(
+                f"Roles contains variable names that are not in the data {list(roles.values())} {self.data.columns}."
+            )
         # Todo: do we want to allow ingredients without grouping columns?
         # elif check_roles and select_groups(self) == []:
         #     raise ValueError("Roles are given but no groups are found in the data.")
@@ -94,7 +94,7 @@ class Ingredients:
     def columns(self):
         return self.data.columns
 
-    def to_df(self, output_format = None) -> pl.DataFrame:
+    def to_df(self, output_format=None) -> pl.DataFrame:
         """Return the underlying DataFrame.
 
 
@@ -113,8 +113,6 @@ class Ingredients:
                 return self.data
         else:
             return self.data
-
-
 
     def _check_column(self, column):
         if not isinstance(column, str):
@@ -178,21 +176,23 @@ class Ingredients:
                     f"Attempted to update role of {column} to {new_role} but "
                     f"{column} has more than one current roles: {self.roles[column]}"
                 )
-    def select_dtypes(self,include=None):
+
+    def select_dtypes(self, include=None):
         # if(isinstance(include,[str])):
         dtypes = self.get_str_dtypes()
         selected = [key for key, value in dtypes.items() if value in include]
         return selected
+
     def get_dtypes(self):
         dtypes = list(self.schema.values())
         return dtypes
 
     def get_str_dtypes(self):
-        """"
-            Helper function for polar dataframes to return schema with dtypes as strings
+        """ "
+        Helper function for polar dataframes to return schema with dtypes as strings
         """
         dtypes = self.get_schema()
-        return {key:str(value) for key,value in dtypes.items()}
+        return {key: str(value) for key, value in dtypes.items()}
         # return list(map(dtypes, cast()))
 
     def get_schema(self):
@@ -204,10 +204,10 @@ class Ingredients:
     def get_df(self):
         return self.to_df()
 
-    def set_df(self,df):
+    def set_df(self, df):
         self.data = df
 
-    def groupby(self,by):
+    def groupby(self, by):
         if self.backend == Backend.POLARS:
             self.data.group_by(by)
         else:
@@ -230,8 +230,5 @@ class Ingredients:
     def __getitem__(self, list: list[str]) -> pl.DataFrame:
         return self.data[list]
 
-    def __getitem__(self, idx:int) -> pl.Series:
+    def __getitem__(self, idx: int) -> pl.Series:
         return self.data[idx]
-
-
-

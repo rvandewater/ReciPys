@@ -1,6 +1,6 @@
 from __future__ import annotations
 from collections import Counter
-from copy import copy, deepcopy
+from copy import copy
 from itertools import chain
 from typing import Union
 
@@ -11,6 +11,7 @@ from recipys.ingredients import Ingredients
 from recipys.selector import select_groups
 from recipys.step import Step
 from recipys.constants import Backend
+
 
 class Recipe:
     """Recipe for preprocessing data
@@ -41,8 +42,8 @@ class Recipe:
         if not isinstance(data, Ingredients):
             try:
                 data = Ingredients(data, backend=backend)
-            except:
-                raise (f"Expected Ingredients, got {data.__class__}")
+            except Exception as e:
+                raise (f"Expected Ingredients, got {data.__class__} {e}")
         self.data = data
         self.steps = []
         self.original_columns = copy(data.columns)
@@ -113,14 +114,16 @@ class Recipe:
     def _check_data(self, data: Union[pl.DataFrame | pd.DataFrame, Ingredients]) -> Ingredients:
         if data is None:
             data = self.data
-        elif type(data) == pl.DataFrame or type(data) == pd.DataFrame:
-            # this is only executed when prep or bake recieve a DF that is different to the original data
+        elif isinstance(data, pl.DataFrame) or isinstance(data, pd.DataFrame):
+            # this is only executed when prep or bake receive a DF that is different to the original data
             # don't check the roles here, because self.data can have more roles than data (post feature generation)
             data = Ingredients(data, roles=self.data.roles, check_roles=False)
-        #if not data.columns.equals(self.data.columns):
+        # if not data.columns.equals(self.data.columns):
         if not set(data.columns) == set(self.original_columns):
-            raise ValueError(f"Columns of data argument differs from recipe data: "
-                             f"{[x for x in data.columns if x not in self.original_columns]}.")
+            raise ValueError(
+                f"Columns of data argument differs from recipe data: "
+                f"{[x for x in data.columns if x not in self.original_columns]}."
+            )
         return data
 
     def _apply_group(self, data, step):
@@ -130,7 +133,9 @@ class Recipe:
                 data.groupby(group_vars)
         return data
 
-    def prep(self, data: Union[pl.DataFrame | pd.DataFrame, Ingredients] = None, refit: bool = False) -> pl.DataFrame | pd.DataFrame:
+    def prep(
+        self, data: Union[pl.DataFrame | pd.DataFrame, Ingredients] = None, refit: bool = False
+    ) -> pl.DataFrame | pd.DataFrame:
         """Fits and transforms, in other words preps, the data.
 
         Args:
@@ -144,7 +149,7 @@ class Recipe:
         # Todo: check why the roles dissapear after copying
         data = copy(data)
         data = self._apply_fit_transform(data, refit)
-        #return pl.DataFrame(data)
+        # return pl.DataFrame(data)
         return data.get_df()
 
     def bake(self, data: Union[pl.DataFrame | pd.DataFrame, Ingredients] = None) -> pl.DataFrame | pd.DataFrame:

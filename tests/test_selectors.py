@@ -1,5 +1,4 @@
 import pytest
-import polars as pl
 from recipys.constants import Backend
 
 from recipys.selector import (
@@ -101,6 +100,7 @@ def test_has_type(example_ingredients):
     else:
         sel = has_type("float64")
     assert sel(example_ingredients) == ["y", "x1"]
+
 
 # def test_has_type_pl(example_ingredients):
 #     sel = has_type(pl.Float64)

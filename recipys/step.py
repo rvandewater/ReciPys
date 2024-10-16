@@ -24,6 +24,7 @@ from recipys.selector import (
 )
 from recipys.constants import Backend
 
+
 class Step:
     """This class represents a step in a recipe.
 
@@ -131,15 +132,16 @@ class StepImputeFill(Step):
 
     def transform(self, data):
         new_data = self._check_ingredients(data)
-        selected_cols = pl.col(self.columns)
         groups = select_groups(new_data)
         if data.get_backend() == Backend.POLARS:
-            if len(groups)>0:
+            if len(groups) > 0:
                 new_data.data = data.data.with_columns(
-                    pl.col(self.columns).fill_null(self.value, strategy=self.strategy, limit=self.limit).over(groups))
+                    pl.col(self.columns).fill_null(self.value, strategy=self.strategy, limit=self.limit).over(groups)
+                )
             else:
                 new_data.data = data.data.with_columns(
-                    pl.col(self.columns).fill_null(self.value, strategy=self.strategy, limit=self.limit))
+                    pl.col(self.columns).fill_null(self.value, strategy=self.strategy, limit=self.limit)
+                )
         else:
             # Pandas syntax
             self.strategy = "ffill" if self.strategy == "forward" else self.strategy
@@ -148,7 +150,7 @@ class StepImputeFill(Step):
                 df = new_data.groupby(groups)
             else:
                 df = new_data.get_df()
-                # [self.columns] = data.groupby(groups)[self.columns].fillna(self.value, method=self.strategy, limit=self.limit)
+            # [self.columns] = data.groupby(groups)[self.columns].fillna(self.value, method=self.strategy, limit=self.limit)
             new_data.set_df(df[self.columns].fillna(self.value, method=self.strategy, limit=self.limit))
         return new_data
 
@@ -318,16 +320,19 @@ class StepHistorical(Step):
             elif self.fun is Accumulator.MIN:
                 res = selected.with_columns(selected_cols.cum_min().over(id).name.suffix(self.suffix))
             elif self.fun is Accumulator.MEAN:
-                res = selected.with_columns(selected_cols.rolling_mean(window_size=selected.height, min_periods=0)
-                                      .over(id).name.suffix(self.suffix))
+                res = selected.with_columns(
+                    selected_cols.rolling_mean(window_size=selected.height, min_periods=0).over(id).name.suffix(self.suffix)
+                )
             elif self.fun is Accumulator.MEDIAN:
-                res = selected.with_columns(selected_cols.rolling_median(window_size=selected.height, min_periods=0)
-                                      .over(id).name.suffix(self.suffix))
+                res = selected.with_columns(
+                    selected_cols.rolling_median(window_size=selected.height, min_periods=0).over(id).name.suffix(self.suffix)
+                )
             elif self.fun is Accumulator.COUNT:
                 res = selected.with_columns(selected_cols.cum_count().over(id).name.suffix(self.suffix))
             elif self.fun is Accumulator.VAR:
-                res = selected.with_columns(selected_cols.rolling_var(window_size=selected.height, min_periods=0)
-                                      .over(id).name.suffix(self.suffix))
+                res = selected.with_columns(
+                    selected_cols.rolling_var(window_size=selected.height, min_periods=0).over(id).name.suffix(self.suffix)
+                )
             else:
                 raise TypeError(f"Expected Accumulator enum for function, got {self.fun.__class__}")
             new_data.set_df(res)
@@ -370,12 +375,12 @@ class StepSklearn(Step):
     """
 
     def __init__(
-            self,
-            sklearn_transformer: object,
-            sel: Selector = all_predictors(),
-            columnwise: bool = False,
-            in_place: bool = True,
-            role: str = "predictor",
+        self,
+        sklearn_transformer: object,
+        sel: Selector = all_predictors(),
+        columnwise: bool = False,
+        in_place: bool = True,
+        role: str = "predictor",
     ):
         super().__init__(sel)
         self.desc = f"Use sklearn transformer {sklearn_transformer.__class__.__name__}"
@@ -428,7 +433,7 @@ class StepSklearn(Step):
                     else [f"{self.sklearn_transformer.__class__.__name__}_{col}_{i + 1}" for i in range(new_cols.shape[1])]
                 )
                 if data.get_backend() == Backend.POLARS:
-                    if isinstance(col_names,str):
+                    if isinstance(col_names, str):
                         col_names = [col_names]
                     updated_cols = pl.from_numpy(new_cols, schema=col_names)
                     new_data.data = new_data.data.with_columns(updated_cols)
@@ -448,10 +453,11 @@ class StepSklearn(Step):
             col_names = (
                 self.columns
                 if self.in_place
-                else [f"{self.sklearn_transformer.__class__.__name__}_{self.columns[i]}" for i in range(new_cols.shape[1])]
-                if new_cols.shape[1] == len(self.columns)
-                else
-                    [f"{self.sklearn_transformer.__class__.__name__}_{i + 1}" for i in range(new_cols.shape[1])]
+                else (
+                    [f"{self.sklearn_transformer.__class__.__name__}_{self.columns[i]}" for i in range(new_cols.shape[1])]
+                    if new_cols.shape[1] == len(self.columns)
+                    else [f"{self.sklearn_transformer.__class__.__name__}_{i + 1}" for i in range(new_cols.shape[1])]
+                )
             )
             if new_cols.shape[1] != len(col_names):
                 raise ValueError(
@@ -502,9 +508,13 @@ class StepResampling(Step):
         sequence_datatype = new_data.dtypes[sequence_role]
 
         # if not (isinstance(pl.datatypes.TemporalType,sequence_datatype)): #or is_datetime64_any_dtype(sequence_datatype)):
-        if data.get_backend() == Backend.POLARS and not (sequence_datatype.is_temporal()):  # or is_datetime64_any_dtype(sequence_datatype)):
+        if data.get_backend() == Backend.POLARS and not (
+            sequence_datatype.is_temporal()
+        ):  # or is_datetime64_any_dtype(sequence_datatype)):
             raise ValueError(f"Expected Timedelta or Timestamp object, got {sequence_role(data).__class__}")
-        if data.get_backend() == Backend.PANDAS and not (is_timedelta64_dtype(sequence_datatype) or is_datetime64_any_dtype(sequence_datatype)):
+        if data.get_backend() == Backend.PANDAS and not (
+            is_timedelta64_dtype(sequence_datatype) or is_datetime64_any_dtype(sequence_datatype)
+        ):
             raise ValueError(f"Expected Timedelta or Timestamp object, got {sequence_role(data).__class__}")
 
         # Dictionary with the format column: str , accumulator:str is created
@@ -530,21 +540,27 @@ class StepResampling(Step):
             acc_col_map = defaultdict(list)
             for k, v in col_acc_map.items():
                 acc_col_map[v].append(k)
-            if len(select_groups(new_data))>0:
+            if len(select_groups(new_data)) > 0:
                 grouping_role = select_groups(new_data)[0]
                 # Resampling with the functions defined in col_acc_map
                 new_data.set_df(new_data.get_df().sort(grouping_role, sequence_role).set_sorted(sequence_role))
-                new_data.set_df(new_data.get_df().upsample(every=self.new_resolution, time_column=sequence_role, group_by=grouping_role)
-                                .with_columns(pl.col(acc_col_map["last"]).fill_null(strategy="forward"))
-                                .with_columns(pl.col(acc_col_map["mean"]).fill_null(strategy="mean"))
-                                .with_columns(pl.col(acc_col_map["max"]).fill_null(strategy="max"))
-                               .with_columns(pl.col(grouping_role).fill_null(strategy="forward")))
+                new_data.set_df(
+                    new_data.get_df()
+                    .upsample(every=self.new_resolution, time_column=sequence_role, group_by=grouping_role)
+                    .with_columns(pl.col(acc_col_map["last"]).fill_null(strategy="forward"))
+                    .with_columns(pl.col(acc_col_map["mean"]).fill_null(strategy="mean"))
+                    .with_columns(pl.col(acc_col_map["max"]).fill_null(strategy="max"))
+                    .with_columns(pl.col(grouping_role).fill_null(strategy="forward"))
+                )
             else:
                 new_data.set_df(new_data.get_df().sort(sequence_role).set_sorted(sequence_role))
-                new_data.set_df(new_data.get_df().upsample(every=self.new_resolution, time_column=sequence_role)
-                                .with_columns(pl.col(acc_col_map["last"]).fill_null(strategy="forward"))
-                                .with_columns(pl.col(acc_col_map["mean"]).fill_null(strategy="mean"))
-                                .with_columns(pl.col(acc_col_map["max"]).fill_null(strategy="max")))
+                new_data.set_df(
+                    new_data.get_df()
+                    .upsample(every=self.new_resolution, time_column=sequence_role)
+                    .with_columns(pl.col(acc_col_map["last"]).fill_null(strategy="forward"))
+                    .with_columns(pl.col(acc_col_map["mean"]).fill_null(strategy="mean"))
+                    .with_columns(pl.col(acc_col_map["max"]).fill_null(strategy="max"))
+                )
         else:
             # Resampling with the functions defined in col_acc_map
             if len(select_groups(new_data)) > 0:
@@ -573,24 +589,11 @@ class StepScale(StepSklearn):
        role (str, optional): Defaults to 'predictor'. Incase new columns are added, set their role to role.
     """
 
-    # def __new__(
-    #     cls,
-    #     sel: Selector = all_numeric_predictors(),
-    #     with_mean: bool = True,
-    #     with_std: bool = True,
-    #     in_place: bool = True,
-    #     role: str = "predictor",
-    # ):
-    #     return super(StepScale,self).StandardScaler(with_mean=with_mean, with_std=with_std), sel=sel, in_place=in_place, role=role)
-    def __init__(self,
-                 sel=all_numeric_predictors(),
-                 with_mean: bool = True,
-                 with_std: bool = True,
-                 *args, **kwargs):
-        super().__init__(sklearn_transformer=StandardScaler(with_mean=with_mean,with_std=with_std), sel=sel,
-                         in_place=True, *args, **kwargs)
+    def __init__(self, sel=all_numeric_predictors(), with_mean: bool = True, with_std: bool = True, *args, **kwargs):
+        super().__init__(
+            sklearn_transformer=StandardScaler(with_mean=with_mean, with_std=with_std), sel=sel, in_place=True, *args, **kwargs
+        )
         self.desc = "Scale with StandardScaler"
-
 
     def transform(self, data: Ingredients) -> Ingredients:
         data = super().transform(data)
@@ -600,8 +603,6 @@ class StepScale(StepSklearn):
         # else:
         #     data.set_df(data.get_df()[self.columns].fillna(value=None))
         return data
-
-
 
 
 class StepFunction(Step):
