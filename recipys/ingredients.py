@@ -31,24 +31,34 @@ class Ingredients:
         copy: bool = None,
         roles: dict = None,
         check_roles: bool = True,
-        backend: Backend = Backend.POLARS,
+        backend: Backend = None,
     ):
-        self.backend = backend
+        if backend is None:
+            if isinstance(data, pl.DataFrame):
+                self.backend = Backend.POLARS
+            elif isinstance(data, pd.DataFrame):
+                self.backend = Backend.PANDAS
+            elif isinstance(data, Ingredients):
+                self.backend = data.get_backend()
+            else:
+                raise ValueError(f"Backend not specified and could not be inferred from data.")
+        else:
+            self.backend = backend
         if isinstance(data, pd.DataFrame) or isinstance(data, pl.DataFrame):
-            if backend == Backend.POLARS:
+            if self.backend == Backend.POLARS:
                 if isinstance(data, pd.DataFrame):
                         self.data = pl.DataFrame(data)
                 elif isinstance(data, pl.DataFrame):
                     self.data = data
                 else:
                     raise TypeError(f"Expected DataFrame, got {data.__class__}")
-            elif backend == Backend.PANDAS:
+            elif self.backend == Backend.PANDAS:
                 if isinstance(data, pd.DataFrame):
                     self.data = data
                 if isinstance(data, pl.DataFrame):
                     self.data = data.to_pandas()
             else:
-                raise ValueError(f"Backend {backend} not supported.")
+                raise ValueError(f"Backend {self.backend} not supported.")
             self.schema = self.get_schema()
             self.dtypes = self.get_schema()
 

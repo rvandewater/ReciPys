@@ -1,3 +1,5 @@
+from datetime import datetime, MINYEAR
+
 import pandas as pd
 import pytest
 import polars as pl
@@ -52,9 +54,11 @@ class TestStepResampling:
         pre_sampling_len = example_df.shape[0]
         if isinstance(example_df, pl.DataFrame):
             backend = Backend.POLARS
+            timecolumn = pl.concat([pl.datetime_range(datetime(MINYEAR, 1, 1,0), datetime(MINYEAR, 1, 1,5), "1h", eager=True), pl.datetime_range(datetime(MINYEAR, 1, 1,0), datetime(MINYEAR, 1, 1,3), "1h", eager=True)])
+            example_df = example_df.with_columns(time=timecolumn)
         else:
             backend = Backend.PANDAS
-        rec = Recipe(example_df, ["y"], ["x1", "x2"], ["id"], ["time"])
+        rec = Recipe(example_df, ["y"], ["x1", "x2"], ["id"], ["time"], backend=backend)
         resampling_dict = {all_numeric_predictors(backend): Accumulator.MEAN}
         rec.add_step(StepResampling("2h", accumulator_dict=resampling_dict))
         df = rec.bake()
@@ -63,21 +67,36 @@ class TestStepResampling:
     def test_step_wo_selectors(self, example_df):
         # Using group role and without supplying any selectors
         pre_sampling_len = example_df.shape[0]
-        rec = Recipe(example_df, ["y"], ["x1", "x2"], ["id"], ["time"])
+        if isinstance(example_df, pl.DataFrame):
+            backend = Backend.POLARS
+            timecolumn = pl.concat([pl.datetime_range(datetime(MINYEAR, 1, 1,0), datetime(MINYEAR, 1, 1,5), "1h", eager=True), pl.datetime_range(datetime(MINYEAR, 1, 1,0), datetime(MINYEAR, 1, 1,3), "1h", eager=True)])
+            example_df = example_df.with_columns(time=timecolumn)
+        else:
+            backend = Backend.PANDAS
+        rec = Recipe(example_df, ["y"], ["x1", "x2"], ["id"], ["time"], backend=backend)
         rec.add_step(StepResampling("2h"))
         df = rec.bake()
         assert df.shape[0] == pre_sampling_len / 2
 
     # Todo: check if desired behaviour to have no group role
-    # def test_step_ungrouped(self, example_pl_df):
-    #     # Without using group role
-    #     pre_sampling_len = pl.Series(example_pl_df.time).drop_duplicates(inplace=False, keep="first").size
-    #     rec = Recipe(example_pl_df, ["y"], ["x1", "x2"])
-    #     rec.update_roles("time", "sequence")
-    #     resampling_dict = {all_numeric_predictors(): Accumulator.MEAN}
-    #     rec.add_step(StepResampling("2h", accumulator_dict=resampling_dict))
-    #     df = rec.bake()
-    #     assert df.shape[0] == pre_sampling_len / 2
+    def test_step_ungrouped(self, example_df):
+        # Without using group role
+        if isinstance(example_df, pl.DataFrame):
+            timecolumn = pl.concat([pl.datetime_range(datetime(MINYEAR, 1, 1,0), datetime(MINYEAR, 1, 1,5), "1h", eager=True), pl.datetime_range(datetime(MINYEAR, 1, 1,0), datetime(MINYEAR, 1, 1,3), "1h", eager=True)])
+            example_df = example_df.with_columns(time=timecolumn)
+            example_df = example_df.drop("id")
+            example_df = example_df.unique(subset="time")
+        else:
+            # Pandas
+            example_df.drop("id", axis=1, inplace=True)
+            example_df = example_df.drop_duplicates(subset="time", inplace=False, keep="first")
+        pre_sampling_len = example_df.shape[0]
+        rec = Recipe(example_df, ["y"], ["x1", "x2"])
+        rec.update_roles("time", "sequence")
+        resampling_dict = {all_numeric_predictors(): Accumulator.MEAN}
+        rec.add_step(StepResampling("2h", accumulator_dict=resampling_dict))
+        df = rec.bake()
+        assert df.shape[0] == (pre_sampling_len / 2)
 
 
 class TestStepHistorical:
@@ -162,7 +181,7 @@ class TestSklearnStep:
         backend = example_recipe_w_nan.get_backend()
         example_recipe_w_nan.add_step(StepSklearn(KNNImputer(), sel=all_numeric_predictors(backend)))
         df = example_recipe_w_nan.prep()
-        assert (~np.isnan(df[[2, 4, 6], "x2"].to_numpy())).all()
+        assert (~np.isnan(df[[2, 4, 6], "x2"].to_numpy())).all() if backend == backend.POLARS else (~np.isnan(df.loc[[2, 4, 6], "x2"])).all()
 
     def test_iterative_imputer(self, example_recipe_w_nan):
         backend = example_recipe_w_nan.get_backend()
@@ -236,7 +255,7 @@ class TestSklearnStep:
 
     def test_ordinal_encoder(self, example_recipe):
         backend = example_recipe.get_backend()
-        example_recipe.add_step(StepSklearn(OneHotEncoder(sparse=False), sel=has_type([str(pl.Categorical(ordering="physical")) if backend == backend.POLARS else "category"]), in_place=False))
+        example_recipe.add_step(StepSklearn(OrdinalEncoder(), sel=has_type([str(pl.Categorical(ordering="physical")) if backend == backend.POLARS else "category"]), in_place=False))
         df = example_recipe.prep()
         # FIXME assert correct number of new columns
         assert ((0 <= df["OrdinalEncoder_x3"]) & (df["OrdinalEncoder_x4"] <= 2)).all()
@@ -268,9 +287,14 @@ class TestSklearnStep:
             StepSklearn(LabelBinarizer(), sel=has_role(["outcome"]), columnwise=True, in_place=False, role="outcome")
         )
         df = example_recipe_w_categorical_label.prep()
-        assert (df["LabelBinarizer_y_1"].is_in([0, 1])).all()
-        assert (df["LabelBinarizer_y_2"].is_in([0, 1])).all()
-        assert (df["LabelBinarizer_y_3"].is_in([0, 1])).all()
+        if example_recipe_w_categorical_label.get_backend() == Backend.POLARS:
+            assert (df["LabelBinarizer_y_1"].is_in([0, 1])).all()
+            assert (df["LabelBinarizer_y_2"].is_in([0, 1])).all()
+            assert (df["LabelBinarizer_y_3"].is_in([0, 1])).all()
+        else:
+            assert (df["LabelBinarizer_y_1"].isin([0, 1])).all()
+            assert (df["LabelBinarizer_y_2"].isin([0, 1])).all()
+            assert (df["LabelBinarizer_y_3"].isin([0, 1])).all()
 
     def test_spline_transformer(self, example_recipe):
         backend = example_recipe.get_backend()

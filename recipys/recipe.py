@@ -10,7 +10,7 @@ import polars as pl
 from recipys.ingredients import Ingredients
 from recipys.selector import select_groups
 from recipys.step import Step
-
+from recipys.constants import Backend
 
 class Recipe:
     """Recipe for preprocessing data
@@ -33,10 +33,11 @@ class Recipe:
         predictors: Union[str, list[str]] = None,
         groups: Union[str, list[str]] = None,
         sequences: Union[str, list[str]] = None,
+        backend: Backend = None,
     ):
         if not isinstance(data, Ingredients):
             try:
-                data = Ingredients(data)
+                data = Ingredients(data, backend=backend)
             except:
                 raise (f"Expected Ingredients, got {data.__class__}")
         self.data = data

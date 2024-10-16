@@ -22,8 +22,8 @@ def example_pl_df():
     # ])
     # timecolumn = pl.arange(0, 5,eager=True)
     timecolumn = pl.from_pandas(pd.to_timedelta(np.concatenate((np.arange(6), np.arange(4))), unit="h"))
-    #pl.concat([pl.datetime_range(datetime(MINYEAR, 1, 1,0), datetime(MINYEAR, 1, 1,5), "1h", eager=True),
-              #pl.datetime_range(datetime(MINYEAR, 1, 1,0), datetime(MINYEAR, 1, 1,3), "1h", eager=True)])
+    # timecolumn = pl.concat([pl.datetime_range(datetime(MINYEAR, 1, 1,0), datetime(MINYEAR, 1, 1,5), "1h", eager=True),
+    #           pl.datetime_range(datetime(MINYEAR, 1, 1,0), datetime(MINYEAR, 1, 1,3), "1h", eager=True)])
 
     df = pl.DataFrame(
         {

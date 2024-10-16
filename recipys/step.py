@@ -281,7 +281,9 @@ class StepHistorical(Step):
                                       .over(id).name.suffix(self.suffix))
             else:
                 raise TypeError(f"Expected Accumulator enum for function, got {self.fun.__class__}")
+            new_data.set_df(res)
         else:
+            data = data.groupby(id)
             if self.fun is Accumulator.MAX:
                 res = data[self.columns].cummax(skipna=True)
             elif self.fun is Accumulator.MIN:
@@ -297,9 +299,10 @@ class StepHistorical(Step):
                 res = data[self.columns].expanding().var().reset_index(drop=True)
             else:
                 raise TypeError(f"Expected Accumulator enum for function, got {self.fun.__class__}")
-            new_data[new_columns] = res
+            df = new_data.get_df()
+            df[new_columns] = res
+            new_data.set_df(df)
 
-        new_data.data = res
         for nc in new_columns:
             new_data.update_role(nc, self.role)
 
@@ -478,27 +481,35 @@ class StepResampling(Step):
             acc_col_map = defaultdict(list)
             for k, v in col_acc_map.items():
                 acc_col_map[v].append(k)
-
-            grouping_role = select_groups(new_data)[0]
-            # Resampling with the functions defined in col_acc_map
-            # print(acc_col_map)
-            # print(acc_col_map["mean"])
-            new_data.set_df(new_data.get_df().sort(grouping_role, sequence_role).set_sorted(sequence_role))
-            new_data.set_df(new_data.get_df().upsample(every=self.new_resolution, time_column=sequence_role, group_by=grouping_role)
-                            .with_columns(pl.col(acc_col_map["last"]).fill_null(strategy="forward"))
-                            .with_columns(pl.col(acc_col_map["mean"]).fill_null(strategy="mean"))
-                            .with_columns(pl.col(acc_col_map["max"]).fill_null(strategy="max"))
-                           .with_columns(pl.col(grouping_role).fill_null(strategy="forward")))
+            if len(select_groups(new_data))>0:
+                grouping_role = select_groups(new_data)[0]
+                # Resampling with the functions defined in col_acc_map
+                new_data.set_df(new_data.get_df().sort(grouping_role, sequence_role).set_sorted(sequence_role))
+                new_data.set_df(new_data.get_df().upsample(every=self.new_resolution, time_column=sequence_role, group_by=grouping_role)
+                                .with_columns(pl.col(acc_col_map["last"]).fill_null(strategy="forward"))
+                                .with_columns(pl.col(acc_col_map["mean"]).fill_null(strategy="mean"))
+                                .with_columns(pl.col(acc_col_map["max"]).fill_null(strategy="max"))
+                               .with_columns(pl.col(grouping_role).fill_null(strategy="forward")))
+            else:
+                new_data.set_df(new_data.get_df().sort(sequence_role).set_sorted(sequence_role))
+                new_data.set_df(new_data.get_df().upsample(every=self.new_resolution, time_column=sequence_role)
+                                .with_columns(pl.col(acc_col_map["last"]).fill_null(strategy="forward"))
+                                .with_columns(pl.col(acc_col_map["mean"]).fill_null(strategy="mean"))
+                                .with_columns(pl.col(acc_col_map["max"]).fill_null(strategy="max")))
         else:
             # Resampling with the functions defined in col_acc_map
-            new_data = data.set_df(data.get_df().resample(self.new_resolution, on=sequence_role).agg(col_acc_map))
+            if len(select_groups(new_data)) > 0:
+                df = data.groupby(select_groups(data))
+            else:
+                df = data.get_df()
+            new_data.set_df(df.resample(self.new_resolution, on=sequence_role).agg(col_acc_map))
 
             # Remove multi-index in case of grouped data
             if isinstance(data.get_df(), DataFrameGroupBy):
                 new_data = new_data.set_df(new_data.get_df().droplevel(select_groups(data.get_df().obj)))
 
             # Remove sequence index, while keeping column
-            new_data = new_data.set_df(new_data.get_df().reset_index(drop=False))
+            # new_data = new_data.set_df(new_data.get_df().reset_index(drop=False))
         return new_data
 
 
