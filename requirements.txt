@@ -1,0 +1,10 @@
+black==24.3.0
+coverage==7.5.4
+flake8==7.1.0
+numpy==1.26.2
+pandas==2.2.3
+polars==1.9.0
+pyarrow==17.0.0
+pytest==8.3.3
+scikit-learn==1.5.2
+tqdm==4.66.3

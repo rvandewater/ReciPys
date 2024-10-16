@@ -5,10 +5,12 @@ from itertools import chain
 from typing import Union
 
 import pandas as pd
+import polars as pl
 
 from recipys.ingredients import Ingredients
 from recipys.selector import select_groups
 from recipys.step import Step
+from recipys.constants import Backend
 
 
 class Recipe:
@@ -30,16 +32,24 @@ class Recipe:
 
     def __init__(
         self,
-        data: Union[pd.DataFrame, Ingredients],
+        data: Ingredients | pl.DataFrame | pd.DataFrame,
         outcomes: Union[str, list[str]] = None,
         predictors: Union[str, list[str]] = None,
         groups: Union[str, list[str]] = None,
         sequences: Union[str, list[str]] = None,
+        backend: Backend = None,
     ):
-        self.data = Ingredients(data)
+        if not isinstance(data, Ingredients):
+            try:
+                data = Ingredients(data, backend=backend)
+            except Exception as e:
+                raise (f"Expected Ingredients, got {data.__class__} {e}")
+        self.data = data
         self.steps = []
+        self.original_columns = copy(data.columns)
         self.roles = self.data.roles
         self.columns = self.data.columns
+
         if outcomes:
             self.update_roles(outcomes, "outcome")
         if predictors:
@@ -101,25 +111,31 @@ class Recipe:
         self.steps.append(step)
         return self
 
-    def _check_data(self, data: Union[pd.DataFrame, Ingredients]) -> Ingredients:
+    def _check_data(self, data: Union[pl.DataFrame | pd.DataFrame, Ingredients]) -> Ingredients:
         if data is None:
             data = self.data
-        elif type(data) == pd.DataFrame:
-            # this is only executed when prep or bake recieve a DF that is different to the original data
+        elif isinstance(data, pl.DataFrame) or isinstance(data, pd.DataFrame):
+            # this is only executed when prep or bake receive a DF that is different to the original data
             # don't check the roles here, because self.data can have more roles than data (post feature generation)
-            data = Ingredients(data, roles=self.roles, check_roles=False)
-        if not data.columns.equals(self.columns):
-            raise ValueError("Columns of data argument differs from recipe data.")
+            data = Ingredients(data, roles=self.data.roles, check_roles=False)
+        # if not data.columns.equals(self.data.columns):
+        if not set(data.columns) == set(self.original_columns):
+            raise ValueError(
+                f"Columns of data argument differs from recipe data: "
+                f"{[x for x in data.columns if x not in self.original_columns]}."
+            )
         return data
 
     def _apply_group(self, data, step):
         if step.group:
             group_vars = select_groups(data)
             if len(group_vars) > 0:
-                data = data.groupby(group_vars)
+                data.groupby(group_vars)
         return data
 
-    def prep(self, data: Union[pd.DataFrame, Ingredients] = None, refit: bool = False) -> pd.DataFrame:
+    def prep(
+        self, data: Union[pl.DataFrame | pd.DataFrame, Ingredients] = None, refit: bool = False
+    ) -> pl.DataFrame | pd.DataFrame:
         """Fits and transforms, in other words preps, the data.
 
         Args:
@@ -130,11 +146,13 @@ class Recipe:
             Transformed data.
         """
         data = self._check_data(data)
+        # Todo: check why the roles dissapear after copying
         data = copy(data)
         data = self._apply_fit_transform(data, refit)
-        return pd.DataFrame(data)
+        # return pl.DataFrame(data)
+        return data.get_df()
 
-    def bake(self, data: Union[pd.DataFrame, Ingredients] = None) -> pd.DataFrame:
+    def bake(self, data: Union[pl.DataFrame | pd.DataFrame, Ingredients] = None) -> pl.DataFrame | pd.DataFrame:
         """Transforms, or bakes, the data if it has been prepped.
 
         Args:
@@ -144,9 +162,10 @@ class Recipe:
             Transformed data.
         """
         data = self._check_data(data)
-        data = copy(data)
+        # original_data = deepcopy(data)
         data = self._apply_fit_transform(data)
-        return pd.DataFrame(data)
+        # return pl.DataFrame(data)
+        return data.get_df()
 
     def _apply_fit_transform(self, data=None, refit=False):
         # applies transform or fit and transform (when refit or not trained yet)
@@ -163,7 +182,7 @@ class Recipe:
 
         # Print all existing roles and how many variables are assigned to each
         num_roles = Counter(chain.from_iterable(self.data.roles.values()))
-        num_roles = pd.DataFrame({"role": [r for r in num_roles.keys()], "#variables": [n for n in num_roles.values()]})
+        num_roles = pl.DataFrame({"role": [r for r in num_roles.keys()], "#variables": [n for n in num_roles.values()]})
         repr += "Inputs:\n\n" + num_roles.__repr__() + "\n\n"
 
         # Print all steps
@@ -172,6 +191,9 @@ class Recipe:
             repr += str(step) + "\n"
 
         return repr
+
+    def get_backend(self):
+        return self.data.get_backend()
 
     def cache(self):
         """Prepares the recipe for caching"""
