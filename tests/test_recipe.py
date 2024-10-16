@@ -1,4 +1,6 @@
 import polars as pl
+
+from recipys.constants import Backend
 from recipys.recipe import Recipe
 
 
@@ -25,3 +27,20 @@ def test_init_roles(example_pl_df):
     assert rec.data.roles["x3"] == ["predictor"]
     assert rec.data.roles["time"] == ["sequence"]
     assert rec.data.roles["id"] == ["group"]
+
+def test_inferring_backend_recipe(example_df):
+    ing = Recipe(example_df)
+    if isinstance(example_df, pl.DataFrame):
+        assert ing.get_backend() == Backend.POLARS
+    else:
+        assert ing.get_backend() == Backend.PANDAS
+
+def test_explicit_backend_recipe(example_df):
+    ing = Recipe(example_df, backend=Backend.PANDAS)
+    assert ing.get_backend() == Backend.PANDAS
+    ing = Recipe(example_df, backend=Backend.POLARS)
+    assert ing.get_backend() == Backend.POLARS
+
+def test_backend_ingredients_recipe(example_ingredients):
+    rec = Recipe(example_ingredients)
+    assert rec.get_backend() == example_ingredients.get_backend()

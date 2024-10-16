@@ -2,6 +2,7 @@ import pytest
 
 from recipys.ingredients import Ingredients
 from recipys.constants import Backend
+import polars as pl
 
 def test_pl_init_role(example_df):
     Ingredients(example_df, roles={"y": "outcome"})
@@ -136,3 +137,16 @@ def test_update_role_typo(example_ingredients):
     with pytest.raises(ValueError) as e_info:
         example_ingredients.update_role("y", "updated role", "firs role")
     assert e_info.match("not among current roles")
+
+def test_inferring_backend_ingredients(example_df):
+    ing = Ingredients(example_df)
+    if isinstance(example_df, pl.DataFrame):
+        assert ing.get_backend() == Backend.POLARS
+    else:
+        assert ing.get_backend() == Backend.PANDAS
+
+def test_explicit_backend_ingredients(example_df):
+    ing = Ingredients(example_df, backend=Backend.PANDAS)
+    assert ing.get_backend() == Backend.PANDAS
+    ing = Ingredients(example_df, backend=Backend.POLARS)
+    assert ing.get_backend() == Backend.POLARS
