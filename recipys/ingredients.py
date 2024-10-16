@@ -1,13 +1,14 @@
 from copy import deepcopy
-import numpy as np
 import pandas as pd
+import polars as pl
+from typing import overload
+from recipys.constants import Backend
 
-from pandas._typing import Axes, Dtype
 
-
-class Ingredients(pd.DataFrame):
-    """Wrapper around pandas.DataFrames to store columns roles (e.g., predictor)
-
+class Ingredients:
+    """Wrapper around either polars.DataFrame to store columns roles (e.g., predictor)
+        Due to the workings of polars, we do not subclass pl.dataframe anymore,
+        but instead store the dataframe as an attribute.
     Args:
         roles: roles of DataFrame columns as (list of) strings.
             Defaults to None.
@@ -24,33 +25,61 @@ class Ingredients(pd.DataFrame):
 
     def __init__(
         self,
-        data=None,
-        index: Axes = None,
-        columns: Axes = None,
-        dtype: Dtype = None,
+        data: pl.DataFrame | pd.DataFrame = None,
         copy: bool = None,
         roles: dict = None,
         check_roles: bool = True,
+        backend: Backend = None,
     ):
-        super().__init__(
-            data,
-            index,
-            columns,
-            dtype,
-            copy,
-        )
+        if backend is None:
+            if isinstance(data, pl.DataFrame):
+                self.backend = Backend.POLARS
+            elif isinstance(data, pd.DataFrame):
+                self.backend = Backend.PANDAS
+            elif isinstance(data, Ingredients):
+                self.backend = data.get_backend()
+            else:
+                raise ValueError("Backend not specified and could not be inferred from data.")
+        else:
+            self.backend = backend
+        if isinstance(data, pd.DataFrame) or isinstance(data, pl.DataFrame):
+            if self.backend == Backend.POLARS:
+                if isinstance(data, pd.DataFrame):
+                    self.data = pl.DataFrame(data)
+                elif isinstance(data, pl.DataFrame):
+                    self.data = data
+                else:
+                    raise TypeError(f"Expected DataFrame, got {data.__class__}")
+            elif self.backend == Backend.PANDAS:
+                if isinstance(data, pd.DataFrame):
+                    self.data = data
+                if isinstance(data, pl.DataFrame):
+                    self.data = data.to_pandas()
+            else:
+                raise ValueError(f"Backend {self.backend} not supported.")
+            self.schema = self.get_schema()
+            self.dtypes = self.get_schema()
 
         if isinstance(data, Ingredients) and roles is None:
             if copy is None or copy is True:
                 self.roles = deepcopy(data.roles)
             else:
                 self.roles = data.roles
+            self.data = data.data
+            self.schema = data.schema
+            self.dtypes = self.schema
+
         elif roles is None:
             self.roles = {}
         elif not isinstance(roles, dict):
-            raise TypeError(f"expected dict object for roles, got {roles.__class__}")
-        elif check_roles and not np.all([k in self.columns for k in roles]):
-            raise ValueError("roles contains variable name that is not in the data.")
+            raise TypeError(f"Expected dict object for roles, got {roles.__class__}")
+        elif check_roles and not all(set(k).issubset(set(self.data.columns)) for k, v in roles.items()):
+            raise ValueError(
+                f"Roles contains variable names that are not in the data {list(roles.values())} {self.data.columns}."
+            )
+        # Todo: do we want to allow ingredients without grouping columns?
+        # elif check_roles and select_groups(self) == []:
+        #     raise ValueError("Roles are given but no groups are found in the data.")
         else:
             if copy is None or copy is True:
                 self.roles = deepcopy(roles)
@@ -61,13 +90,29 @@ class Ingredients(pd.DataFrame):
     def _constructor(self):
         return Ingredients
 
-    def to_df(self) -> pd.DataFrame:
-        """Return the underlying pandas.DataFrame.
+    @property
+    def columns(self):
+        return self.data.columns
+
+    def to_df(self, output_format=None) -> pl.DataFrame:
+        """Return the underlying DataFrame.
+
 
         Returns:
             Self as DataFrame.
         """
-        return pd.DataFrame(self)
+        if output_format == Backend.POLARS:
+            if self.backend == Backend.POLARS:
+                return self.data
+            else:
+                return pl.DataFrame(self.data)
+        elif output_format == Backend.PANDAS:
+            if self.backend == Backend.POLARS:
+                return self.data.to_pandas()
+            else:
+                return self.data
+        else:
+            return self.data
 
     def _check_column(self, column):
         if not isinstance(column, str):
@@ -131,3 +176,59 @@ class Ingredients(pd.DataFrame):
                     f"Attempted to update role of {column} to {new_role} but "
                     f"{column} has more than one current roles: {self.roles[column]}"
                 )
+
+    def select_dtypes(self, include=None):
+        # if(isinstance(include,[str])):
+        dtypes = self.get_str_dtypes()
+        selected = [key for key, value in dtypes.items() if value in include]
+        return selected
+
+    def get_dtypes(self):
+        dtypes = list(self.schema.values())
+        return dtypes
+
+    def get_str_dtypes(self):
+        """ "
+        Helper function for polar dataframes to return schema with dtypes as strings
+        """
+        dtypes = self.get_schema()
+        return {key: str(value) for key, value in dtypes.items()}
+        # return list(map(dtypes, cast()))
+
+    def get_schema(self):
+        if self.backend == Backend.POLARS:
+            return self.data.schema
+        else:
+            return self.data.dtypes
+
+    def get_df(self):
+        return self.to_df()
+
+    def set_df(self, df):
+        self.data = df
+
+    def groupby(self, by):
+        if self.backend == Backend.POLARS:
+            self.data.group_by(by)
+        else:
+            return self.data.groupby(by)
+
+    def get_backend(self):
+        return self.backend
+
+    def __setitem__(self, idx, val):
+        if self.backend == Backend.POLARS:
+            self.data[idx] = val
+        else:
+            if isinstance(idx, tuple):
+                rows, column = idx
+                self.data[column][rows] = val
+            else:
+                self.data[idx] = val
+
+    @overload
+    def __getitem__(self, list: list[str]) -> pl.DataFrame:
+        return self.data[list]
+
+    def __getitem__(self, idx: int) -> pl.Series:
+        return self.data[idx]

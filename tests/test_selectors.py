@@ -1,4 +1,5 @@
 import pytest
+from recipys.constants import Backend
 
 from recipys.selector import (
     Selector,
@@ -25,9 +26,9 @@ def test_no_description():
     assert e_info.match("missing 1 required positional argument")
 
 
-def test_not_ingredients(example_df):
+def test_not_ingredients(example_pl_df):
     with pytest.raises(TypeError) as e_info:
-        Selector("test step")(example_df)
+        Selector("test step")(example_pl_df)
     assert e_info.match("Expected Ingredients")
 
 
@@ -92,10 +93,18 @@ def test_has_role(example_ingredients):
 
 
 def test_has_type(example_ingredients):
-    sel = has_type("float64")
+    # sel = has_type("Float64")
+    # sel = has_type(pl.Float64)
+    if example_ingredients.get_backend() == Backend.POLARS:
+        sel = has_type("Float64")
+    else:
+        sel = has_type("float64")
     assert sel(example_ingredients) == ["y", "x1"]
 
 
+# def test_has_type_pl(example_ingredients):
+#     sel = has_type(pl.Float64)
+#     assert sel(example_ingredients) == ["y", "x1"]
 def test_all_predictors(example_ingredients):
     example_ingredients.update_role("x1", "predictor")
     example_ingredients.update_role("x2", "predictor")
@@ -106,7 +115,7 @@ def test_all_predictors(example_ingredients):
 def test_all_numeric_predictors(example_ingredients):
     example_ingredients.update_role("x1", "predictor")
     example_ingredients.update_role("x2", "predictor")
-    sel = all_numeric_predictors()
+    sel = all_numeric_predictors(backend=example_ingredients.get_backend())
     assert sel(example_ingredients) == ["x1", "x2"]
 
 
