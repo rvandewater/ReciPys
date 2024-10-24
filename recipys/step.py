@@ -149,24 +149,23 @@ class StepImputeFill(Step):
                 func = pd.core.groupby.SeriesGroupBy.ffill
             elif self.strategy == "backward":
                 func = pd.core.groupby.SeriesGroupBy.bfill
-            else:
-                raise ValueError("No valid strategy provided.")
+            elif self.strategy == "zero":
+                self.value = 0
+            elif self.value is None:
+                raise ValueError(f"No valid strategy provided. Strategy was: {self.strategy}")
 
             if len(groups) > 0:
                 df = new_data.groupby(groups)
             else:
                 df = new_data.get_df()
             # [self.columns] = data.groupby(groups)[self.columns].fillna(self.value, method=self.strategy, limit=self.limit)
-            if self.strategy == "zero":
-                self.value=0
             new_df = new_data.get_df()
             if self.value is not None:
                 # If value is set, fill with value
                 if isinstance(df, GroupBy) or isinstance(df, DataFrameGroupBy):
                     # This type of imputation can only be done with ungrouped data
                     df = df.obj
-                    updated_columns = {col: df[col].fillna(self.value) for col in self.columns}
-
+                updated_columns = {col: df[col].fillna(self.value) for col in self.columns}
             else:
                 # if func is None:
                 #     # updated_columns = {col: df[col].fillna(self.value, method=self.strategy, limit=self.limit) for col in
