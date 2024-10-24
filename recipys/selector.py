@@ -281,10 +281,11 @@ def all_numeric_predictors(backend=Backend.POLARS) -> Selector:
         Object representing the selection rule.
     """
     sel = all_predictors()
-    if backend == Backend.POLARS:
-        sel.set_types(["Int8", "Int16", "Int32", "Int64", "Float32", "Float64"])
-    else:
-        sel.set_types(["int16", "int32", "int64", "float16", "float32", "float64"])
+    # if backend == Backend.POLARS:
+    sel.set_types(["Int8", "Int16", "Int32", "Int64", "Float32", "Float64",
+                   "int16", "int32", "int64", "float16", "float32", "float64"])
+    # else:
+    #     sel.set_types([])
     sel.description = "all numeric predictors"
     return sel
 
@@ -317,7 +318,8 @@ def select_groups(ingr: Ingredients) -> list[str]:
     Returns:
         grouping columns
     """
-    return all_groups()(ingr)
+    groups = all_groups()(ingr)
+    return groups
 
 
 def all_sequences() -> Selector:
