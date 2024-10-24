@@ -144,14 +144,40 @@ class StepImputeFill(Step):
                 )
         else:
             # Pandas syntax
-            self.strategy = "ffill" if self.strategy == "forward" else self.strategy
-            self.strategy = "bfill" if self.strategy == "backward" else self.strategy
+            func = None
+            if self.strategy == "forward":
+                func = pd.core.groupby.SeriesGroupBy.ffill
+            elif self.strategy == "backward":
+                func = pd.core.groupby.SeriesGroupBy.bfill
+            else:
+                raise ValueError("No valid strategy provided.")
+
             if len(groups) > 0:
                 df = new_data.groupby(groups)
             else:
                 df = new_data.get_df()
             # [self.columns] = data.groupby(groups)[self.columns].fillna(self.value, method=self.strategy, limit=self.limit)
-            new_data.set_df(df[self.columns].fillna(self.value, method=self.strategy, limit=self.limit))
+            if self.strategy == "zero":
+                self.value=0
+            new_df = new_data.get_df()
+            if self.value is not None:
+                # If value is set, fill with value
+                if isinstance(df, GroupBy) or isinstance(df, DataFrameGroupBy):
+                    # This type of imputation can only be done with ungrouped data
+                    df = df.obj
+                    updated_columns = {col: df[col].fillna(self.value) for col in self.columns}
+
+            else:
+                # if func is None:
+                #     # updated_columns = {col: df[col].fillna(self.value, method=self.strategy, limit=self.limit) for col in
+                #     #                    self.columns}
+                # else:
+                updated_columns = {col: func(df[col]) for col in self.columns}
+
+            # Use pd.concat to update the DataFrame in one go
+            new_df = pd.concat([new_df.drop(columns=self.columns), pd.DataFrame(updated_columns)], axis=1)
+            df = new_df
+            new_data.set_df(df)
         return new_data
 
 
@@ -353,9 +379,10 @@ class StepHistorical(Step):
                 res = data[self.columns].expanding().var().reset_index(drop=True)
             else:
                 raise TypeError(f"Expected Accumulator enum for function, got {self.fun.__class__}")
-            df = new_data.get_df()
-            df[new_columns] = res
-            new_data.set_df(df)
+            # df = new_data.get_df()
+            # df[new_columns] = res
+            # new_data.set_df(df)
+            new_data.set_df(new_data.get_df().assign(**{new_columns[i]: res.iloc[:, i] for i in range(len(new_columns))}))
 
         for nc in new_columns:
             new_data.update_role(nc, self.role)
