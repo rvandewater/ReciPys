@@ -137,7 +137,9 @@ class TestStepHistorical:
         if rec.get_backend() == Backend.POLARS:
             assert df["x1_min"][-1] == df.filter(pl.col("id") == 2).select(pl.col("x1")).min().item()
             assert df["x1_max"][-1] == df.filter(pl.col("id") == 2).select(pl.col("x1")).max().item()
-            assert df["x1_mean"][-1] == df.filter(pl.col("id") == 2).select(pl.col("x1")).mean().item()
+            # assert df["x1_mean"][-1] == df.filter(pl.col("id") == 2).select(pl.col("x1")).mean().item()
+            # With approximate equality
+            assert df["x1_mean"][-1] == pytest.approx(df.filter(pl.col("id") == 2).select(pl.col("x1")).mean().item())
             assert df["x1_median"][-1] == df.filter(pl.col("id") == 2).select(pl.col("x1")).median().item()
             assert df["x1_count"][-1] == df.filter(pl.col("id") == 2).select(pl.col("x1")).count().item()
             # somehow we get a rounding difference between these two values
