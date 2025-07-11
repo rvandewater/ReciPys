@@ -1,4 +1,4 @@
-![logo](https://github.com/rvandewater/ReciPies/blob/development/docs/figures/ReciPies_logo.png?raw=true)
+![logo](https://github.com/rvandewater/ReciPies/blob/development/docs/figures/recipies_logo.png?raw=true)
 
 # 🥧ReciPies🐍
 
