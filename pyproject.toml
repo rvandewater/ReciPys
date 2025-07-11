@@ -9,7 +9,9 @@ description = "A modular preprocessing package for Pandas Dataframe"
 readme = "README.md"
 license = { text = "MIT license" }
 authors = [
-    { name = "Robin van de Water", email = "robin.vandewater@hpi.de" }
+    { name = "Robin van de Water", email = "robin.vandewater@hpi.de" },
+    { name = "Hendrik Schmidt"},
+    { name = "Patrick Rockenschaub"}
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -30,7 +32,7 @@ recipys = "recipys.recipe:Recipe"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["recipys*"]
+include = ["recipies*"]
 exclude = ["tests*", "benchmarking*", "docs*", "examples*", "icu_demo_data*"]
 
 [tool.pytest.ini_options]
