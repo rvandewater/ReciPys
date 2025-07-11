@@ -29,7 +29,7 @@ jobs:
       - name: Install packages
         run: |
           pip install -e ".[tests, polars, pandas]"
-          pip install pytest
+          pip install pytest pytest-cov pytest-doctest-capture --upgrade
 
       #----------------------------------------------
       #              run test suite
