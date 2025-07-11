@@ -1,7 +1,7 @@
 import polars as pl
 
-from recipys.constants import Backend
-from recipys.recipe import Recipe
+from recipies.constants import Backend
+from recipies.recipe import Recipe
 
 
 def test_empty_prep_return_df(example_pl_df):

@@ -1,3 +1,3 @@
 # -*- coding: utf-8 -*-
 
-"""Test package for ReciPys."""
+"""Test package for ReciPies."""
