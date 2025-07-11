@@ -1,15 +1,15 @@
-![logo](https://github.com/rvandewater/ReciPys/blob/development/docs/figures/recipys_logo.png?raw=true)
+![logo](https://github.com/rvandewater/ReciPies/blob/development/docs/figures/ReciPies_logo.png?raw=true)
 
-# 🥧ReciPys🐍
+# 🥧ReciPies🐍
 
-[![CI](https://github.com/rvandewater/recipys/actions/workflows/ci.yml/badge.svg)](https://github.com/rvandewater/recipys/actions/workflows/ci.yml)
+[![CI](https://github.com/rvandewater/ReciPies/actions/workflows/ci.yml/badge.svg)](https://github.com/rvandewater/ReciPies/actions/workflows/ci.yml)
 [![Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 ![Platform](https://img.shields.io/badge/platform-linux--64%20|%20win--64%20|%20osx--64-lightgrey)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![PyPI version shields.io](https://img.shields.io/pypi/v/recipies.svg)](https://pypi.python.org/pypi/recipies/)
 [![arXiv](https://img.shields.io/badge/arXiv-2306.05109-b31b1b.svg)](http://arxiv.org/abs/2306.05109)
 
-The ReciPys package is a preprocessing framework operating on [Polars](https://github.com/pola-rs/polars)
+The ReciPies package is a preprocessing framework operating on [Polars](https://github.com/pola-rs/polars)
 and [Pandas](https://github.com/pandas-dev/pandas) dataframes. The backend can be chosen by the user.
 The operation of this package is inspired by the R-package [recipes](https://recipes.tidymodels.org/).
 This package allows the user to apply a number of extensible operations for imputation, feature generation/extraction,
@@ -18,19 +18,19 @@ It operates on modified Dataframe objects from the established data science pack
 
 ## Installation
 
-You can install ReciPys from pip using:
+You can install ReciPies from pip using:
 
 ```
 pip install recipies
 ```
 
-> Note that the package is called `recipies` and not `recipys` on pip due to a name clash with an existing package.
+> Note that the package is called `recipies` and not `ReciPies` on pip due to a name clash with an existing package.
 >
-You can install ReciPys from source to ensure you have the latest version:
+You can install ReciPies from source to ensure you have the latest version:
 
 ```
 conda env update -f environment.yml
-conda activate recipys
+conda activate ReciPies
 pip install -e .
 ```
 
