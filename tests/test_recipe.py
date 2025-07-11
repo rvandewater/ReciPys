@@ -6,12 +6,12 @@ from recipies.recipe import Recipe
 
 def test_empty_prep_return_df(example_pl_df):
     rec = Recipe(example_pl_df)
-    assert type(rec.prep()) == pl.DataFrame
+    assert isinstance(rec.prep(), pl.DataFrame)
 
 
 def test_empty_bake_return_df(example_pl_df):
     rec = Recipe(example_pl_df)
-    assert type(rec.bake()) == pl.DataFrame
+    assert isinstance(rec.bake(), pl.DataFrame)
 
 
 def test_prep_bake_same_result(example_pl_df, example_pl_recipe):
