@@ -1,31 +1,31 @@
-ReciPys
+ReciPies
 =======
 
-.. image:: https://img.shields.io/pypi/v/recipys
-  :target: https://pypi.org/project/recipys/
+.. image:: https://img.shields.io/pypi/v/recipies
+  :target: https://pypi.org/project/recipies/
   :alt: PyPI Version
 
-.. image:: https://codecov.io/gh/rvandewater/ReciPys/graph/badge.svg?token=YOUR_CODECOV_TOKEN
-  :target: https://codecov.io/gh/rvandewater/ReciPys
+.. image:: https://codecov.io/gh/rvandewater/ReciPies/graph/badge.svg?token=YOUR_CODECOV_TOKEN
+  :target: https://codecov.io/gh/rvandewater/ReciPies
   :alt: Code Coverage
 
-.. image:: https://github.com/rvandewater/ReciPys/actions/workflows/tests.yaml/badge.svg
-  :target: https://github.com/rvandewater/ReciPys/actions/workflows/tests.yaml
+.. image:: https://github.com/rvandewater/ReciPies/actions/workflows/tests.yaml/badge.svg
+  :target: https://github.com/rvandewater/ReciPies/actions/workflows/tests.yaml
   :alt: Tests
 
-.. image:: https://img.shields.io/pypi/pyversions/recipys
-  :target: https://pypi.org/project/recipys/
+.. image:: https://img.shields.io/pypi/pyversions/recipies
+  :target: https://pypi.org/project/recipies/
   :alt: Python Versions
 
-.. image:: https://img.shields.io/github/license/rvandewater/ReciPys
-  :target: https://github.com/rvandewater/ReciPys/blob/main/LICENSE
+.. image:: https://img.shields.io/github/license/rvandewater/ReciPies
+  :target: https://github.com/rvandewater/ReciPies/blob/main/LICENSE
   :alt: License
 
-.. image:: figures/recipys_logo.png
-  :alt: ReciPys Logo
+.. image:: figures/recipies_logo.png
+  :alt: ReciPies Logo
   :align: center
 
-ReciPys is a Python package for feature engineering and data preprocessing with a focus on medical and clinical data.
+ReciPies is a Python package for feature engineering and data preprocessing with a focus on medical and clinical data.
 It provides a unified interface for working with both Polars and Pandas DataFrames while maintaining column role
 information throughout data transformations.
 
@@ -42,30 +42,30 @@ information throughout data transformations.
    Installation
    ------------
 
-   Install ReciPys using pip:
+   Install ReciPies using pip:
 
    .. code-block:: bash
 
-      pip install recipys
+      pip install recipies
 
    For development installation:
 
    .. code-block:: bash
 
-      git clone https://github.com/rvandewater/ReciPys.git
-      cd ReciPys
+      git clone https://github.com/rvandewater/ReciPies.git
+      cd ReciPies
       pip install -e .
 
    Quick Start
    -----------
 
-   Here's a simple example of using ReciPys:
+   Here's a simple example of using ReciPies:
 
    .. code-block:: python
 
       import polars as pl
-      from recipys import Ingredients, Recipe
-      from recipys.step import Step
+      from recipies import Ingredients, Recipe
+      from recipies.step import Step
 
       # Create sample data
       data = pl.DataFrame({
@@ -111,7 +111,7 @@ information throughout data transformations.
    Backend Support
    ---------------
 
-   ReciPys supports both Polars and Pandas backends:
+   ReciPies supports both Polars and Pandas backends:
 
    - **Polars**: High-performance DataFrame library with lazy evaluation
    - **Pandas**: Traditional DataFrame library with extensive ecosystem support
@@ -131,12 +131,12 @@ information throughout data transformations.
    Contributing
    ------------
 
-   Contributions are welcome! Please see our contributing guidelines and open an issue or submit a pull request on the `GitHub repository <https://github.com/rvandewater/ReciPys>`_.
+   Contributions are welcome! Please see our contributing guidelines and open an issue or submit a pull request on the `GitHub repository <https://github.com/rvandewater/ReciPies>`_.
 
    License
    -------
 
-   This project is licensed under the MIT License. See the `LICENSE <https://github.com/rvandewater/ReciPys/blob/main/LICENSE>`_ file for details.
+   This project is licensed under the MIT License. See the `LICENSE <https://github.com/rvandewater/ReciPies/blob/main/LICENSE>`_ file for details.
 
    .. toctree::
       :maxdepth: 2

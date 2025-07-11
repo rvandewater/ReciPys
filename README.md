@@ -24,7 +24,7 @@ You can install ReciPies from pip using:
 pip install recipies
 ```
 
-> Note that the package is called `recipies` and not `ReciPies` on pip due to a name clash with an existing package.
+> Note that the package is called `recipies`  on pip.
 >
 You can install ReciPies from source to ensure you have the latest version:
 
