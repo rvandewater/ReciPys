@@ -1,7 +1,7 @@
 import pytest
-from recipies.constants import Backend
+from src.recipies.constants import Backend
 
-from recipies.selector import (
+from src.recipies.selector import (
     Selector,
     all_outcomes,
     all_of,

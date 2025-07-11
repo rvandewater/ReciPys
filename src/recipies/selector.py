@@ -1,8 +1,8 @@
 import re
-from recipies.ingredients import Ingredients
+from src.recipies.ingredients import Ingredients
 from typing import Union
 from polars import DataType
-from recipies.constants import Backend
+from src.recipies.constants import Backend
 
 
 class Selector:

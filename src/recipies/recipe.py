@@ -7,10 +7,10 @@ from typing import Union
 import pandas as pd
 import polars as pl
 
-from recipies.ingredients import Ingredients
-from recipies.selector import select_groups
-from recipies.step import Step
-from recipies.constants import Backend
+from .ingredients import Ingredients
+from .selector import select_groups
+from .step import Step
+from .constants import Backend
 
 
 class Recipe:

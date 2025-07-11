@@ -9,10 +9,10 @@ from sklearn.preprocessing import KBinsDiscretizer, StandardScaler, MinMaxScaler
     QuantileTransformer, SplineTransformer
 
 from generate_data import generate_icu_data
-from recipies.constants import Backend
-from recipies.recipe import Recipe
-from recipies.selector import all_numeric_predictors, all_predictors
-from recipies.step import StepScale, StepSklearn, StepImputeFill, StepHistorical, Accumulator
+from src.recipies.constants import Backend
+from src.recipies import Recipe
+from src.recipies.selector import all_numeric_predictors, all_predictors
+from src.recipies.step import StepScale, StepSklearn, StepImputeFill, StepHistorical, Accumulator
 import logging
 import polars.selectors as cs
 from memory_profiler import memory_usage
