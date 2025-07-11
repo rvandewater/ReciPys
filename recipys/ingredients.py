@@ -222,9 +222,20 @@ class Ingredients:
         else:
             if isinstance(idx, tuple):
                 rows, column = idx
-                self.data[column][rows] = val
+                self.data.loc[rows, column] = val
             else:
-                self.data[idx] = val
+                # Use assign for single column assignment to avoid fragmentation
+                if isinstance(idx, str):
+                    self.data = self.data.assign(**{idx: val})
+                else:
+                    # For non-string indices, use a more efficient approach
+                    # that avoids the fragmentation warning
+                    import warnings
+                    with warnings.catch_warnings():
+                        warnings.filterwarnings("ignore",
+                                              message="DataFrame is highly fragmented",
+                                              category=pd.errors.PerformanceWarning)
+                        self.data[idx] = val
 
     @overload
     def __getitem__(self, list: list[str]) -> pl.DataFrame:

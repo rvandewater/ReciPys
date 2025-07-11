@@ -119,7 +119,7 @@ class Step:
 
 
 class StepImputeFill(Step):
-    """For Pandas: yses pandas' internal `nafill` function to replace missing values.
+    """For Pandas: uses pandas' internal `nafill` function to replace missing values.
     See `pandas.DataFrame.nafill` for a description of the arguments.
     """
 
@@ -346,17 +346,17 @@ class StepHistorical(Step):
                 res = selected.with_columns(selected_cols.cum_min().over(id).name.suffix(self.suffix))
             elif self.fun is Accumulator.MEAN:
                 res = selected.with_columns(
-                    selected_cols.rolling_mean(window_size=selected.height, min_periods=0).over(id).name.suffix(self.suffix)
+                    selected_cols.rolling_mean(window_size=selected.height, min_samples=0).over(id).name.suffix(self.suffix)
                 )
             elif self.fun is Accumulator.MEDIAN:
                 res = selected.with_columns(
-                    selected_cols.rolling_median(window_size=selected.height, min_periods=0).over(id).name.suffix(self.suffix)
+                    selected_cols.rolling_median(window_size=selected.height, min_samples=0).over(id).name.suffix(self.suffix)
                 )
             elif self.fun is Accumulator.COUNT:
                 res = selected.with_columns(selected_cols.cum_count().over(id).name.suffix(self.suffix))
             elif self.fun is Accumulator.VAR:
                 res = selected.with_columns(
-                    selected_cols.rolling_var(window_size=selected.height, min_periods=0).over(id).name.suffix(self.suffix)
+                    selected_cols.rolling_var(window_size=selected.height, min_samples=0).over(id).name.suffix(self.suffix)
                 )
             else:
                 raise TypeError(f"Expected Accumulator enum for function, got {self.fun.__class__}")

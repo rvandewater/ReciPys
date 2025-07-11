@@ -1,4 +1,3 @@
-from email.policy import strict
 
 import polars as pl
 import numpy as np
@@ -7,33 +6,8 @@ import random
 # Enable StringCache
 pl.StringCache()
 
-from sklearn.impute import MissingIndicator
-from sklearn.preprocessing import (
-    Binarizer,
-    FunctionTransformer,
-    KBinsDiscretizer,
-    LabelBinarizer,
-    LabelEncoder,
-    MaxAbsScaler,
-    MinMaxScaler,
-    Normalizer,
-    OneHotEncoder,
-    OrdinalEncoder,
-    PolynomialFeatures,
-    PowerTransformer,
-    QuantileTransformer,
-    RobustScaler,
-    StandardScaler,
-    SplineTransformer,
-)
-from sklearn.experimental import enable_iterative_imputer
 
-from sklearn.impute import SimpleImputer, KNNImputer, IterativeImputer, MissingIndicator
 
-from recipys.recipe import Recipe
-from recipys.selector import all_numeric_predictors, all_predictors, has_type
-from recipys.step import StepScale, StepSklearn, StepImputeFill, StepHistorical, Accumulator
-from recipys.constants import Backend
 
 def generate_generic_datetime_data(stay_ids: list[int], max_rows: int, start_time: datetime, timestep: timedelta, columns: list[str], missingness: dict[str, float],
                                    categorical_columns=None) -> pl.DataFrame:
@@ -88,6 +62,8 @@ def generate_generic_datetime_data(stay_ids: list[int], max_rows: int, start_tim
                         col_data[idx] = None
                 data[column] = col_data
                 data[column] = pl.Series(data[column], dtype=pl.Categorical)
+                # data[column] = pl.Series(data[column], dtype=pl.Enum)
+
 
         # Create the DataFrame for the current stay_id
         df = pl.DataFrame(data)

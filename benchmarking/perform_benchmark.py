@@ -6,16 +6,17 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import polars as pl
 from sklearn.impute import MissingIndicator
 from sklearn.preprocessing import KBinsDiscretizer, StandardScaler, MinMaxScaler, MaxAbsScaler, RobustScaler, PowerTransformer, \
-    QuantileTransformer, SplineTransformer, OrdinalEncoder, OneHotEncoder
+    QuantileTransformer, SplineTransformer
 
 from generate_data import generate_icu_data
 from recipys.constants import Backend
 from recipys.recipe import Recipe
-from recipys.selector import all_numeric_predictors, all_predictors, has_type
+from recipys.selector import all_numeric_predictors, all_predictors
 from recipys.step import StepScale, StepSklearn, StepImputeFill, StepHistorical, Accumulator
 import logging
 import polars.selectors as cs
 from memory_profiler import memory_usage
+from tqdm import tqdm
 
 def benchmark_dynamic_recipe(data, backend):
     if backend == Backend.POLARS:
@@ -61,7 +62,7 @@ def dynamic_feature_generation(data, backend):
 
 
 def benchmark_backend(backend, data_size, seed):
-    metrics = {}
+    # metrics = {}
     df_missing = generate_icu_data(data_size, seed=seed)
     df_complete = generate_icu_data(data_size, missingness_threshold=(0,0), seed=seed)
     if backend == Backend.PANDAS:
@@ -137,46 +138,101 @@ if __name__ == "__main__":
     data_sizes = args.data_sizes
     seeds = args.seeds
 
-    df = None
-    df_list = []
-    for seed in seeds:
-        logging.info(f"Starting with seed {seed}")
-        timer = datetime.now()
-        for data_size in data_sizes:
-            timer = datetime.now()
+    # Detect if output is being redirected to a file
+    use_tqdm = sys.stdout.isatty() and sys.stderr.isatty()
+
+    # Create filename once at the beginning
+    csv_filename = f'results_datasizes_{data_sizes}_seeds_{seeds}_datetime_{datetime.now():%Y-%m-%d_%H-%M-%S}.csv'
+    size_results = []
+    with pl.StringCache():
+        data_size_iter = tqdm(data_sizes, desc="Processing data sizes", unit="size") if use_tqdm else data_sizes
+        for data_size in data_size_iter:
             logging.info(f"Starting with data size {data_size}")
-            combined = {}
-            polars = benchmark_backend(Backend.POLARS, data_size, seed=seed)
-            pandas = benchmark_backend(Backend.PANDAS, data_size, seed=seed)
-            polars = [pl.from_dict(item) for item in polars]
-            pandas = [pl.from_dict(item) for item in pandas]
-            polars = pl.concat(polars, how="vertical_relaxed")
-            pandas = pl.concat(pandas, how="vertical_relaxed")
-            if df is not None:
-                df = pl.concat([df, polars,pandas], how="vertical_relaxed")
-            else:
-                df = pl.concat([polars,pandas], how="vertical_relaxed")
-            logging.info(f"Time taken for data size {data_size}: {datetime.now() - timer}")
-        df_list.append(df)
+            timer = datetime.now()
 
-    df = pl.concat(df_list, how="vertical_relaxed")
-    df = df.group_by(["data_size", "step", "backend"]).agg([
-        pl.col("time_passed").mean().alias("duration_mean"),
-        pl.col("time_passed").std().alias("duration_std"),
-        pl.col("memory_usage").mean().alias("memory_mean"),
-        pl.col("memory_usage").std().alias("memory_std")
-    ])
-    columns = ["duration_mean", "duration_std", "memory_mean", "memory_std"]
+            # Collect results for this data size
+            seed_iter = tqdm(seeds, desc=f"Seeds for size {data_size}", unit="seed", leave=False) if use_tqdm else seeds
+            for seed in seed_iter:
+                timer = datetime.now()
+                logging.info(f"Starting with seed {seed}")
+                polars = benchmark_backend(Backend.POLARS, data_size, seed=seed)
+                pandas = benchmark_backend(Backend.PANDAS, data_size, seed=seed)
+                polars = [pl.from_dict(item) for item in polars]
+                pandas = [pl.from_dict(item) for item in pandas]
+                polars = pl.concat(polars, how="vertical_relaxed")
+                pandas = pl.concat(pandas, how="vertical_relaxed")
+                size_results.extend([polars, pandas])
+                logging.info(f"Time taken for seed {seed}: {datetime.now() - timer}")
 
-    df = (df#.group_by(["data_size", "step", "backend"])#.agg(pl.col("time_passed_mean"), pl.col("time_passed_std"))
-          .pivot(on="backend",values=columns, index=["data_size", "step"])
-          .with_columns(speed_difference = (pl.col("duration_mean_Pandas") - pl.col("duration_mean_Polars")),
-                        speedup = (pl.col("duration_mean_Pandas") / pl.col("duration_mean_Polars"))))
-    df = df.with_columns(cs.numeric().round(1))
-        #  value_name="time_passed"))
-    df = df.sort(by=["data_size", "step"])
-    df.write_csv(f'results_seeds_{[seeds]}_datetime_{datetime.now():%Y-%m-%d_%H-%M-%S%z}.csv')
-    print(df)
+            # Process results for this data size
+            df_size = pl.concat(size_results, how="vertical_relaxed")
+            df_size = df_size.group_by(["data_size", "step", "backend"]).agg([
+                pl.col("time_passed").mean().alias("duration_mean"),
+                pl.col("time_passed").std().alias("duration_std"),
+                pl.col("memory_usage").mean().alias("memory_mean"),
+                pl.col("memory_usage").std().alias("memory_std")
+            ])
+
+            columns = ["duration_mean", "duration_std", "memory_mean", "memory_std"]
+            df_size = (df_size
+                      .pivot(on="backend", values=columns, index=["data_size", "step"])
+                      .with_columns(
+                          speed_difference=(pl.col("duration_mean_Pandas") - pl.col("duration_mean_Polars")),
+                          speedup=(pl.col("duration_mean_Pandas") / pl.col("duration_mean_Polars"))
+                      ))
+            df_size = df_size.with_columns(cs.numeric().round(1))
+            df_size = df_size.sort(by=["data_size", "step"])
+
+            df_size.write_csv(csv_filename)
+
+            logging.info(f"Results for data size {data_size} written to {csv_filename}")
+            print(f"Completed data size {data_size}")
+# if __name__ == "__main__":
+#     args = parse_args()
+#     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+#     data_sizes = args.data_sizes
+#     seeds = args.seeds
+#
+#     df = None
+#     df_list = []
+#     for data_size in data_sizes:
+#         logging.info(f"Starting with data size {data_size}")
+#         timer = datetime.now()
+#         for seed in seeds:
+#             timer = datetime.now()
+#             logging.info(f"Starting with seed {seed}")
+#             combined = {}
+#             polars = benchmark_backend(Backend.POLARS, data_size, seed=seed)
+#             pandas = benchmark_backend(Backend.PANDAS, data_size, seed=seed)
+#             polars = [pl.from_dict(item) for item in polars]
+#             pandas = [pl.from_dict(item) for item in pandas]
+#             polars = pl.concat(polars, how="vertical_relaxed")
+#             pandas = pl.concat(pandas, how="vertical_relaxed")
+#             if df is not None:
+#                 df = pl.concat([df, polars,pandas], how="vertical_relaxed")
+#             else:
+#                 df = pl.concat([polars,pandas], how="vertical_relaxed")
+#             logging.info(f"Time taken for data size {data_size}: {datetime.now() - timer}")
+#             df_list.append(df)
+#
+#     df = pl.concat(df_list, how="vertical_relaxed")
+#     df = df.group_by(["data_size", "step", "backend"]).agg([
+#         pl.col("time_passed").mean().alias("duration_mean"),
+#         pl.col("time_passed").std().alias("duration_std"),
+#         pl.col("memory_usage").mean().alias("memory_mean"),
+#         pl.col("memory_usage").std().alias("memory_std")
+#     ])
+#     columns = ["duration_mean", "duration_std", "memory_mean", "memory_std"]
+#
+#     df = (df#.group_by(["data_size", "step", "backend"])#.agg(pl.col("time_passed_mean"), pl.col("time_passed_std"))
+#           .pivot(on="backend",values=columns, index=["data_size", "step"])
+#           .with_columns(speed_difference = (pl.col("duration_mean_Pandas") - pl.col("duration_mean_Polars")),
+#                         speedup = (pl.col("duration_mean_Pandas") / pl.col("duration_mean_Polars"))))
+#     df = df.with_columns(cs.numeric().round(1))
+#         #  value_name="time_passed"))
+#     df = df.sort(by=["data_size", "step"])
+#     df.write_csv(f'results_datasizes_{[data_sizes]}_seeds_{[seeds]}_datetime_{datetime.now():%Y-%m-%d_%H-%M-%S%z}.csv')
+#     print(df)
         # combined = pl.concat([pl.from_dict(combined), pl.from_dict(polars, strict=False), pl.from_dict(pandas, strict=False)], how="vertical_relaxed")
         # prefix = "pandas"
         # pandas = {f"{prefix}_{key}": value for key, value in pandas.items()}
