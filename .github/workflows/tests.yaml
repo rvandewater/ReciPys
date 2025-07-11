@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ["3.11", "3.12"]
+        python-version: ["3.12"]
       fail-fast: false
 
     timeout-minutes: 30
@@ -29,6 +29,7 @@ jobs:
       - name: Install packages
         run: |
           pip install -e ".[tests, polars, pandas]"
+          pip install pytest
 
       #----------------------------------------------
       #              run test suite
