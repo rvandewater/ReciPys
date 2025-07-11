@@ -30,4 +30,4 @@ jobs:
 
       - name: Run Ruff
         run: |
-          ruff check --line-length 127 --statistics
+          ruff check --line-length 127
