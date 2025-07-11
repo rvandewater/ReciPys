@@ -2,7 +2,7 @@ from copy import deepcopy
 import pandas as pd
 import polars as pl
 from typing import overload
-from recipys.constants import Backend
+from recipies.constants import Backend
 
 
 class Ingredients:

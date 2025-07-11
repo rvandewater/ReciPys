@@ -9,10 +9,10 @@ from sklearn.preprocessing import KBinsDiscretizer, StandardScaler, MinMaxScaler
     QuantileTransformer, SplineTransformer
 
 from generate_data import generate_icu_data
-from recipys.constants import Backend
-from recipys.recipe import Recipe
-from recipys.selector import all_numeric_predictors, all_predictors
-from recipys.step import StepScale, StepSklearn, StepImputeFill, StepHistorical, Accumulator
+from recipies.constants import Backend
+from recipies.recipe import Recipe
+from recipies.selector import all_numeric_predictors, all_predictors
+from recipies.step import StepScale, StepSklearn, StepImputeFill, StepHistorical, Accumulator
 import logging
 import polars.selectors as cs
 from memory_profiler import memory_usage
@@ -126,7 +126,7 @@ def benchmark_backend(backend, data_size, seed):
     return results
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Benchmarking script for recipys with ICU data generation and preprocessing.",
+    parser = argparse.ArgumentParser(description="Benchmarking script for recipies with ICU data generation and preprocessing.",
                                      usage="python perform_benchmark.py --data_sizes 10000 100000 --seeds 42 41")
     parser.add_argument('--data_sizes', type=int, nargs='+', default=[1000], help='List of data sizes to benchmark.')
     parser.add_argument('--seeds', type=int, nargs='+', default=[42, 41], help='Random seeds for data generation.')

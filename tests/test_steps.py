@@ -25,10 +25,10 @@ from sklearn.preprocessing import (
 from sklearn.experimental import enable_iterative_imputer  # noqa: F401
 from sklearn.impute import SimpleImputer, KNNImputer, IterativeImputer, MissingIndicator
 
-from recipys.ingredients import Ingredients
-from recipys.recipe import Recipe
-from recipys.selector import all_numeric_predictors, has_type, has_role, all_of
-from recipys.step import (
+from recipies.ingredients import Ingredients
+from recipies.recipe import Recipe
+from recipies.selector import all_numeric_predictors, has_type, has_role, all_of
+from recipies.step import (
     StepSklearn,
     StepHistorical,
     Accumulator,
@@ -38,7 +38,7 @@ from recipys.step import (
     StepImputeFastZeroFill,
     StepImputeFastForwardFill,
 )
-from recipys.constants import Backend
+from recipies.constants import Backend
 
 
 @pytest.fixture()

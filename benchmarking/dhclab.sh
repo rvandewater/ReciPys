@@ -9,5 +9,5 @@
 echo "Starting recipys benchmarking job"
 eval "$(conda shell.bash hook)"
 
-conda activate recipys
+conda activate recipies
 python benchmarking/perform_benchmark.py --seeds 1 2 3 4 5 --data_sizes 50 100 1000 10000 100000 1000000 #10000000 #100000000
