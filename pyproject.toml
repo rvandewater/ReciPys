@@ -35,3 +35,7 @@ exclude = ["tests*", "benchmarking*", "docs*", "examples*", "icu_demo_data*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 127
+include = ["*.py"]
