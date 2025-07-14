@@ -3,10 +3,13 @@
 # 🥧ReciPies🐍
 
 [![CI](https://github.com/rvandewater/ReciPies/actions/workflows/ci.yml/badge.svg)](https://github.com/rvandewater/ReciPies/actions/workflows/ci.yml)
-[![Black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)]
+(https://github.com/astral-sh/ruff)
 ![Platform](https://img.shields.io/badge/platform-linux--64%20|%20win--64%20|%20osx--64-lightgrey)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![PyPI version shields.io](https://img.shields.io/pypi/v/recipies.svg)](https://pypi.python.org/pypi/recipies/)
+[![Python Version](https://img.shields.io/pypi/pyversions/recipies.svg)](https://pypi.python.org/pypi/recipies/)
+[![Downloads](https://pepy.tech/badge/recipies)](https://pepy.tech/project/recipies)
 [![arXiv](https://img.shields.io/badge/arXiv-2306.05109-b31b1b.svg)](http://arxiv.org/abs/2306.05109)
 
 The ReciPies package is a preprocessing framework operating on [Polars](https://github.com/pola-rs/polars)
@@ -15,7 +18,6 @@ The operation of this package is inspired by the R-package [recipes](https://rec
 This package allows the user to apply a number of extensible operations for imputation, feature generation/extraction,
 scaling, and encoding.
 It operates on modified Dataframe objects from the established data science package Pandas.
-
 ## Installation
 
 You can install ReciPies from pip using:
