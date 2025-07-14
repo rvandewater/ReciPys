@@ -9,7 +9,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ["3.12"]
+        python-version: [ "3.12" ]
 
     steps:
       - uses: actions/checkout@v4
@@ -20,12 +20,16 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install pypa/build
-        run: >-
-          python3 -m
-          pip install
-          build
-          --user
+      - name: Debug git and version info
+        run: |
+          git tag -l
+          git describe --tags --dirty --always
+          echo "GitHub ref: ${{ github.ref }}"
+      - name: Install dependencies
+        run: |
+          python3 -m pip install setuptools-scm build
+      - name: Check setuptools-scm version
+        run: python3 -m setuptools_scm
       - name: Build a binary wheel and a source tarball
         run: python3 -m build
       - name: Store the distribution packages
