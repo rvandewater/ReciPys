@@ -3,8 +3,7 @@
 # 🥧ReciPies🐍
 
 [![CI](https://github.com/rvandewater/ReciPies/actions/workflows/ci.yml/badge.svg)](https://github.com/rvandewater/ReciPies/actions/workflows/ci.yml)
-[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)]
-(https://github.com/astral-sh/ruff)
+![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)
 ![Platform](https://img.shields.io/badge/platform-linux--64%20|%20win--64%20|%20osx--64-lightgrey)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![PyPI version shields.io](https://img.shields.io/pypi/v/recipies.svg)](https://pypi.python.org/pypi/recipies/)
