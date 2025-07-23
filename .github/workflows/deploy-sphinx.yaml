@@ -7,7 +7,7 @@ on:
       - development
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -24,4 +24,4 @@ jobs:
       - id: deployment
         uses: sphinx-notes/pages@v3
         with:
-          documentation_path: ./docs/source
+          documentation_path: docs
