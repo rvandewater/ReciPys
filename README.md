@@ -1,5 +1,6 @@
 <div align="center">
-  <img src="https://github.com/rvandewater/ReciPies/blob/development/docs/figures/recipies_logo.svg?raw=true" alt="logo" height="200">
+  <img src="https://github.com/rvandewater/ReciPies/blob/development/docs/figures/recipies_logo.svg?raw=true" 
+alt="recipies logo" height="300">
 </div>
 # 🥧ReciPies🐍
 
