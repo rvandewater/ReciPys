@@ -2,7 +2,8 @@
   <img src="https://github.com/rvandewater/ReciPies/blob/development/docs/figures/recipies_logo.svg?raw=true" 
 alt="recipies logo" height="300">
 </div>
-# 🥧ReciPies🐍
+
+# ReciPies 🥧
 
 [![CI](https://github.com/rvandewater/ReciPies/actions/workflows/ci.yml/badge.svg)](https://github.com/rvandewater/ReciPies/actions/workflows/ci.yml)
 ![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)
@@ -51,7 +52,8 @@ Any missing step can be added by following the step interface.
 
 # 📄Paper
 
-If you use this code in your research, please cite the following publication (a standalone paper is in preparation):
+If you use this code in your research, please cite the following publication which uses ReciPys extensively to create a 
+customisable preprocessing pipeline (a standalone paper is in preparation):
 
 ```
 @inproceedings{vandewaterYetAnotherICUBenchmark2024,

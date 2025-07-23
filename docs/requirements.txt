@@ -1,4 +1,4 @@
 sphinx
-sphinx-rtd-theme
+sphinx_immaterial
 sphinx-autoapi
 sphinx-autobuild

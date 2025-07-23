@@ -31,9 +31,7 @@ dependencies = [
     "polars[all]>=1.21.0",
     "scikit-learn>=1.5.2"
 ]
-
-[project.scripts]
-recipys = "recipys.recipe:Recipe"
+optional-dependencies = { dev = ["pytest>=7.0", "ruff>=0.1.0"], docs = ["sphinx", "sphinx_immaterial", "sphinx-autoapi", "sphinx-autobuild", "myst_parser"] }
 
 [tool.setuptools.packages.find]
 where = ["."]

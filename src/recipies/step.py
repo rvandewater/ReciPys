@@ -13,16 +13,16 @@ from sklearn.preprocessing import StandardScaler
 
 from pandas.api.types import is_timedelta64_dtype, is_datetime64_any_dtype
 
-from src.recipies.ingredients import Ingredients
+from .ingredients import Ingredients
 from enum import Enum
-from src.recipies.selector import (
+from .selector import (
     Selector,
     all_predictors,
     all_numeric_predictors,
     select_groups,
     select_sequence,
 )
-from src.recipies.constants import Backend
+from .constants import Backend
 
 
 class Step:
