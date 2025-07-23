@@ -5,90 +5,23 @@ on:
     branches:
       - main
       - development
+
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
   pages:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    permissions:
-      pages: write
-      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
       - id: deployment
         uses: sphinx-notes/pages@v3
         with:
           documentation_path: ./docs/source
-#jobs:
-#  #  deploy:
-#  #    runs-on: ubuntu-latest
-#  #  jobs:
-#  pages:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - id: deployment
-#        uses: sphinx-notes/pages@v3
-#        with:
-#          publish: false
-#          documentation_path: ./docs/source
-#      - uses: peaceiris/actions-gh-pages@v3
-#        with:
-#          github_token: ${{ secrets.GITHUB_TOKEN }}
-#          publish_dir: ${{ steps.deployment.outputs.artifact }}
-#    steps:
-#      - uses: actions/checkout@v4
-
-#      - name: Configure Git Credentials
-#        run: |
-#          git config user.name github-actions[bot]
-#          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-#
-#      - uses: actions/setup-python@v5
-#        with:
-#          python-version: 3.x
-
-#      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
-
-#      - uses: actions/cache@v4
-#        with:
-#          key: mkdocs-material-${{ env.cache_id }}
-#          path: .cache
-#
-#          restore-keys: |
-#            mkdocs-material-
-# Install dependencies
-#      - name: Install dependencies
-#        run: |
-#          pip install sphinx sphinx-rtd-theme sphinx-autoapi
-#      - name: Sphinx to GitHub Pages
-#        uses: sphinx-notes/pages@3.2
-# Build Sphinx documentation
-#          pip install mkdocs-material 'mkdocstrings[python]' sphinx-autoapi
-#      - name: Build Sphinx documentation
-#        run: |
-#          cd docs
-#          make html
-
-#      # Copy Sphinx output to MkDocs docs directory
-#      - name: Copy Sphinx output
-#        run: |
-#          cp -r sphinx/build/html docs/sphinx
-
-# Deploy MkDocs to GitHub Pages
-#      - name: Deploy MkDocs
-#        run: |
-#          mkdocs build --config-file ".readthedocs.yaml" --site-dir docs
-#          mkdocs gh-deploy --force
-#      - name: Deploy Sphinx to GitHub Pages
-#        run: |
-#          git worktree add /tmp/gh-pages origin/gh-pages || true
-#          rm -rf /tmp/gh-pages/*
-#          cp -r docs/_build/html/* /tmp/gh-pages/
-#          cd /tmp/gh-pages
-#          git add --all
-#          git commit -m "Deploy Sphinx documentation" || true
-#          git push origin gh-pages
