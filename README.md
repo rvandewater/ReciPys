@@ -1,5 +1,4 @@
-![logo](https://github.com/rvandewater/ReciPies/blob/development/docs/figures/recipies_logo.svg?raw=true)
-
+<img src="https://github.com/rvandewater/ReciPies/blob/development/docs/figures/recipies_logo.svg?raw=true" alt="logo" height="200">
 # 🥧ReciPies🐍
 
 [![CI](https://github.com/rvandewater/ReciPies/actions/workflows/ci.yml/badge.svg)](https://github.com/rvandewater/ReciPies/actions/workflows/ci.yml)
