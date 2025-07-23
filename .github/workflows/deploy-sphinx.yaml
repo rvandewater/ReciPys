@@ -5,23 +5,19 @@ on:
     branches:
       - main
       - development
-
 permissions:
   contents: write
-  pages: write
-  id-token: write
-
 jobs:
   pages:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
       - id: deployment
         uses: sphinx-notes/pages@v3
         with:
-          documentation_path: docs/source
+          documentation_path: ./docs/source
