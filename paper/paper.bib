@@ -1,0 +1,310 @@
+@book{10.1145/3641525,
+  title = {{{ACM REP}} '24: {{Proceedings}} of the 2nd {{ACM}} Conference on Reproducibility and Replicability},
+  date = {2024},
+  publisher = {Association for Computing Machinery},
+  location = {Rennes, France and New York, NY, USA},
+  isbn = {979-8-4007-0530-4}
+}
+
+@article{galliFeatureenginePythonPackage2021,
+  title = {Feature-Engine: {{A Python}} Package for Feature Engineering for Machine Learning},
+  shorttitle = {Feature-Engine},
+  author = {Galli, Soledad},
+  date = {2021-09-22},
+  journaltitle = {Journal of Open Source Software},
+  shortjournal = {JOSS},
+  volume = {6},
+  number = {65},
+  pages = {3642},
+  publisher = {The Open Journal},
+  issn = {2475-9066},
+  doi = {10.21105/joss.03642},
+  url = {https://joss.theoj.org/papers/10.21105/joss.03642},
+  urldate = {2025-07-22},
+  abstract = {Feature-engine is an open source Python library with the most exhaustive battery of transformations to engineer and select features for use in machine learning. Feature-engine supports several techniques to impute missing data, encode categorical variables, transform variables mathematically, perform discretization, remove or censor outliers, and combine variables into new features. Feature-engine also hosts an array of algorithms for feature selection.},
+  langid = {english},
+  file = {/Users/robin/Zotero/storage/V3LYVWF4/Galli - 2021 - Feature-engine A Python package for feature engineering for machine learning.pdf}
+}
+
+@inproceedings{j.PyjanitorCleanerAPI2019,
+  title = {Pyjanitor: {{A Cleaner API}} for {{Cleaning Data}}},
+  shorttitle = {Pyjanitor},
+  booktitle = {Proceedings of the {{Python}} in {{Science Conference}}},
+  author = {J., Eric and Barry, Zachary and Zuckerman, Sam and Sailer, Zachary},
+  date = {2019},
+  pages = {50--53},
+  publisher = {SciPy},
+  location = {Austin, Texas},
+  issn = {2575-9752},
+  doi = {10.25080/majora-7ddc1dd1-007},
+  url = {https://doi.curvenote.com/10.25080/Majora-7ddc1dd1-007},
+  urldate = {2025-07-22},
+  abstract = {The pandas library has become the de facto library for data wrangling in the Python programming language. However, inconsistencies in the pandas application programming interface (API), while idiomatic due to historical use, prevent use of expressive, fluent programming idioms that enable self-documenting pandas code. Here, we introduce pyjanitor, an open source Python package that extends the pandas API with such idioms. We describe its design and implementation of the package, provide usage examples from a variety of domains, and discuss the ways that the pyjanitor project has enabled the inclusion of first-time contributors to open source projects.},
+  eventtitle = {Python in {{Science Conference}}},
+  langid = {english},
+  file = {/Users/robin/Zotero/storage/KFHKGQJY/J. et al. - 2019 - pyjanitor A Cleaner API for Cleaning Data.pdf}
+}
+
+@article{johnsonMIMICIVFreelyAccessible2023,
+  title = {{{MIMIC-IV}}, a Freely Accessible Electronic Health Record Dataset},
+  author = {Johnson, Alistair E. W. and Bulgarelli, Lucas and Shen, Lu and Gayles, Alvin and Shammout, Ayad and Horng, Steven and Pollard, Tom J. and Moody, Benjamin and Gow, Brian and Lehman, Li-wei H. and Celi, Leo A. and Mark, Roger G.},
+  date = {2023-01-03},
+  journaltitle = {Scientific Data},
+  shortjournal = {Sci Data},
+  volume = {10},
+  number = {1},
+  pages = {1},
+  issn = {2052-4463},
+  doi = {10.1038/s41597-022-01899-x},
+  url = {https://www.nature.com/articles/s41597-022-01899-x},
+  urldate = {2023-04-13},
+  abstract = {Abstract             Digital data collection during routine clinical practice is now ubiquitous within hospitals. The data contains valuable information on the care of patients and their response to treatments, offering exciting opportunities for research. Typically, data are stored within archival systems that are not intended to support research. These systems are often inaccessible to researchers and structured for optimal storage, rather than interpretability and analysis. Here we present MIMIC-IV, a publicly available database sourced from the electronic health record of the Beth Israel Deaconess Medical Center. Information available includes patient measurements, orders, diagnoses, procedures, treatments, and deidentified free-text clinical notes. MIMIC-IV is intended to support a wide array of research studies and educational material, helping to reduce barriers to conducting clinical research.},
+  langid = {english},
+  file = {/Users/robin/Zotero/storage/ZTI6MGCU/Johnson et al_2023_MIMIC-IV, a freely accessible electronic health record dataset.pdf}
+}
+
+@inproceedings{johnsonReproducibilityCriticalCare2017a,
+  title = {Reproducibility in Critical Care: A Mortality Prediction Case Study},
+  shorttitle = {Reproducibility in Critical Care},
+  booktitle = {Proceedings of the 2nd {{Machine Learning}} for {{Healthcare Conference}}},
+  author = {Johnson, Alistair E. W. and Pollard, Tom J. and Mark, Roger G.},
+  date = {2017-11-06},
+  pages = {361--376},
+  publisher = {PMLR},
+  issn = {2640-3498},
+  url = {https://proceedings.mlr.press/v68/johnson17a.html},
+  urldate = {2025-07-23},
+  abstract = {Mortality prediction of intensive care unit (ICU) patients facilitates hospital benchmarking and has the opportunity to provide caregivers with useful summaries of patient health at the bedside. The development of novel models for mortality prediction is a popular task in machine learning, with researchers typically seeking to maximize measures such as the area under the receiver operator characteristic curve (AUROC). The number of ’researcher degrees of freedom’ that contribute to the performance of a model, however, presents a challenge when seeking to compare reported performance of such models. In this study, we review publications that have reported performance of mortality prediction models based on the Medical Information Mart for Intensive Care (MIMIC) database and attempt to reproduce the cohorts used in their studies. We then compare the performance reported in the studies against gradient boosting and logistic regression models using a simple set of features extracted from MIMIC. We demonstrate the large heterogeneity in studies that purport to conduct the single task of ’mortality prediction’, highlighting the need for improvements in the way that prediction tasks are reported to enable fairer comparison between models. We reproduced datasets for 38 experiments corresponding to 28 published studies using MIMIC. In half of the experiments, the sample size we acquired was 25\% greater or smaller than the sample size reported. The highest discrepancy was 11,767 patients. While accurate reproduction of each study cannot be guaranteed, we believe that these results highlight the need for more consistent reporting of model design and methodology to allow performance improvements to be compared. We discuss the challenges in reproducing the cohorts used in the studies, highlighting the importance of clearly reported methods (e.g. data cleansing, variable selection, cohort selection) and the need for open code and publicly available benchmarks.},
+  eventtitle = {Machine {{Learning}} for {{Healthcare Conference}}},
+  langid = {english},
+  file = {/Users/robin/Zotero/storage/5C74RYC5/Johnson et al. - 2017 - Reproducibility in critical care a mortality prediction case study.pdf}
+}
+
+@article{kellyKeyChallengesDelivering2019a,
+  title = {Key Challenges for Delivering Clinical Impact with Artificial Intelligence},
+  author = {Kelly, Christopher J. and Karthikesalingam, Alan and Suleyman, Mustafa and Corrado, Greg and King, Dominic},
+  date = {2019-12},
+  journaltitle = {BMC Medicine},
+  shortjournal = {BMC Med},
+  volume = {17},
+  number = {1},
+  pages = {195},
+  issn = {1741-7015},
+  doi = {10.1186/s12916-019-1426-2},
+  url = {https://bmcmedicine.biomedcentral.com/articles/10.1186/s12916-019-1426-2},
+  urldate = {2023-04-12},
+  abstract = {Background: Artificial intelligence (AI) research in healthcare is accelerating rapidly, with potential applications being demonstrated across various domains of medicine. However, there are currently limited examples of such techniques being successfully deployed into clinical practice. This article explores the main challenges and limitations of AI in healthcare, and considers the steps required to translate these potentially transformative technologies from research to clinical practice. Main body: Key challenges for the translation of AI systems in healthcare include those intrinsic to the science of machine learning, logistical difficulties in implementation, and consideration of the barriers to adoption as well as of the necessary sociocultural or pathway changes. Robust peer-reviewed clinical evaluation as part of randomised controlled trials should be viewed as the gold standard for evidence generation, but conducting these in practice may not always be appropriate or feasible. Performance metrics should aim to capture real clinical applicability and be understandable to intended users. Regulation that balances the pace of innovation with the potential for harm, alongside thoughtful postmarket surveillance, is required to ensure that patients are not exposed to dangerous interventions nor deprived of access to beneficial innovations. Mechanisms to enable direct comparisons of AI systems must be developed, including the use of independent, local and representative test sets. Developers of AI algorithms must be vigilant to potential dangers, including dataset shift, accidental fitting of confounders, unintended discriminatory bias, the challenges of generalisation to new populations, and the unintended negative consequences of new algorithms on health outcomes. Conclusion: The safe and timely translation of AI research into clinically validated and appropriately regulated systems that can benefit everyone is challenging. Robust clinical evaluation, using metrics that are intuitive to clinicians and ideally go beyond measures of technical accuracy to include quality of care and patient outcomes, is essential. Further work is required (1) to identify themes of algorithmic bias and unfairness while developing mitigations to address these, (2) to reduce brittleness and improve generalisability, and (3) to develop methods for improved interpretability of machine learning predictions. If these goals can be achieved, the benefits for patients are likely to be transformational.},
+  langid = {english},
+  file = {/Users/robin/Zotero/storage/IL456PGP/Kelly et al. - 2019 - Key challenges for delivering clinical impact with.pdf}
+}
+
+@software{kuhnRecipesPreprocessingFeature2024,
+  title = {Recipes: {{Preprocessing}} and {{Feature Engineering Steps}} for {{Modeling}}},
+  shorttitle = {Recipes},
+  author = {Kuhn, Max and Wickham, Hadley and Hvitfeldt, Emil and Software, Posit and PBC},
+  date = {2024-07-04},
+  url = {https://cloud.r-project.org/web/packages/recipes/index.html},
+  urldate = {2024-07-09},
+  abstract = {A recipe prepares your data for modeling. We provide an extensible framework for pipeable sequences of feature engineering steps provides preprocessing tools to be applied to data. Statistical parameters for the steps can be estimated from an initial data set and then applied to other data sets. The resulting processed output can then be used as inputs for statistical or machine learning models.},
+  version = {1.1.0}
+}
+
+@inproceedings{mckinney-proc-scipy-2010,
+  title = {Data {{Structures}} for {{Statistical Computing}} in {{Python}}},
+  booktitle = {Proceedings of the 9th {{Python}} in {{Science Conference}}},
+  author = {McKinney, Wes},
+  editor = {family=Walt, given=Stéfan, prefix=van der, useprefix=true and Millman, Jarrod},
+  date = {2010},
+  pages = {56--61},
+  doi = {10.25080/Majora-92bf1922-00a}
+}
+
+@online{mozzilloEvaluationDataframeLibraries2024,
+  title = {Evaluation of {{Dataframe Libraries}} for {{Data Preparation}} on a {{Single Machine}}},
+  author = {Mozzillo, Angelo and Zecchini, Luca and Gagliardelli, Luca and Aslam, Adeel and Bergamaschi, Sonia and Simonini, Giovanni},
+  date = {2024-06-10},
+  eprint = {2312.11122},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  url = {http://arxiv.org/abs/2312.11122},
+  urldate = {2024-07-09},
+  abstract = {Data preparation is a trial-and-error process that typically involves countless iterations over the data to define the best pipeline of operators for a given task. With tabular data, practitioners often perform that burdensome activity on local machines by writing ad hoc scripts with libraries based on the Pandas dataframe API and testing them on samples of the entire dataset—the faster the library, the less idle time its users have.},
+  langid = {english},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Databases},
+  file = {/Users/robin/Zotero/storage/B2KUGHJ3/Mozzillo et al. - 2024 - Evaluation of Dataframe Libraries for Data Prepara.pdf}
+}
+
+@inproceedings{paszkePyTorchImperativeStyle2019,
+  title = {{{PyTorch}}: {{An Imperative Style}}, {{High-Performance Deep Learning Library}}},
+  shorttitle = {{{PyTorch}}},
+  booktitle = {Advances in {{Neural Information Processing Systems}}},
+  author = {Paszke, Adam and Gross, Sam and Massa, Francisco and Lerer, Adam and Bradbury, James and Chanan, Gregory and Killeen, Trevor and Lin, Zeming and Gimelshein, Natalia and Antiga, Luca and Desmaison, Alban and Kopf, Andreas and Yang, Edward and DeVito, Zachary and Raison, Martin and Tejani, Alykhan and Chilamkurthy, Sasank and Steiner, Benoit and Fang, Lu and Bai, Junjie and Chintala, Soumith},
+  date = {2019},
+  volume = {32},
+  publisher = {Curran Associates, Inc.},
+  url = {https://proceedings.neurips.cc/paper/2019/hash/bdbca288fee7f92f2bfa9f7012727740-Abstract.html},
+  urldate = {2023-04-18},
+  abstract = {Deep learning frameworks have often focused on either usability or speed, but not both. PyTorch is a machine learning library that shows that these two goals are in fact compatible: it was designed from first principles to support an imperative and Pythonic programming style that supports code as a model, makes debugging easy and is consistent with other popular scientific computing libraries, while remaining efficient and supporting hardware accelerators such as GPUs. In this paper, we detail the principles that drove the implementation of PyTorch and how they are reflected in its architecture. We emphasize that every aspect of PyTorch is a regular Python program under the full control of its user. We also explain how the careful and pragmatic implementation of the key components of its runtime enables them to work together to achieve compelling performance. We demonstrate the efficiency of individual subsystems, as well as the overall speed of PyTorch on several commonly used benchmarks.},
+  file = {/Users/robin/Zotero/storage/DBZHEP84/Paszke et al_2019_PyTorch.pdf}
+}
+
+@article{pedregosa_scikit-learn_2011,
+  title = {Scikit-Learn: {{Machine}} Learning in Python},
+  shorttitle = {Scikit-Learn},
+  author = {Pedregosa, Fabian and Varoquaux, Gaël and Gramfort, Alexandre and Michel, Vincent and Thirion, Bertrand and Grisel, Olivier and Blondel, Mathieu and Prettenhofer, Peter and Weiss, Ron and Dubourg, Vincent and Vanderplas, Jake and Passos, Alexandre and Cournapeau, David and Brucher, Matthieu and Perrot, Matthieu and Duchesnay, Édouard},
+  date = {2011},
+  journaltitle = {Journal of Machine Learning Research},
+  volume = {12},
+  number = {85},
+  pages = {2825--2830},
+  issn = {1533-7928},
+  url = {http://jmlr.org/papers/v12/pedregosa11a.html},
+  urldate = {2022-12-21},
+  abstract = {Scikit-learn is a Python module integrating a wide range of state-of-the-art machine learning algorithms for medium-scale supervised and unsupervised problems. This package focuses on bringing machine learning to non-specialists using a general-purpose high-level language. Emphasis is put on ease of use, performance, documentation, and API consistency. It has minimal dependencies and is distributed under the simplified BSD license, encouraging its use in both academic and commercial settings. Source code, binaries, and documentation can be downloaded from http://scikit-learn.sourceforge.net.}
+}
+
+@software{PolarsPolars2024,
+  title = {Pola-Rs/Polars},
+  date = {2024-07-09T10:48:49Z},
+  origdate = {2020-05-13T19:45:33Z},
+  url = {https://github.com/pola-rs/polars},
+  urldate = {2024-07-09},
+  abstract = {Dataframes powered by a multithreaded, vectorized query engine, written in Rust},
+  organization = {Polars},
+  keywords = {arrow,dataframe,dataframe-library,dataframes,out-of-core,polars,python,rust}
+}
+
+@online{Proceedings2ndACM,
+  title = {Proceedings of the 2nd {{ACM Conference}} on {{Reproducibility}} and {{Replicability}}},
+  url = {https://dl.acm.org/doi/proceedings/10.1145/3641525},
+  urldate = {2025-07-23},
+  langid = {english},
+  organization = {ACM Conferences},
+  file = {/Users/robin/Zotero/storage/DCPUI73M/3641525.html}
+}
+
+@inproceedings{rahmanWhatQuestionsProgrammers2018,
+  title = {What Questions Do Programmers Ask about Configuration as Code?},
+  booktitle = {Proceedings of the 4th {{International Workshop}} on {{Rapid Continuous Software Engineering}}},
+  author = {Rahman, Akond and Partho, Asif and Morrison, Patrick and Williams, Laurie},
+  date = {2018-05-29},
+  series = {{{RCoSE}} '18},
+  pages = {16--22},
+  publisher = {Association for Computing Machinery},
+  location = {New York, NY, USA},
+  doi = {10.1145/3194760.3194769},
+  url = {https://dl.acm.org/doi/10.1145/3194760.3194769},
+  urldate = {2024-11-05},
+  abstract = {Configuration as code (CaC) tools, such as Ansible and Puppet, help software teams to implement continuous deployment and deploy software changes rapidly. CaC tools are growing in popularity, yet what challenges programmers encounter about CaC tools, have not been characterized. A systematic investigation on what questions are asked by programmers, can help us identify potential technical challenges about CaC, and can aid in successful use of CaC tools. The goal of this paper is to help current and potential configuration as code (CaC) adoptees in identifying the challenges related to CaC through an analysis of questions asked by programmers on a major question and answer website. We extract 2,758 Puppet-related questions asked by programmers from January 2010 to December 2016, posted on Stack Overflow. We apply qualitative analysis to identify the questions programmers ask about Puppet. We also investigate the trends in questions with unsatisfactory answers, and changes in question categories over time. From our empirical study, we synthesize 16 major categories of questions. The three most common question categories are: (i) syntax errors, (ii) provisioning instances; and (iii) assessing Puppet's feasibility to accomplish certain tasks. Three categories of questions that yield the most unsatisfactory answers are (i) installation, (ii) security, and (iii) data separation.},
+  isbn = {978-1-4503-5745-6},
+  file = {/Users/robin/Zotero/storage/NPUTS3V9/Rahman et al_2018_What questions do programmers ask about configuration as code.pdf}
+}
+
+@online{santosImprovingRepresentationLearning2025,
+  title = {Improving {{Representation Learning}} of {{Complex Critical Care Data}} with {{ICU-BERT}}},
+  author = {Santos, Ricardo and Carreiro, André V. and Peng, Xi and Gamboa, Hugo and Fröhlich, Holger},
+  date = {2025-02-26},
+  eprint = {2502.19593},
+  eprinttype = {arXiv},
+  eprintclass = {cs},
+  doi = {10.48550/arXiv.2502.19593},
+  url = {http://arxiv.org/abs/2502.19593},
+  urldate = {2025-04-24},
+  abstract = {The multivariate, asynchronous nature of real-world clinical data, such as that generated in Intensive Care Units (ICUs), challenges traditional AI-based decision-support systems. These often assume data regularity and feature independence and frequently rely on limited data scopes and manual feature engineering. The potential of generative AI technologies has not yet been fully exploited to analyze clinical data. We introduce ICU-BERT, a transformer-based model pre-trained on the MIMIC-IV database using a multi-task scheme to learn robust representations of complex ICU data with minimal preprocessing. ICU-BERT employs a multi-token input strategy, incorporating dense embeddings from a biomedical Large Language Model to learn a generalizable representation of complex and multivariate ICU data. With an initial evaluation of five tasks and four additional ICU datasets, ICU-BERT results indicate that ICU-BERT either compares to or surpasses current performance benchmarks by leveraging fine-tuning. By integrating structured and unstructured data, ICU-BERT advances the use of foundational models in medical informatics, offering an adaptable solution for clinical decision support across diverse applications.},
+  pubstate = {prepublished},
+  keywords = {Computer Science - Artificial Intelligence,Computer Science - Machine Learning},
+  file = {/Users/robin/Zotero/storage/XDHVFWNA/Santos et al. - 2025 - Improving Representation Learning of Complex Critical Care Data with ICU-BERT.pdf;/Users/robin/Zotero/storage/87X4T6R4/2502.html}
+}
+
+@article{sarwarSecondaryUseElectronic2023,
+  title = {The {{Secondary Use}} of {{Electronic Health Records}} for {{Data Mining}}: {{Data Characteristics}} and {{Challenges}}},
+  shorttitle = {The {{Secondary Use}} of {{Electronic Health Records}} for {{Data Mining}}},
+  author = {Sarwar, Tabinda and Seifollahi, Sattar and Chan, Jeffrey and Zhang, Xiuzhen and Aksakalli, Vural and Hudson, Irene and Verspoor, Karin and Cavedon, Lawrence},
+  date = {2023-03-31},
+  journaltitle = {ACM Computing Surveys},
+  shortjournal = {ACM Comput. Surv.},
+  volume = {55},
+  number = {2},
+  pages = {1--40},
+  issn = {0360-0300, 1557-7341},
+  doi = {10.1145/3490234},
+  url = {https://dl.acm.org/doi/10.1145/3490234},
+  urldate = {2022-05-02},
+  abstract = {The primary objective of implementing Electronic Health Records (EHRs) is to improve the management of patients’ health-related information. However, these records have also been extensively used for the secondary purpose of clinical research and to improve healthcare practice. EHRs provide a rich set of information that includes demographics, medical history, medications, laboratory test results, and diagnosis. Data mining and analytics techniques have extensively exploited EHR information to study patient cohorts for various clinical and research applications, such as phenotype extraction, precision medicine, intervention evaluation, disease prediction, detection, and progression. But the presence of diverse data types and associated characteristics poses many challenges to the use of EHR data. In this article, we provide an overview of information found in EHR systems and their characteristics that could be utilized for secondary applications. We first discuss the different types of data stored in EHRs, followed by the data transformations necessary for data analysis and mining. Later, we discuss the data quality issues and characteristics of the EHRs along with the relevant methods used to address them. Moreover, this survey also highlights the usage of various data types for different applications. Hence, this article can serve as a primer for researchers to understand the use of EHRs for data mining and analytics purposes.},
+  langid = {english},
+  keywords = {_tablet},
+  file = {/Users/robin/Zotero/storage/TJYEISKX/Sarwar et al_2023_The Secondary Use of Electronic Health Records for Data Mining.pdf}
+}
+
+@article{semmelrockReproducibilityMachinelearningbasedResearch2025,
+  title = {Reproducibility in Machine-Learning-Based Research: {{Overview}}, Barriers, and Drivers},
+  shorttitle = {Reproducibility in Machine-Learning-Based Research},
+  author = {Semmelrock, Harald and Ross-Hellauer, Tony and Kopeinik, Simone and Theiler, Dieter and Haberl, Armin and Thalmann, Stefan and Kowald, Dominik},
+  date = {2025},
+  journaltitle = {AI Magazine},
+  volume = {46},
+  number = {2},
+  pages = {e70002},
+  issn = {2371-9621},
+  doi = {10.1002/aaai.70002},
+  url = {https://onlinelibrary.wiley.com/doi/abs/10.1002/aaai.70002},
+  urldate = {2025-07-23},
+  abstract = {Many research fields are currently reckoning with issues of poor levels of reproducibility. Some label it a “crisis,” and research employing or building machine learning (ML) models is no exception. Issues including lack of transparency, data or code, poor adherence to standards, and the sensitivity of ML training conditions mean that many papers are not even reproducible in principle. Where they are, though, reproducibility experiments have found worryingly low degrees of similarity with original results. Despite previous appeals from ML researchers on this topic and various initiatives from conference reproducibility tracks to the ACM's new Emerging Interest Group on Reproducibility and Replicability, we contend that the general community continues to take this issue too lightly. Poor reproducibility threatens trust in and integrity of research results. Therefore, in this article, we lay out a new perspective on the key barriers and drivers (both procedural and technical) to increased reproducibility at various levels (methods, code, data, and experiments). We then map the drivers to the barriers to give concrete advice for strategies for researchers to mitigate reproducibility issues in their own work, to lay out key areas where further research is needed in specific areas, and to further ignite discussion on the threat presented by these urgent issues.},
+  langid = {english},
+  file = {/Users/robin/Zotero/storage/MPE2A5NV/Semmelrock et al. - 2025 - Reproducibility in machine-learning-based research Overview, barriers, and drivers.pdf;/Users/robin/Zotero/storage/LIUDAM67/aaai.html}
+}
+
+@inproceedings{shenDataAdditionDilemma2024b,
+  title = {The {{Data Addition Dilemma}}},
+  booktitle = {Proceedings of the 9th {{Machine Learning}} for {{Healthcare Conference}}},
+  author = {Shen, Judy Hanwen and Raji, Inioluwa Deborah and Chen, Irene Y.},
+  date = {2024-11-25},
+  publisher = {PMLR},
+  issn = {2640-3498},
+  url = {https://proceedings.mlr.press/v252/shen24a.html},
+  urldate = {2025-07-23},
+  abstract = {In many machine learning for healthcare tasks, standard datasets are constructed by amassing data across many, often fundamentally dissimilar, sources. But when does adding more data help, and when does it hinder progress on desired model outcomes in real-world settings? We identify this situation as the Data Addition Dilemma, demonstrating that adding training data in this multi-source scaling context can at times result in reduced overall accuracy, uncertain fairness outcomes and reduced worst-subgroup performance. We find that this possibly arises from an empirically observed trade-off between model performance improvements due to data scaling and model deterioration from distribution shift.  We thus establish baseline strategies for navigating this dilemma, introducing distribution shift heuristics to guide decision-making for which data sources to add in order to yield the expected model performance improvements.  We conclude with a discussion of the required considerations for data collection and suggestions for studying data composition and scale in the age of increasingly larger models.},
+  eventtitle = {Machine {{Learning}} for {{Healthcare Conference}}},
+  langid = {english}
+}
+
+@inproceedings{vandewaterAnotherICUBenchmark2024a,
+  title = {Yet {{Another ICU Benchmark}}: {{A Flexible Multi-Center Framework}} for {{Clinical ML}}},
+  shorttitle = {Yet {{Another ICU Benchmark}}},
+  booktitle = {Proceedings of {{The Twelfth International Conference}} on {{Learning Representations}}},
+  author = {family=Water, given=Robin, prefix=van de, useprefix=true and Schmidt, Hendrik Nils Aurel and Elbers, Paul and Thoral, Patrick and Arnrich, Bert and Rockenschaub, Patrick},
+  date = {2024-05-07},
+  url = {https://openreview.net/forum?id=ox2ATRM90I},
+  urldate = {2025-01-31},
+  abstract = {Medical applications of machine learning (ML) have experienced a surge in popularity in recent years. Given the abundance of available data from electronic health records, the intensive care unit (ICU) is a natural habitat for ML. Models have been proposed to address numerous ICU prediction tasks like the early detection of complications. While authors frequently report state-of-the-art performance, it is challenging to verify claims of superiority. Datasets and code are not always published, and cohort definitions, preprocessing pipelines, and training setups are difficult to reproduce. This work introduces Yet Another ICU Benchmark (YAIB), a modular framework that allows researchers to define reproducible and comparable clinical ML experiments; we offer an end-to-end solution from cohort definition to model evaluation. The framework natively supports most open-access ICU datasets (MIMIC III/IV, eICU, HiRID, AUMCdb) and is easily adaptable to future ICU datasets. Combined with a transparent preprocessing pipeline and extensible training code for multiple ML and deep learning models, YAIB enables unified model development, transfer, and evaluation. Our benchmark comes with five predefined established prediction tasks (mortality, acute kidney injury, sepsis, kidney function, and length of stay) developed in collaboration with clinicians. Adding further tasks is straightforward by design. Using YAIB, we demonstrate that the choice of dataset, cohort definition, and preprocessing have a major impact on the prediction performance — often more so than model class — indicating an urgent need for YAIB as a holistic benchmarking tool. We provide our work to the clinical ML community to accelerate method development and enable real-world clinical implementations.},
+  eventtitle = {The {{Twelfth International Conference}} on {{Learning Representations}}},
+  langid = {english},
+  file = {/Users/robin/Zotero/storage/4VNZA8JF/Water et al. - 2023 - Yet Another ICU Benchmark A Flexible Multi-Center Framework for Clinical ML.pdf}
+}
+
+@software{warmerdamKoaningScikitlegoV0952025,
+  title = {Koaning/Scikit-Lego: V0.9.5},
+  shorttitle = {Koaning/Scikit-Lego},
+  author = {family=warmerdam, given=vincent, prefix=d, useprefix=false and Bruzzesi, Francesco and MBrouns and Collot, Stéphane and family=Boer, given=Josko, prefix=de, useprefix=false and Kübler, Robert and family=hoeven, prefix=pim-, useprefix=true and {mkalimeri} and Paulino, Arthur and Gorelli, Marco Edward and Verheijen, Peter and Borry, Maxime and Hoogland, Kay and Masip, David and Kowalczuk, Magdalena and {ktiamur} and AminaZ and Sharma, Gaurav and Lepelaars, Carlo and Rens and Cor and Hermans, Frits and Borrella, Tomas and Rose, Stephen Anthony and family=Dorsten, given=Sander, prefix=van, useprefix=false and Levitski, Hleb and Keromnes, Jan and Pérez-Lozao, Sergio Calderón and Payne, Skylar},
+  date = {2025-04-30},
+  doi = {10.5281/zenodo.15313097},
+  url = {https://zenodo.org/records/15313097},
+  urldate = {2025-07-22},
+  abstract = {Minor bugfix release, mainly for https://github.com/koaning/scikit-lego/pull/742},
+  organization = {Zenodo},
+  file = {/Users/robin/Zotero/storage/Y2T2RU6L/15313097.html}
+}
+
+@inproceedings{waterAnotherICUBenchmark2023,
+  title = {Yet {{Another ICU Benchmark}}: {{A Flexible Multi-Center Framework}} for {{Clinical ML}}},
+  shorttitle = {Yet {{Another ICU Benchmark}}},
+  author = {family=Water, given=Robin, prefix=van de, useprefix=false and Schmidt, Hendrik Nils Aurel and Elbers, Paul and Thoral, Patrick and Arnrich, Bert and Rockenschaub, Patrick},
+  date = {2023-10-13},
+  url = {https://openreview.net/forum?id=ox2ATRM90I},
+  urldate = {2024-04-12},
+  abstract = {Medical applications of machine learning (ML) have experienced a surge in popularity in recent years. Given the abundance of available data from electronic health records, the intensive care unit (ICU) is a natural habitat for ML. Models have been proposed to address numerous ICU prediction tasks like the early detection of complications. While authors frequently report state-of-the-art performance, it is challenging to verify claims of superiority. Datasets and code are not always published, and cohort definitions, preprocessing pipelines, and training setups are difficult to reproduce. This work introduces Yet Another ICU Benchmark (YAIB), a modular framework that allows researchers to define reproducible and comparable clinical ML experiments; we offer an end-to-end solution from cohort definition to model evaluation. The framework natively supports most open-access ICU datasets (MIMIC III/IV, eICU, HiRID, AUMCdb) and is easily adaptable to future ICU datasets. Combined with a transparent preprocessing pipeline and extensible training code for multiple ML and deep learning models, YAIB enables unified model development, transfer, and evaluation. Our benchmark comes with five predefined established prediction tasks (mortality, acute kidney injury, sepsis, kidney function, and length of stay) developed in collaboration with clinicians. Adding further tasks is straightforward by design. Using YAIB, we demonstrate that the choice of dataset, cohort definition, and preprocessing have a major impact on the prediction performance — often more so than model class — indicating an urgent need for YAIB as a holistic benchmarking tool. We provide our work to the clinical ML community to accelerate method development and enable real-world clinical implementations.},
+  eventtitle = {The {{Twelfth International Conference}} on {{Learning Representations}}},
+  langid = {english},
+  file = {/Users/robin/Zotero/storage/BKYUEA8A/Water et al_2023_Yet Another ICU Benchmark.pdf}
+}
