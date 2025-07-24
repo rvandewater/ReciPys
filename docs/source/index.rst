@@ -142,12 +142,9 @@ The package automatically detects the backend and provides a consistent API rega
 Examples
 --------
 
-Check out the `examples/` directory for Jupyter notebooks demonstrating:
-
-- Basic usage and concepts
-- Advanced pipeline construction
-
+Check out the `examples/` directory for Jupyter notebooks demonstrating various use cases of ReciPies.
 Check out the `benchmarks/` directory for performance comparisons between Polars and Pandas backends.
+
 Contributing
 ------------
 
