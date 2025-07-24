@@ -31,15 +31,14 @@ ReciPies is a Python package for feature engineering and data preprocessing with
 It provides a unified interface for working with both Polars and Pandas DataFrames while maintaining column role
 information throughout data transformations.
 
-Features
+Summary
 --------
 
-- **Dual Backend Support**: Seamlessly work with both Polars and Pandas DataFrames
-- **Column Role Management**: Track and maintain semantic roles of columns (e.g., patient_id, timestamp, features)
-- **Medical Data Focus**: Specialized tools for clinical and medical data preprocessing
-- **Pipeline Architecture**: Build reproducible data processing pipelines with Steps and Recipes
-- **Type Safety**: Strong typing support for better code reliability
-- **Performance**: Leverage the speed of Polars while maintaining Pandas compatibility
+- Declarative, reproducible data preprocessing
+- Human-readable and transparent pipelines
+- No trade-off between readability, performance, or flexibility
+- Backend flexibility: works with Polars and Pandas
+- Reduces cognitive overhead in feature engineering
 
 Installation
 ------------
@@ -63,51 +62,58 @@ Quick Start
 
 Here's a simple example of using ReciPies:
 
-   .. code-block:: python
+.. code-block:: python
 
-      import polars as pl
-      import numpy as np
-      from datetime import datetime, MINYEAR
-      import recipies as rp
-      from recipies import Ingredients, Recipe
+   # Import necessary libraries
+    import polars as pl
+    import numpy as np
+    from datetime import datetime, MINYEAR
+    from recipies import Ingredients, Recipe
+    from recipies.selector import all_numeric_predictors, all_predictors
+    from recipies.step import StepSklearn, StepHistorical, Accumulator, StepImputeFill
+    from sklearn.impute import MissingIndicator
+    # Set up random state for reproducible results
+    rand_state = np.random.RandomState(42)
+    # Create time columns for two different groups
+    timecolumn = pl.concat([
+      pl.datetime_range(datetime(MINYEAR, 1, 1, 0), datetime(MINYEAR, 1, 1, 5), "1h", eager=True),
+      pl.datetime_range(datetime(MINYEAR, 1, 1, 0), datetime(MINYEAR, 1, 1, 3), "1h", eager=True)
+    ])
+    # Create sample DataFrame
+    df = pl.DataFrame({
+      "id": [1] * 6 + [2] * 4,
+      "time": timecolumn,
+      "y": rand_state.normal(size=(10,)),
+      "x1": rand_state.normal(loc=10, scale=5, size=(10,)),
+      "x2": rand_state.binomial(n=1, p=0.3, size=(10,)),
+      "x3": pl.Series(["a", "b", "c", "a", "c", "b", "c", "a", "b", "c"], dtype=pl.Categorical),
+      "x4": pl.Series(["x", "y", "y", "x", "y", "y", "x", "x", "y", "x"], dtype=pl.Categorical),
+    })
+    # Introduce some missing values
+    df = df.with_columns(
+      pl.when(pl.int_range(pl.len()).is_in([1, 2, 4, 7]))
+      .then(None)
+      .otherwise(pl.col("x1"))
+      .alias("x1")
+    )
+    df2 = df.clone()
+    # Create Ingredients and Recipe
+    ing = Ingredients(df)
+    rec = Recipe(
+      ing,
+      outcomes=["y"],
+      predictors=["x1", "x2", "x3", "x4"],
+      groups=["id"],
+      sequences=["time"]
+    )
+    rec.add_step(StepSklearn(MissingIndicator(features="all"), sel=all_predictors()))
+    rec.add_step(StepImputeFill(sel=all_predictors(), strategy="forward"))
+    rec.add_step(StepHistorical(sel=all_predictors(), fun=Accumulator.MEAN, suffix="mean_hist"))
+    # Apply the recipe to the ingredients
+    df = rec.prep()
+    # Apply the recipe to a new DataFrame (e.g., test set)
+    df2 = rec.bake(df2)
 
-      # Set up random state for reproducible results
-      rand_state = np.random.RandomState(42)
-
-      # Create time columns for two different groups
-      timecolumn = pl.concat([
-          pl.datetime_range(datetime(MINYEAR, 1, 1, 0), datetime(MINYEAR, 1, 1, 5), "1h", eager=True),
-          pl.datetime_range(datetime(MINYEAR, 1, 1, 0), datetime(MINYEAR, 1, 1, 3), "1h", eager=True)
-      ])
-
-      # Create sample DataFrame
-      df = pl.DataFrame({
-          "id": [1] * 6 + [2] * 4,
-          "time": timecolumn,
-          "y": rand_state.normal(size=(10,)),
-          "x1": rand_state.normal(loc=10, scale=5, size=(10,)),
-          "x2": rand_state.binomial(n=1, p=0.3, size=(10,)),
-          "x3": pl.Series(["a", "b", "c", "a", "c", "b", "c", "a", "b", "c"], dtype=pl.Categorical),
-          "x4": pl.Series(["x", "y", "y", "x", "y", "y", "x", "x", "y", "x"], dtype=pl.Categorical),
-      })
-
-      # Introduce some missing values
-      df = df.with_columns(
-          pl.when(pl.int_range(pl.len()).is_in([1, 2, 4, 7]))
-          .then(None)
-          .otherwise(pl.col("x1"))
-          .alias("x1")
-      )
-
-      # Create Ingredients and Recipe
-      ing = Ingredients(df)
-      rec = Recipe(
-          ing,
-          outcomes=["y"],
-          predictors=["x1", "x2", "x3", "x4"],
-          groups=["id"],
-          sequences=["time"]
-      )
 Core Concepts
 -------------
 
@@ -139,10 +145,9 @@ Examples
 Check out the `examples/` directory for Jupyter notebooks demonstrating:
 
 - Basic usage and concepts
-- Medical data preprocessing workflows
-- Performance benchmarking between backends
 - Advanced pipeline construction
 
+Check out the `benchmarks/` directory for performance comparisons between Polars and Pandas backends.
 Contributing
 ------------
 
