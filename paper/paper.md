@@ -9,7 +9,7 @@ authors:
     corresponding: true
   - name: Hendrik Schmidt
     orcid: 0000-0001-7699-3983
-    affiliation:
+    affiliation: [ 1 ]
     equal-contrib: false
   - name: Patrick Rockenschaub
     orcid: 0000-0002-6499-7933
@@ -19,17 +19,13 @@ affiliations:
   - index: 1
     name: Hasso Plattner Institute, University of Potsdam, Potsdam, Germany
   - index: 2
-    name: Hasso Plattner Institute for Digital Health at Mount Sinai, Icahn School of Medicine at Mount Sinai, New York City, NY, USA
+    name: Icahn School of Medicine at Mount Sinai, New York City, NY, USA
   - index: 3
     name: Innsbruck Medical University, Innsbruck, Austria
-date: 2025-07-24
+date: 2025-07-25
 bibliography: paper.bib
-repository: https://github.com/rvandewater/`ReciPies`
+repository: https://github.com/rvandewater/ReciPies
 tags:
-  - reference
-  - example
-  - markdown
-  - publishing
 ---
 
 # Summary
@@ -41,9 +37,9 @@ reproducible way to declare, execute, and share preprocessing pipelines, that ad
 principles.
 It lets users describe transformations as a recipe made of ordered *steps* (e.g., imputing, encoding, normalizing)
 applied to variables identified by semantic roles (predictor, outcome, ID, time stamp, etc.). Recipes can be *prepped*
-once, *baked* many times, and cleanly separated between training and new data. `ReciPies` provides the choice of both
+once, *baked* many times, and separated between training and new data. `ReciPies` provides the choice of
 Pandas and Polars backends and
-is easily extensible: users can create steps with minimal boilerplate. Provenance can be tracked and published.
+is easily extensible. Data provenance can be tracked and published.
 Packaging preprocessing as clear, declarative objects, `ReciPies` lowers the cognitive load of feature engineering,
 improves reproducibility, and makes methodological choices explicit, benefiting individual researchers, engineering
 teams, and peer reviewers alike.
@@ -52,9 +48,8 @@ teams, and peer reviewers alike.
 
 Robust machine‑learning results in science hinge on transparent, reproducible data‑preprocessing—yet in Python, these
 steps are typically spread across ad‑hoc notebooks or are buried inside opaque scripts; that is, if this code is even
-made available. Additionally, most variable semantics are unclear (*Which columns are outcomes? IDs? Time stamps?*);
-this encourages accidental data leakage when "fitting" transforms on the full dataset, confounding research results,
-complicating peer review, and hindering reuse. Researchers and engineers working with longitudinal or regulated data (
+made available. Additionally, most variable semantics are unclear. These problems confound research results,
+complicate peer review, and hinder reuse. Researchers and engineers working with longitudinal regulated data (
 e.g., energy production, finance, and environmental monitoring) especially need pipelines they are able to audit,
 serialize, and hand to collaborators without reverse‑engineering a tangle of imperative code [@10.1145/3641525]. The
 lack of reproducibility has been documented extensively in
@@ -70,26 +65,19 @@ Object-oriented abstractions enable users to implement custom steps.
 
 Our work is an improvement upon [@kuhnRecipesPreprocessingFeature2024]  aimed at the ML
 community. The design enables
-straightforward integration as part of a pipeline that includes machine learning libraries such as
+straightforward integration as part of a pipeline that includes machine learning libraries like
 sklearn [@pedregosa_scikit-learn_2011] and PyTorch[@paszkePyTorchImperativeStyle2019]. To the best of our knowledge, no
 other packages comply with the flexibility and reproducibility of `ReciPies` and its Configuration as Code approach.
 Sklearn offers composable transformers, but
-no role-based variable grammar, limited human-readability, and awkward serialization beyond pickling.
+no role-based variable grammar, limited human-readability, and awkward serialization.
 Feature-engine [@galliFeatureenginePythonPackage2021], pyjanitor [@j.PyjanitorCleanerAPI2019], or
 scikit-lego[@warmerdamKoaningScikitlegoV0952025] add helpful transformers or cleaning verbs. However, none provide a
 unified, declarative recipe abstraction with a strict "prep/bake" split and backend flexibility. `ReciPies` provides a
 stepwise recipe
-interface that is easy to use and read, allowing users to easily preprocess data for a wide range of machine learning
+interface that is easy to use and read, allowing users to readily preprocess data for a wide range of machine learning
 pipelines.
 
 # Usage
-
-`ReciPies` is used as the bedrock of reproducible pipelines of Yet Another ICU
-Benchmark [@vandewaterAnotherICUBenchmark2024a], a flexible benchmarking framework for EHR and ICU models that has been
-adapted by the community in multiple works [@shenDataAdditionDilemma2024b; @santosImprovingRepresentationLearning2025].
-The adaptable, configurable code modules that make extensive use of `ReciPies` can be
-found [here](https://github.com/rvandewater/YAIB/blob/development/icu_benchmarks/data/preprocessor.py). Note that
-`ReciPies` can be used for arbitrary research domains and is especially useful in domains where data is sequential.
 
 If we have a dataset, `df`, with a label `y`, some features `x1`, `x2`, `x3`, `x4`, an identifier `id`, and a sequential
 component `time`, we can build a preprocessing pipeline using `ReciPies`. We first do a train/test split:
@@ -105,8 +93,8 @@ roles = {outcomes:["y"], predictors=["x1", "x2", "x3", "x4"], groups=["id"],
 sequences=["time"]}
 ```
 
-Now we can create the `ingredients` which encapsulate the training data and its roles, and the `recipe` that will
-be used to preprocess the data:
+Now we can create the `ingredients` which encapsulate the training data and its roles, and the `recipe` that to
+preprocess the data:
 
 ``` Python
 ing = Ingredients(df_train, roles=roles)
@@ -131,12 +119,16 @@ df_train = rec.prep()
 df_test = rec.bake(df_test)
 ```
 
-We can also use the `bake` method on the training set to transform it again, e.g., to apply the same transformations to
+We can use the `bake` method on the training set to transform it again, e.g., to apply the same transformations to
 a new dataset. Complete code, benchmarks, and interactive notebooks are available in the project documentation.
-`ReciPies` also provides a benchmarking suite with results that allows users to compare the performance of different
-preprocessing
-steps on (generated) data. One can run on a variety of datasets and can be used to compare the performance of different
-preprocessing steps on a variety of sizes.
+`ReciPies` also provides a benchmarking suite with results to compare the performance of different preprocessing steps
+on (generated) data.
+
+`ReciPies` is used as the bedrock of reproducible pipelines of Yet Another ICU
+Benchmark [@vandewaterAnotherICUBenchmark2024a]
+The adaptable, configurable code modules that make extensive use of `ReciPies` can be
+found [here](https://github.com/rvandewater/YAIB/blob/development/icu_benchmarks/data/preprocessor.py); this
+demonstrates that `ReciPies` can be used for arbitrary research domains.
 
 # Future steps
 
