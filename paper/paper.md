@@ -5,7 +5,7 @@ authors:
   - name: Robin P. van de Water
     email: robin.vandewater@hpi.de
     affiliation: [1, 2]
-    orcid: 0000-0002-2895-4872ß
+    orcid: 0000-0002-2895-4872
     corresponding: true
   - name: Hendrik Schmidt
     orcid: 0000-0001-7699-3983
