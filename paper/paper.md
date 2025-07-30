@@ -32,14 +32,12 @@ tags:
 
 Machine Learning (ML) workflows live or die by their data‑preprocessing steps, yet in Python, these steps are often
 scattered across ad‑hoc scripts or opaque Scikit-Learn (sklearn) snippets that are hard to read, audit, or reuse.
-`ReciPies` provides a concise, human‑readable, and fully
-reproducible way to declare, execute, and share preprocessing pipelines, that adheres to Configuration as Code
-principles.
+`ReciPies` provides a concise, human‑readable, and fully reproducible method to declare, execute, and share
+preprocessing pipelines, that adheres to Configuration as Code principles.
 It lets users describe transformations as a recipe made of ordered *steps* (e.g., imputing, encoding, normalizing)
 applied to variables identified by semantic roles (predictor, outcome, ID, time stamp, etc.). Recipes can be *prepped*
-once, *baked* many times, and separated between training and new data. `ReciPies` provides the choice of
-Pandas and Polars backends and
-is easily extensible. Data provenance can be tracked and published.
+once, *baked* many times, and separated between training and new data. `ReciPies` provides the choice of Pandas and
+Polars backends and is easily extensible. Data provenance can be tracked and published.
 Packaging preprocessing as clear, declarative objects, `ReciPies` lowers the cognitive load of feature engineering,
 improves reproducibility, and makes methodological choices explicit, benefiting individual researchers, engineering
 teams, and peer reviewers alike.
@@ -48,8 +46,8 @@ teams, and peer reviewers alike.
 
 Robust machine‑learning results in science hinge on transparent, reproducible data‑preprocessing—yet in Python, these
 steps are typically spread across ad‑hoc notebooks or are buried inside opaque scripts; that is, if this code is even
-made available. Additionally, most variable semantics are unclear. These problems confound research results,
-complicate peer review, and hinder reuse. Researchers and engineers working with longitudinal regulated data (
+made available. Additionally, most variable semantics are unclear (called *roles*). These problems confound research
+results, complicate peer review and hinder reuse. Researchers and engineers working with longitudinal regulated data (
 e.g., energy production, finance, and environmental monitoring) especially need pipelines they are able to audit,
 serialize, and hand to collaborators without reverse‑engineering a tangle of imperative code [@10.1145/3641525]. The
 lack of reproducibility has been documented extensively in
@@ -59,23 +57,27 @@ literature [@johnsonReproducibilityCriticalCare2017a; @kellyKeyChallengesDeliver
 variables selected by semantic roles; recipes are "prepped" once on training data and "baked" on new data to eliminate
 leakage; and every step is inspectable, versionable, and serializable (JSON/YAML). `Recipes` runs on
 Pandas [@mckinney-proc-scipy-2010] and Polars [@PolarsPolars2024] for interoperability and performance, and their
-Object-oriented abstractions enable users to implement custom steps.
+Object-oriented abstractions enable users to implement custom steps. The framework is declarative and reproducible for
+data preprocessing, prioritizing human readability and methodological transparency.
+We demonstrate that there is no need to sacrifice readability for performance or flexibility for simplicity. By reducing
+the cognitive overhead of feature engineering and making methodological choices explicit, `ReciPies` enables researchers
+to focus on their core work. We hope this will broaden the reproducibility discussion in ML from hyperparameters to the
+entire experiment pipeline. We encourage the development of domain-specific step libraries and integration patterns that
+can benefit the broader ecosystem.
 
 # Related Work
 
-Our work is an improvement upon [@kuhnRecipesPreprocessingFeature2024]  aimed at the ML
-community. The design enables
-straightforward integration as part of a pipeline that includes machine learning libraries like
+Our work brings the Recipes [@kuhnRecipesPreprocessingFeature2024] framework to Python and extends it for the ML
+community. The design enables straightforward integration as part of a pipeline that includes ML libraries like
 sklearn [@pedregosa_scikit-learn_2011] and PyTorch[@paszkePyTorchImperativeStyle2019]. To the best of our knowledge, no
 other packages comply with the flexibility and reproducibility of `ReciPies` and its Configuration as Code approach.
-Sklearn offers composable transformers, but
-no role-based variable grammar, limited human-readability, and awkward serialization.
+Sklearn offers composable transformers, but no role-based variable grammar, limited human-readability, and awkward
+serialization.
 Feature-engine [@galliFeatureenginePythonPackage2021], pyjanitor [@j.PyjanitorCleanerAPI2019], or
 scikit-lego[@warmerdamKoaningScikitlegoV0952025] add helpful transformers or cleaning verbs. However, none provide a
 unified, declarative recipe abstraction with a strict "prep/bake" split and backend flexibility. `ReciPies` provides a
-stepwise recipe
-interface that is easy to use and read, allowing users to readily preprocess data for a wide range of machine learning
-pipelines.
+stepwise recipe that is easy to use and read, allowing users to readily preprocess data for a wide range of machine
+learning pipelines.
 
 # Usage
 
@@ -93,7 +95,7 @@ roles = {outcomes:["y"], predictors=["x1", "x2", "x3", "x4"], groups=["id"],
 sequences=["time"]}
 ```
 
-Now we can create the `ingredients` which encapsulate the training data and its roles, and the `recipe` that to
+Afterward, we create the `ingredients` which encapsulate the training data and its roles, and the `recipe` to
 preprocess the data:
 
 ``` Python
@@ -101,7 +103,7 @@ ing = Ingredients(df_train, roles=roles)
 rec = Recipe(ing)
 ```
 
-We can now add preprocessing steps:
+We add preprocessing steps:
 
 ``` Python
 rec.add_step(StepScale())
@@ -132,22 +134,8 @@ demonstrates that `ReciPies` can be used for arbitrary research domains.
 
 # Future steps
 
-We plan to expand the library of
-Polars-native steps to fully leverage its columnar execution model, particularly for time-series operations and
-large-scale aggregations, where Polars shows significant performance advantages. We envision `ReciPies` recipes as
-portable preprocessing
-artifacts that can be versioned, tracked, and deployed across different environments. Tighter integration with
-experiment tracking and model registries would streamline the transition from research to production, a complex process
-in many application domains.
-
-# Conclusion
-
-`ReciPies` addresses a critical gap in the Python machine learning ecosystem by providing a declarative, reproducible
-framework for data preprocessing that prioritizes human readability and methodological transparency. We demonstrate that
-there is no need to sacrifice readability for performance or flexibility for simplicity. Its role-based variable
-grammar, strict prep/bake separation, and backend flexibility create a preprocessing framework that scales while
-maintaining full
-auditability. By reducing the cognitive overhead of feature engineering and making
-methodological choices explicit, `ReciPies` enables researchers to focus on their core work. We hope this will broaden
-the reproducibility discussion in ML from hyperparameters to the entire experiment pipeline. We encourage the
-development of domain-specific step libraries and integration patterns that can benefit the broader ecosystem.
+We plan to expand the library of Polars-native steps to fully leverage its columnar execution model, particularly for
+time-series operations and large-scale aggregations, where Polars shows significant performance advantages. We envision
+`ReciPies` recipes as portable preprocessing artifacts that can be versioned, tracked, and deployed across different
+environments. Tighter integration with experiment tracking and model registries would streamline the transition from
+research to production, a complex process in many application domains.
