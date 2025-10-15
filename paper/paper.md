@@ -56,7 +56,7 @@ literature [@johnsonReproducibilityCriticalCare2017a; @kellyKeyChallengesDeliver
 `ReciPies` fills this gap by bringing a tidy, stepwise *recipe* interface to Python. Users declare transformations over
 variables selected by semantic roles; recipes are "prepped" once on training data and "baked" on new data to eliminate
 leakage; and every step is inspectable, versionable, and serializable (JSON/YAML). `Recipes` runs on
-Pandas [@mckinney-proc-scipy-2010] and Polars [@PolarsPolars2024] for interoperability and performance, and their
+Pandas [@mckinney-proc-scipy-2010] and Polars [@vinkPolarsPolarsPython2024] for interoperability and performance, and their
 Object-oriented abstractions enable users to implement custom steps. The framework is declarative and reproducible for
 data preprocessing, prioritizing human readability and methodological transparency.
 We demonstrate that there is no need to sacrifice readability for performance or flexibility for simplicity. By reducing
