@@ -282,8 +282,9 @@ def all_numeric_predictors(backend=Backend.POLARS) -> Selector:
     """
     sel = all_predictors()
     # if backend == Backend.POLARS:
-    sel.set_types(["Int8", "Int16", "Int32", "Int64", "Float32", "Float64",
-                   "int16", "int32", "int64", "float16", "float32", "float64"])
+    sel.set_types(
+        ["Int8", "Int16", "Int32", "Int64", "Float32", "Float64", "int16", "int32", "int64", "float16", "float32", "float64"]
+    )
     # else:
     #     sel.set_types([])
     sel.description = "all numeric predictors"

@@ -4,16 +4,16 @@ title: >-
 authors:
   - name: Robin P. van de Water
     email: robin.vandewater@hpi.de
-    affiliation: "1, 2"
+    affiliation: 1, 2
     orcid: 0000-0002-2895-4872
     corresponding: true
   - name: Hendrik Schmidt
     orcid: 0000-0001-7699-3983
-    affiliation: "1"
+    affiliation: '1'
     equal-contrib: false
   - name: Patrick Rockenschaub
     orcid: 0000-0002-6499-7933
-    affiliation: "3"
+    affiliation: '3'
     equal-contrib: false
 affiliations:
   - index: 1
@@ -84,39 +84,39 @@ learning pipelines.
 If we have a dataset, `df`, with a label `y`, some features `x1`, `x2`, `x3`, `x4`, an identifier `id`, and a sequential
 component `time`, we can build a preprocessing pipeline using `ReciPies`. We first do a train/test split:
 
-``` Python
+```Python
 df_train, df_test = train_test_split(df, test_size=0.2, random_state=42)
 ```
 
 We then define the roles of the variables in this dataset:
 
-``` Python
-roles = {outcomes:["y"], predictors=["x1", "x2", "x3", "x4"], groups=["id"], 
+```Python
+roles = {outcomes:["y"], predictors=["x1", "x2", "x3", "x4"], groups=["id"],
 sequences=["time"]}
 ```
 
 Afterward, we create the `ingredients` which encapsulate the training data and its roles, and the `recipe` to
 preprocess the data:
 
-``` Python
+```Python
 ing = Ingredients(df_train, roles=roles)
 rec = Recipe(ing)
 ```
 
 We add preprocessing steps:
 
-``` Python
+```Python
 rec.add_step(StepScale())
-rec.add_step(StepSklearn(MissingIndicator(features="all"), 
+rec.add_step(StepSklearn(MissingIndicator(features="all"),
   sel=has_role("predictor")))
 rec.add_step(StepImputeFill(strategy="forward"))
-rec.add_step(StepSklearn(LabelEncoder(), sel=has_type("categorical"), 
+rec.add_step(StepSklearn(LabelEncoder(), sel=has_type("categorical"),
   columnwise=True))
 ```
 
 We can now fit the recipe and transform both the train and test set without leakage and in a transparent manner:
 
-``` Python
+```Python
 df_train = rec.prep()
 df_test = rec.bake(df_test)
 ```
