@@ -124,9 +124,10 @@ Next, we 3) define a Recipe consisting of multiple Steps that operate on selecte
 Finally, we 4) prep the Recipe on the training data and 5) bake it on new data. We can then 6) run our ML pipeline on 
 train and test data.
 <div>
-  <img src="docs/figures/recipies_flow.svg" alt="recipies flow" height="800">
+  <img src="docs/figures/recipies_flow.svg" alt="recipies flowchart" height="800">
 </div>
 The main building blocks of ReciPies are:
+
 - **Ingredients**: A wrapper around DataFrames that maintains column role information, ensuring data semantics are preserved during transformations.
 - **Recipe**: A collection of processing steps that can be applied to Ingredients objects to create reproducible data pipelines.
 - **Step**: Individual data transformation operations that understand column roles and can work with both Polars and Pandas backends.
