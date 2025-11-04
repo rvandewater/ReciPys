@@ -119,7 +119,7 @@ df2 = rec.bake(df2)
 
 ## Core Concepts
 <div>
-  <img src="docs/figures/recipies_flow.svg" alt="recipies flow" height="600">
+  <img src="docs/figures/recipies_flow.svg" alt="recipies flow" height="800">
 </div>
 
 **Ingredients**
