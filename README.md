@@ -33,26 +33,33 @@ The backend can either be [Polars](https://github.com/pola-rs/polars) or [Pandas
 The operation of this package is inspired by the R-package [recipes](https://recipes.tidymodels.org/). Please check the [documentation](rvandewater.github.io/ReciPies/) for more details.
 
 ## Installation
-
+### Using `pip`
 You can install ReciPies from pip using:
 
 ```
 pip install recipies
 ```
-
-> Note that the package is called `recipies` on pip.
-
-You can install ReciPies from source to ensure you have the latest version:
-
+### Using `uv`
+You can install ReciPies using `uv` (the unified package manager) with the following command:
+```bash
+uv add recipies
 ```
+> Note that the package is called `recipies` on pip.
+> 
+### Developer / Editable install
+
+```bash
+# with conda (optional)
 conda env update -f environment.yml
 conda activate ReciPies
+# with pip
 pip install -e .
+# with uv venv
+uv venv && source .venv/bin/activate
+
 ```
 
-> Note that the last command installs the package called `recipies`.
-
-## Quick Start
+## Gettiing Start
 
 Here's a simple example of using ReciPies:
 
@@ -111,6 +118,9 @@ df2 = rec.bake(df2)
 ```
 
 ## Core Concepts
+<div>
+  <img src="docs/figures/recipies_flow.svg" alt="recipies flow" height="600">
+</div>
 
 **Ingredients**
 A wrapper around DataFrames that maintains column role information, ensuring data semantics are preserved during transformations.
