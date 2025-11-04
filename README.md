@@ -118,21 +118,19 @@ df2 = rec.bake(df2)
 ```
 
 ## Core Concepts
+Below is a schematic overview of ReciPies' architecture. We 1) load a Pandas or Polars (training) dataframe, then 2) wrap it in an
+Ingredients object that maintains column role information (i.e., what does this column do in this dataset). 
+Next, we 3) define a Recipe consisting of multiple Steps that operate on selected columns.
+Finally, we 4) prep the Recipe on the training data and 5) bake it on new data. We can then 6) run our ML pipeline on 
+train and test data.
 <div>
   <img src="docs/figures/recipies_flow.svg" alt="recipies flow" height="800">
 </div>
-
-**Ingredients**
-A wrapper around DataFrames that maintains column role information, ensuring data semantics are preserved during transformations.
-
-**Recipe**
-A collection of processing steps that can be applied to Ingredients objects to create reproducible data pipelines.
-
-**Step**
-Individual data transformation operations that understand column roles and can work with both Polars and Pandas backends.
-
-**Selector**
-Utilities for selecting columns based on their roles or other criteria.
+The main building blocks of ReciPies are:
+- **Ingredients**: A wrapper around DataFrames that maintains column role information, ensuring data semantics are preserved during transformations.
+- **Recipe**: A collection of processing steps that can be applied to Ingredients objects to create reproducible data pipelines.
+- **Step**: Individual data transformation operations that understand column roles and can work with both Polars and Pandas backends.
+- **Selector**: Utilities for selecting columns based on their roles or other criteria.
 
 ## Backend Support
 
