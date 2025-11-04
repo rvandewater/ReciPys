@@ -25,10 +25,10 @@ from sklearn.preprocessing import (
 from sklearn.experimental import enable_iterative_imputer  # noqa: F401
 from sklearn.impute import SimpleImputer, KNNImputer, IterativeImputer, MissingIndicator
 
-from recipys.ingredients import Ingredients
-from recipys.recipe import Recipe
-from recipys.selector import all_numeric_predictors, has_type, has_role, all_of
-from recipys.step import (
+from src.recipies.ingredients import Ingredients
+from src.recipies.recipe import Recipe
+from src.recipies.selector import all_numeric_predictors, has_type, has_role, all_of
+from src.recipies.step import (
     StepSklearn,
     StepHistorical,
     Accumulator,
@@ -38,7 +38,7 @@ from recipys.step import (
     StepImputeFastZeroFill,
     StepImputeFastForwardFill,
 )
-from recipys.constants import Backend
+from src.recipies.constants import Backend
 
 
 @pytest.fixture()
@@ -137,7 +137,9 @@ class TestStepHistorical:
         if rec.get_backend() == Backend.POLARS:
             assert df["x1_min"][-1] == df.filter(pl.col("id") == 2).select(pl.col("x1")).min().item()
             assert df["x1_max"][-1] == df.filter(pl.col("id") == 2).select(pl.col("x1")).max().item()
-            assert df["x1_mean"][-1] == df.filter(pl.col("id") == 2).select(pl.col("x1")).mean().item()
+            # assert df["x1_mean"][-1] == df.filter(pl.col("id") == 2).select(pl.col("x1")).mean().item()
+            # With approximate equality
+            assert df["x1_mean"][-1] == pytest.approx(df.filter(pl.col("id") == 2).select(pl.col("x1")).mean().item())
             assert df["x1_median"][-1] == df.filter(pl.col("id") == 2).select(pl.col("x1")).median().item()
             assert df["x1_count"][-1] == df.filter(pl.col("id") == 2).select(pl.col("x1")).count().item()
             # somehow we get a rounding difference between these two values

@@ -1,7 +1,7 @@
 import pytest
 
-from recipys.ingredients import Ingredients
-from recipys.constants import Backend
+from src.recipies.ingredients import Ingredients
+from src.recipies.constants import Backend
 import polars as pl
 
 

@@ -1,34 +1,48 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
+requires = ["setuptools>=64", "setuptools-scm>=8.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "recipies"
-version = "1.0"
+dynamic = ["version"]
 description = "A modular preprocessing package for Pandas Dataframe"
 readme = "README.md"
 license = { text = "MIT license" }
 authors = [
-    { name = "Robin van de Water", email = "robin.vandewater@hpi.de" }
+    { name = "Robin van de Water", email = "robin.vandewater@hpi.de" },
+    { name = "Hendrik Schmidt"},
+    { name = "Patrick Rockenschaub"}
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Natural Language :: English",
-    "Programming Language :: Python :: 3.12"
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.9",
 ]
 keywords = ["recipies", "pandas", "dataframe", "polars", "preprocessing", "recipys"]
 dependencies = [
-    "coverage>=7.0.0",
-    "numpy>=1.24.0",
-    "pandas>=2.0.0",
-    "polars[all]>=1.0.0",
-    "scikit-learn>=1.4.0"
+    "pandas>=2.3.0",
+    "polars[all]>=1.21.0",
+    "scikit-learn>=1.5.2"
 ]
+optional-dependencies = { dev = ["pytest>=7.0", "ruff>=0.1.0"]} # docs = ["sphinx", "sphinx_immaterial", "sphinx-autoapi", "sphinx-autobuild", "myst_parser"] }
 
-[project.scripts]
-recipys = "recipys.recipe:Recipe"
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["recipies*"]
+exclude = ["tests*", "benchmarking*", "docs*", "examples*", "icu_demo_data*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.setuptools_scm]
+
+[tool.ruff]
+line-length = 127
+include = ["*.py"]

@@ -1,10 +1,10 @@
 import pytest
 import numpy as np
 import polars as pl
-from recipys.recipe import Recipe
-from recipys.ingredients import Ingredients
+from src.recipies.recipe import Recipe
+from src.recipies.ingredients import Ingredients
 import pandas as pd
-from recipys.constants import Backend
+from src.recipies.constants import Backend
 
 
 @pl.api.register_dataframe_namespace("pd")
