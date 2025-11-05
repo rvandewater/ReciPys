@@ -10,9 +10,7 @@ nav:
   - API Reference: api.md
   - Examples:
       - Tutorial: examples/tutorial.ipynb
-      - Benchmarking: examples/benchmarking.ipynb
-      - Debug: examples/debug.ipynb
-
+      - Pandas and Polars: examples/pandas_or_polars.ipynb
 theme:
   name: material
   logo: figures/recipies_logo.svg
