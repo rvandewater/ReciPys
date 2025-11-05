@@ -80,6 +80,7 @@ stepwise recipe that is easy to use and read, allowing users to readily preproce
 learning pipelines.
 
 # Usage
+
 ![recipies flowchart](../docs/figures/recipies_flow.svg)
 
 If we have a dataset, `df`, with a label `y`, some features `x1`, `x2`, `x3`, `x4`, an identifier `id`, and a sequential
