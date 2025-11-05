@@ -31,7 +31,14 @@ dependencies = [
     "polars[all]>=1.21.0",
     "scikit-learn>=1.5.2"
 ]
-optional-dependencies = { dev = ["pytest>=7.0", "ruff>=0.1.0"], docs = ["sphinx", "sphinx_immaterial", "sphinx-autoapi", "sphinx-autobuild", "myst_parser"] }
+optional-dependencies = { dev = ["pytest>=7.0", "ruff>=0.1.0"], docs = [
+    "mkdocs>=1.6",
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.26",
+    "mkdocs-autorefs>=1.0",
+    "pymdown-extensions>=10.8",
+    "mkdocs-jupyter>=0.24"
+] }
 
 [tool.setuptools.packages.find]
 where = ["src"]

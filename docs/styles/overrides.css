@@ -1,0 +1,29 @@
+:root{
+  --md-primary-fg-color: #196B24;
+  --md-primary-fg-color--light: #3AA14A; /* lighter primary */
+  --md-primary-fg-color--dark: #0F3E14;  /* darker primary */
+  --md-accent-fg-color: #5FBD6C;        /* lighter accent */
+}
+
+[data-md-color-scheme="slate"]{
+  --md-primary-fg-color: #196B24;
+  --md-primary-fg-color--light: #3AA14A;
+  --md-primary-fg-color--dark: #0F3E14;
+  --md-accent-fg-color: #5FBD6C;
+}
+
+/* Force header (top-left) logo to appear black for readability */
+.md-header .md-logo img,
+.md-header .md-logo svg {
+  filter: brightness(0) saturate(100%) !important; /* make it black */
+}
+
+.md-typeset .hero-logo img,
+.md-typeset img[alt="recipies logo"] {
+  height: 300px !important;
+  width: auto !important;
+}
+
+.md-typeset .centered {
+  text-align: center;
+}

@@ -33,19 +33,25 @@ The backend can either be [Polars](https://github.com/pola-rs/polars) or [Pandas
 The operation of this package is inspired by the R-package [recipes](https://recipes.tidymodels.org/). Please check the [documentation](rvandewater.github.io/ReciPies/) for more details.
 
 ## Installation
+
 ### Using `pip`
+
 You can install ReciPies from pip using:
 
 ```
 pip install recipies
 ```
+
 ### Using `uv`
+
 You can install ReciPies using `uv` (the unified package manager) with the following command:
+
 ```bash
 uv add recipies
 ```
+
 > Note that the package is called `recipies` on pip.
-> 
+
 ### Developer / Editable install
 
 ```bash
@@ -118,11 +124,13 @@ df2 = rec.bake(df2)
 ```
 
 ## Core Concepts
+
 Below is a schematic overview of ReciPies' architecture. We 1) load a Pandas or Polars (training) dataframe, then 2) wrap it in an
-Ingredients object that maintains column role information (i.e., what does this column do in this dataset). 
+Ingredients object that maintains column role information (i.e., what does this column do in this dataset).
 Next, we 3) define a Recipe consisting of multiple Steps that operate on selected columns.
-Finally, we 4) prep the Recipe on the training data and 5) bake it on new data. We can then 6) run our ML pipeline on 
+Finally, we 4) prep the Recipe on the training data and 5) bake it on new data. We can then 6) run our ML pipeline on
 train and test data.
+
 <div>
   <img src="docs/figures/recipies_flow.svg" alt="recipies flowchart" height="800">
 </div>
