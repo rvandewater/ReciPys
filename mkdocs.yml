@@ -44,10 +44,6 @@ plugins:
       default_handler: python
       handlers:
         python:
-          selection:
-            docstring_style: numpy
-            filters:
-              - "!^__init__$"
           rendering:
             show_root_heading: true
             show_source: false

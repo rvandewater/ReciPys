@@ -109,13 +109,4 @@ rec.prep()
 df_test_transformed = rec.bake(df_test)
 ```
 
-______________________________________________________________________
-
-## Learn More
-
-- [API Reference](../api/)
-- [Tutorials & Examples](../examples/)
-
-______________________________________________________________________
-
 `ReciPies` brings clarity, reproducibility, and flexibility to your ML preprocessing pipelines.
