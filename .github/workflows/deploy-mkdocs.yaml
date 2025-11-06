@@ -19,11 +19,6 @@ jobs:
       pages: write
       id-token: write
     steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
-        with:
-          # Path to your built site directory
-          source: site
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
@@ -36,3 +31,8 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: site
+      - id: deployment
+        uses: actions/deploy-pages@v4
+        with:
+          # Path to your built site directory
+          source: site
