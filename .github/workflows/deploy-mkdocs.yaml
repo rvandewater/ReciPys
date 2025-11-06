@@ -26,7 +26,7 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install dependencies
-        run: pip install mkdocs mkdocs-material mkdocstrings[python] mkdocs-jupyter
+        run: pip install mkdocs mkdocs-material mkdocstrings[python] mkdocs-jupyter recipies
       - name: Build MkDocs site
         run: mkdocs build
       - name: Upload artifact
