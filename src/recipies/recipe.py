@@ -24,7 +24,7 @@ class Recipe:
         outcomes: names of columns in data that are assigned the 'outcome' role
         predictors: names of columns in data that should be assigned the 'predictor' role
         groups: names of columns in data that should be assigned the 'group' role
-        sequence: names of columns in data that should be assigned the 'sequence' role
+        sequences: names of columns in data that should be assigned the 'sequence' role
     """
 
     columns = None

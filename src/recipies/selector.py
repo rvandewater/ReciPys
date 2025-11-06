@@ -210,7 +210,7 @@ def regex_names(regex: str) -> Selector:
     """Define selector for any columns where the name matches the regex pattern
 
     Args:
-        pattern: string to be transformed to regex pattern to search for
+        regex: string to be transformed to regex pattern to search for
 
     Returns:
         Object representing the selection rule.
@@ -235,7 +235,7 @@ def ends_with(suffix: str) -> Selector:
     """Define selector for any columns where the name ends with the suffix
 
     Args:
-        prsuffixefix: suffix to search for
+        suffix: suffix to search for
 
     Returns:
         Object representing the selection rule.

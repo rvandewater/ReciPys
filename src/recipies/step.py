@@ -612,12 +612,23 @@ class StepScale(StepSklearn):
        with_mean: Defaults to True. If True, center the data before scaling.
        with_std: Defaults to True. If True, scale the data to unit variance (or equivalently, unit standard deviation).
        in_place: Defaults to True. Set to False to have the step generate new columns instead of overwriting the existing ones.
-       role (str, optional): Defaults to 'predictor'. In case new columns are added, set their role to role.
     """
 
-    def __init__(self, sel=all_numeric_predictors(), with_mean: bool = True, with_std: bool = True, *args, **kwargs):
+    def __init__(
+        self,
+        sel=all_numeric_predictors(),
+        with_mean: bool = True,
+        with_std: bool = True,
+        in_place: bool = True,
+        *args,
+        **kwargs,
+    ):
         super().__init__(
-            sklearn_transformer=StandardScaler(with_mean=with_mean, with_std=with_std), sel=sel, in_place=True, *args, **kwargs
+            sklearn_transformer=StandardScaler(with_mean=with_mean, with_std=with_std),
+            sel=sel,
+            in_place=in_place,
+            *args,
+            **kwargs,
         )
         self.desc = "Scale with StandardScaler"
 
