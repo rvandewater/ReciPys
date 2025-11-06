@@ -146,7 +146,7 @@ class Recipe:
             Transformed data.
         """
         data = self._check_data(data)
-        # Todo: check why the roles dissapear after copying
+        # Todo: check why the roles disappear after copying
         data = copy(data)
         data = self._apply_fit_transform(data, refit)
         # return pl.DataFrame(data)

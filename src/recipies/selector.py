@@ -6,7 +6,8 @@ from .constants import Backend
 
 
 class Selector:
-    """Class responsible for selecting the variables affected by a recipe step
+    """Class responsible for selecting the variables affected by a recipe step.
+    This class is an iterable
 
     Args:
         description: Text used to represent Selector when printed in summaries
@@ -29,6 +30,24 @@ class Selector:
         self.set_roles(roles)
         self.set_types(types)
         self.set_pattern(pattern)
+
+    def __iter__(self):
+        """Allow Selector to be used as an iterable after being called with Ingredients."""
+        if not hasattr(self, "_last_selection"):
+            raise AttributeError("Selector must be called with Ingredients before iteration.")
+        return iter(self._last_selection)
+
+    def __len__(self):
+        """Return the number of selected columns after being called."""
+        if not hasattr(self, "_last_selection"):
+            raise AttributeError("Selector must be called with Ingredients before getting length.")
+        return len(self._last_selection)
+
+    def __getitem__(self, idx):
+        """Allow indexing into the selected columns after being called."""
+        if not hasattr(self, "_last_selection"):
+            raise AttributeError("Selector must be called with Ingredients before indexing.")
+        return self._last_selection[idx]
 
     def set_names(self, names: Union[str, list[str]]):
         """Set the column names to select with this Selector
@@ -99,7 +118,7 @@ class Selector:
 
         if self.pattern is not None:
             vars = list(filter(self.pattern.search, vars))
-
+        self._last_selection = vars  # Store last selection for iteration
         return vars
 
     def __repr__(self):

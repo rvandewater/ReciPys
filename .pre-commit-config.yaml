@@ -74,7 +74,7 @@ repos:
       - id: codespell
         args:
           - --skip=*.ipynb,*.bib,*.svg,pyproject.toml,*.csv
-          - --ignore-words-list=ehr,crate
+          - --ignore-words-list=ehr,crate,recipies,ReciPies
 
   # jupyter notebook cell output clearing
   - repo: https://github.com/kynan/nbstripout
@@ -87,6 +87,6 @@ repos:
     rev: 1.9.1
     hooks:
       - id: nbqa-ruff
-        args: ["--fix"]
+        args: ["--fix", "--ignore=E402"]
       - id: nbqa-ruff-format
         args: ["--line-length=110"]
