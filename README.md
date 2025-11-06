@@ -65,7 +65,7 @@ uv venv && source .venv/bin/activate
 
 ```
 
-## Gettiing Start
+## Getting Start
 
 Here's a simple example of using ReciPies:
 
@@ -181,4 +181,4 @@ customisable preprocessing pipeline (a standalone paper is in preparation):
 }
 ```
 
-This paper can also be found on arxiv: https://arxiv.org/pdf/2306.05109.pdf.
+This paper can also be found on arxiv: [arxiv](https://arxiv.org/pdf/2306.05109.pdf).

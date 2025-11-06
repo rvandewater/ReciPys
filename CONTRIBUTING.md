@@ -8,26 +8,26 @@ Thank you for your interest in contributing! We welcome all contributions to imp
 
 2. **Install dependencies** using:
 
-    ```
+    ```bash
     pip install -e '.[dev]'
     ```
 
     or use the provided `environment.yml` for conda environments.
     For docs, use:
 
-    ```
+    ```bash
     pip install -e '.[docs]'
     ```
 
 3. **Run tests** before submitting changes:
 
-    ```
+    ```bash
     pytest
     ```
 
 4. **Lint your code** with [Ruff](https://github.com/astral-sh/ruff):
 
-    ```
+    ```bash
     ruff src/ tests/
     ```
 

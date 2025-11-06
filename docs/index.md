@@ -48,7 +48,7 @@ from recipies.step import StepSklearn, StepHistorical, Accumulator, StepImputeFi
 from sklearn.impute import MissingIndicator
 
 df_train = pl.read_parquet("path_to_your_data.parquet")
-ing = Ingredients(df)
+ing = Ingredients(df_train)
 rec = Recipe(ing, outcomes=["y"], predictors=["x1", "x2"], groups=["id"], sequences=["time"]) 
 rec.add_step(StepSklearn(MissingIndicator(features="all"), sel=all_predictors()))
 rec.add_step(StepImputeFill(sel=all_predictors(), strategy="forward"))
@@ -59,7 +59,7 @@ Now prep your data (train the steps and convert the data):
 df_train_preprocessed = rec.prep()
 ```
 Now use the prepped recipe to also process your test data without information leakage:
-```
+``` python
 df_test = pl.read_parquet("path_to_your_data.parquet")
 df_test_preprocessed = rec.bake(df_test)
 ```
