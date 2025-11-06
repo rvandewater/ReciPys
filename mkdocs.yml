@@ -42,8 +42,6 @@ plugins:
   - autorefs
   - mkdocstrings:
       default_handler: python
-      handlers:
-        python:
   - mkdocs-jupyter:
       execute: true
       include_source: true
