@@ -231,10 +231,11 @@ class Ingredients:
                     # For non-string indices, use a more efficient approach
                     # that avoids the fragmentation warning
                     import warnings
+
                     with warnings.catch_warnings():
-                        warnings.filterwarnings("ignore",
-                                              message="DataFrame is highly fragmented",
-                                              category=pd.errors.PerformanceWarning)
+                        warnings.filterwarnings(
+                            "ignore", message="DataFrame is highly fragmented", category=pd.errors.PerformanceWarning
+                        )
                         self.data[idx] = val
 
     @overload

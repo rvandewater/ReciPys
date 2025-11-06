@@ -333,7 +333,7 @@ class StepHistorical(Step):
         """
 
         new_data = self._check_ingredients(data)
-        self.suffix = "_" + self.suffix
+        self.suffix = self.suffix
         new_columns = [c + self.suffix for c in self.columns]
 
         selected = new_data.data
@@ -397,7 +397,7 @@ class StepSklearn(Step):
         columnwise: Defaults to False. Set to True to fit and transform the DF column by column.
         in_place: Defaults to True. Set to False to have the step generate new columns
             instead of overwriting the existing ones.
-        role (str, optional): Defaults to 'predictor'. Incase new columns are added, set their role to role.
+        role (str, optional): Defaults to 'predictor'. In case new columns are added, set their role to role.
     """
 
     def __init__(
@@ -434,7 +434,7 @@ class StepSklearn(Step):
             except ValueError as e:
                 if "should be a 1d array" in str(e) or "Multioutput target data is not supported" in str(e):
                     raise ValueError(
-                        "The sklearn transformer expects a 1d array as input. " "Try running the step with columnwise=True."
+                        "The sklearn transformer expects a 1d array as input. Try running the step with columnwise=True."
                     )
                 raise
 
@@ -612,7 +612,7 @@ class StepScale(StepSklearn):
        with_mean: Defaults to True. If True, center the data before scaling.
        with_std: Defaults to True. If True, scale the data to unit variance (or equivalently, unit standard deviation).
        in_place: Defaults to True. Set to False to have the step generate new columns instead of overwriting the existing ones.
-       role (str, optional): Defaults to 'predictor'. Incase new columns are added, set their role to role.
+       role (str, optional): Defaults to 'predictor'. In case new columns are added, set their role to role.
     """
 
     def __init__(self, sel=all_numeric_predictors(), with_mean: bool = True, with_std: bool = True, *args, **kwargs):

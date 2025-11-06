@@ -2,11 +2,20 @@ import argparse
 from datetime import datetime, timedelta
 import sys
 import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 import polars as pl
 from sklearn.impute import MissingIndicator
-from sklearn.preprocessing import KBinsDiscretizer, StandardScaler, MinMaxScaler, MaxAbsScaler, RobustScaler, PowerTransformer, \
-    QuantileTransformer, SplineTransformer
+from sklearn.preprocessing import (
+    KBinsDiscretizer,
+    StandardScaler,
+    MinMaxScaler,
+    MaxAbsScaler,
+    RobustScaler,
+    PowerTransformer,
+    QuantileTransformer,
+    SplineTransformer,
+)
 
 from generate_data import generate_icu_data
 from src.recipies.constants import Backend
@@ -18,12 +27,13 @@ import polars.selectors as cs
 from memory_profiler import memory_usage
 from tqdm import tqdm
 
+
 def benchmark_dynamic_recipe(data, backend):
     if backend == Backend.POLARS:
         numeric_predictors = data.select(pl.exclude("stay_id", "time")).columns
     else:
         numeric_predictors = list(set(data.columns).difference(["stay_id", "time"]))
-    dyn_rec = Recipe(data, [],numeric_predictors, "stay_id", "time", backend=backend)
+    dyn_rec = Recipe(data, [], numeric_predictors, "stay_id", "time", backend=backend)
 
     dyn_rec.add_step(StepScale(all_numeric_predictors(backend)))
 
@@ -46,7 +56,7 @@ def benchmark_step(data, backend, step):
     else:
         numeric_predictors = list(set(data.columns).difference(["stay_id", "time"]))
 
-    recipe = Recipe(data, [],numeric_predictors, "stay_id", "time", backend=backend)
+    recipe = Recipe(data, [], numeric_predictors, "stay_id", "time", backend=backend)
     recipe.add_step(step)
     data = recipe.bake()
     time_passed = datetime.now() - timer
@@ -64,7 +74,7 @@ def dynamic_feature_generation(data, backend):
 def benchmark_backend(backend, data_size, seed):
     # metrics = {}
     df_missing = generate_icu_data(data_size, seed=seed)
-    df_complete = generate_icu_data(data_size, missingness_threshold=(0,0), seed=seed)
+    df_complete = generate_icu_data(data_size, missingness_threshold=(0, 0), seed=seed)
     if backend == Backend.PANDAS:
         backend_name = "Pandas"
         df_missing = df_missing.to_pandas()
@@ -72,8 +82,9 @@ def benchmark_backend(backend, data_size, seed):
     else:
         backend_name = "Polars"
     steps_missing = [
-            StepImputeFill(all_predictors(), strategy="forward"),
-            StepSklearn(MissingIndicator(features="all"), all_predictors(), in_place=False)]
+        StepImputeFill(all_predictors(), strategy="forward"),
+        StepSklearn(MissingIndicator(features="all"), all_predictors(), in_place=False),
+    ]
     steps_complete = [
         # StepSklearn(
         #  OrdinalEncoder(),
@@ -85,14 +96,15 @@ def benchmark_backend(backend, data_size, seed):
         #     in_place=False,
         # ),
         StepSklearn(
-         KBinsDiscretizer(n_bins=2, strategy="uniform", encode="ordinal"),
-         sel=all_numeric_predictors(),
-         in_place=False,
+            KBinsDiscretizer(n_bins=2, strategy="uniform", encode="ordinal"),
+            sel=all_numeric_predictors(),
+            in_place=False,
         ),
         StepHistorical(sel=all_numeric_predictors(), fun=Accumulator.MEAN, suffix="Mean"),
         StepHistorical(sel=all_numeric_predictors(), fun=Accumulator.MIN, suffix="Min"),
         StepHistorical(sel=all_numeric_predictors(), fun=Accumulator.MAX, suffix="Max"),
-        StepHistorical(sel=all_numeric_predictors(), fun=Accumulator.COUNT, suffix="Count"),]
+        StepHistorical(sel=all_numeric_predictors(), fun=Accumulator.COUNT, suffix="Count"),
+    ]
 
     for item in [StandardScaler(), MinMaxScaler(), MaxAbsScaler(), RobustScaler()]:
         steps_complete.append(StepSklearn(item, sel=all_numeric_predictors()))
@@ -106,7 +118,9 @@ def benchmark_backend(backend, data_size, seed):
     def run_step_benchmark(backend, backend_name, data_size, results, step, df):
         metrics = {}
         metrics["data_size"] = data_size
-        mem_usage, time_passed = memory_usage((benchmark_step, (df, backend, step)), retval=True, max_iterations=1, interval=0.5)
+        mem_usage, time_passed = memory_usage(
+            (benchmark_step, (df, backend, step)), retval=True, max_iterations=1, interval=0.5
+        )
         metrics["backend"] = backend_name
         if isinstance(step, StepSklearn):
             metrics["step"] = str(step.sklearn_transformer.__class__.__name__)
@@ -125,16 +139,20 @@ def benchmark_backend(backend, data_size, seed):
         run_step_benchmark(backend, backend_name, data_size, results, step, df_missing)
     return results
 
+
 def parse_args():
-    parser = argparse.ArgumentParser(description="Benchmarking script for recipies with ICU data generation and preprocessing.",
-                                     usage="python perform_benchmark.py --data_sizes 10000 100000 --seeds 42 41")
-    parser.add_argument('--data_sizes', type=int, nargs='+', default=[1000], help='List of data sizes to benchmark.')
-    parser.add_argument('--seeds', type=int, nargs='+', default=[42, 41], help='Random seeds for data generation.')
+    parser = argparse.ArgumentParser(
+        description="Benchmarking script for recipies with ICU data generation and preprocessing.",
+        usage="python perform_benchmark.py --data_sizes 10000 100000 --seeds 42 41",
+    )
+    parser.add_argument("--data_sizes", type=int, nargs="+", default=[1000], help="List of data sizes to benchmark.")
+    parser.add_argument("--seeds", type=int, nargs="+", default=[42, 41], help="Random seeds for data generation.")
     return parser.parse_args()
+
 
 if __name__ == "__main__":
     args = parse_args()
-    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
     data_sizes = args.data_sizes
     seeds = args.seeds
 
@@ -142,7 +160,7 @@ if __name__ == "__main__":
     use_tqdm = sys.stdout.isatty() and sys.stderr.isatty()
 
     # Create filename once at the beginning
-    csv_filename = f'results_datasizes_{data_sizes}_seeds_{seeds}_datetime_{datetime.now():%Y-%m-%d_%H-%M-%S}.csv'
+    csv_filename = f"results_datasizes_{data_sizes}_seeds_{seeds}_datetime_{datetime.now():%Y-%m-%d_%H-%M-%S}.csv"
     size_results = []
     with pl.StringCache():
         data_size_iter = tqdm(data_sizes, desc="Processing data sizes", unit="size") if use_tqdm else data_sizes
@@ -166,20 +184,20 @@ if __name__ == "__main__":
 
             # Process results for this data size
             df_size = pl.concat(size_results, how="vertical_relaxed")
-            df_size = df_size.group_by(["data_size", "step", "backend"]).agg([
-                pl.col("time_passed").mean().alias("duration_mean"),
-                pl.col("time_passed").std().alias("duration_std"),
-                pl.col("memory_usage").mean().alias("memory_mean"),
-                pl.col("memory_usage").std().alias("memory_std")
-            ])
+            df_size = df_size.group_by(["data_size", "step", "backend"]).agg(
+                [
+                    pl.col("time_passed").mean().alias("duration_mean"),
+                    pl.col("time_passed").std().alias("duration_std"),
+                    pl.col("memory_usage").mean().alias("memory_mean"),
+                    pl.col("memory_usage").std().alias("memory_std"),
+                ]
+            )
 
             columns = ["duration_mean", "duration_std", "memory_mean", "memory_std"]
-            df_size = (df_size
-                      .pivot(on="backend", values=columns, index=["data_size", "step"])
-                      .with_columns(
-                          speed_difference=(pl.col("duration_mean_Pandas") - pl.col("duration_mean_Polars")),
-                          speedup=(pl.col("duration_mean_Pandas") / pl.col("duration_mean_Polars"))
-                      ))
+            df_size = df_size.pivot(on="backend", values=columns, index=["data_size", "step"]).with_columns(
+                speed_difference=(pl.col("duration_mean_Pandas") - pl.col("duration_mean_Polars")),
+                speedup=(pl.col("duration_mean_Pandas") / pl.col("duration_mean_Polars")),
+            )
             df_size = df_size.with_columns(cs.numeric().round(1))
             df_size = df_size.sort(by=["data_size", "step"])
 

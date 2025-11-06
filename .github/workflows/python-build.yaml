@@ -9,13 +9,13 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [ "3.12" ]
+        python-version: ["3.12"]
 
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Fetch full git history for setuptools-scm
-          fetch-tags: true  # Explicitly fetch tags
+          fetch-depth: 0 # Fetch full git history for setuptools-scm
+          fetch-tags: true # Explicitly fetch tags
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
