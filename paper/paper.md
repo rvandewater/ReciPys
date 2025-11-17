@@ -58,7 +58,7 @@ learning pipelines.
 ![recipies flowchart](../docs/figures/recipies_flow.pdf)
 A typical workflow 1) loads a Pandas or Polars training `DataFrame`, 2) wraps it as an `Ingredients` object that records role metadata, 3) defines a `Recipe` from `Steps` operating on columns selected based on roles by `Selectors`, 4) preps the recipe on the training split to estimate parameters, and 5) bakes it on the held-out split to apply those parameters without leakage. The baked outputs feed downstream modeling and evaluation. Figure 1 gives an overview of this workflow.
 ![physionet code snippet](../docs/figures/recipies_code_snippet.pdf)
-Figure 2 demonstrates usage on the PhysioNet Computing in Cardiology 2019 dataset [@reynaEarlyPredictionSepsis2020a], including role assignment, time-aware imputation, categorical encoding, and normalization. The prepped recipe serializes to JSON or YAML, and reloading the artifact reproduces the transforms across supported platforms.
+Figure 2 demonstrates usage on the PhysioNet Computing in Cardiology 2019 dataset [@reynaEarlyPredictionSepsis2020a], including role assignment, temporal imputation, and normalization. The prepped recipe serializes to JSON or YAML, and reloading the artifact reproduces the transforms across supported platforms.
 
 Complete code and interactive notebooks are available in the project documentation. `ReciPies` also provides a benchmarking suite comparing the performance of different preprocessing steps
 on (generated) data.
@@ -74,3 +74,9 @@ can benefit the broader ecosystem.
 Our first step is to expand the library of Polars-native steps to fully leverage its columnar execution model, particularly for
 time-series operations and large-scale aggregations, where Polars shows significant performance advantages. Second, we aim to integrate with ML versioning systems to streamline the
 transition from research to production.
+
+# Acknowledgements
+Robin P. van de Water is funded by the European Commission in the Horizon 2020 project INTERVENE (Grant agreement ID: 101016775).
+This work has been edited with the help of Large Language Models (LLMs) to improve readability. 
+
+# References
