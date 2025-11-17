@@ -14,6 +14,7 @@ alt="recipies logo" height="300">
 [![Python Version](https://img.shields.io/pypi/pyversions/recipies.svg)](https://pypi.python.org/pypi/recipies/)
 [![Downloads](https://pepy.tech/badge/recipies)](https://pepy.tech/project/recipies)
 [![arXiv](https://img.shields.io/badge/arXiv-2306.05109-b31b1b.svg)](http://arxiv.org/abs/2306.05109)
+[![codecov](https://codecov.io/gh/rvandewater/ReciPies/graph/badge.svg?token=5L5KUN8I3F)](https://codecov.io/gh/rvandewater/ReciPies)
 
 Modern machine learning (ML) workflows live or die by their data‑preprocessing steps, yet in Python—a language with a
 rich ecosystem for data science and ML—these steps are often scattered across ad‑hoc scripts or opaque Scikit-Learn
