@@ -76,7 +76,8 @@ time-series operations and large-scale aggregations, where Polars shows signific
 transition from research to production.
 
 # Acknowledgements
+
 Robin P. van de Water is funded by the European Commission in the Horizon 2020 project INTERVENE (Grant agreement ID: 101016775).
-This work has been edited with the help of Large Language Models (LLMs) to improve readability. 
+This work has been edited with the help of Large Language Models (LLMs) to improve readability.
 
 # References

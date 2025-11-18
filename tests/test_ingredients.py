@@ -1,8 +1,9 @@
 import pytest
+import pandas as pd
+import polars as pl
 
 from src.recipies.ingredients import Ingredients
 from src.recipies.constants import Backend
-import polars as pl
 
 
 def test_pl_init_role(example_df):
@@ -165,3 +166,33 @@ def test_explicit_backend_ingredients(example_df):
     assert ing.get_backend() == Backend.PANDAS
     ing = Ingredients(example_df, backend=Backend.POLARS)
     assert ing.get_backend() == Backend.POLARS
+
+
+def test_ingredients_backend_inference():
+    # Test backend inference for Polars DataFrame
+    pl_df = pl.DataFrame({"col1": [1, 2], "col2": [3, 4]})
+    ingr = Ingredients(pl_df)
+    assert ingr.backend == Backend.POLARS
+
+    # Test backend inference for Pandas DataFrame
+    pd_df = pd.DataFrame({"col1": [1, 2], "col2": [3, 4]})
+    ingr = Ingredients(pd_df)
+    assert ingr.backend == Backend.PANDAS
+
+    # Test backend inference for Ingredients object
+    ingr2 = Ingredients(ingr)
+    assert ingr2.backend == Backend.PANDAS
+
+    # Test invalid backend inference
+    with pytest.raises(ValueError):
+        Ingredients("invalid_data")
+
+
+def test_ingredients_roles_copy():
+    # Test roles copying
+    pd_df = pd.DataFrame({"col1": [1, 2], "col2": [3, 4]})
+    roles = {"col1": ["role1"], "col2": ["role2"]}  # Ensure roles match column names
+    ingr = Ingredients(pd_df, roles=roles, check_roles=False)  # Disable role checking for this test
+    ingr_copy = Ingredients(ingr)
+    assert ingr_copy.roles == roles
+    assert ingr_copy.data.equals(ingr.data)

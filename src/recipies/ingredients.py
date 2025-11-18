@@ -153,6 +153,10 @@ class Ingredients:
                 If old_role is given but column has no role old_role.
                 If no old_role is given but column has multiple roles already.
         """
+        if isinstance(column, list):
+            for col in column:
+                self.update_role(col, new_role, old_role)
+            return self
         self._check_column(column)
         self._check_role(new_role)
         if old_role is not None:

@@ -37,6 +37,7 @@ from src.recipies.step import (
     StepResampling,
     StepImputeFastZeroFill,
     StepImputeFastForwardFill,
+    Step,
 )
 from src.recipies.constants import Backend
 
@@ -483,3 +484,26 @@ class TestSklearnStep:
         with pytest.raises(TypeError) as exc_info:
             example_recipe.prep()
         assert "sparse_output=False" in str(exc_info.value)
+
+
+def test_step_trained_property():
+    step = Step()
+    assert not step.trained  # Default should be False
+
+
+def test_step_group_property():
+    step = Step()
+    assert step.group  # Default should be True
+
+
+def test_step_fit(example_ingredients):
+    step = Step()
+    step.fit(example_ingredients)
+    assert step.trained  # Ensure the step is marked as trained after fitting
+
+
+def test_step_unsupported_backend(example_ingredients):
+    step = Step(supported_backends=[Backend.PANDAS])
+    example_ingredients.backend = Backend.POLARS
+    with pytest.raises(ValueError):
+        step.fit(example_ingredients)  # Should raise an error for unsupported backend

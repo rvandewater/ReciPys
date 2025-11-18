@@ -169,6 +169,8 @@ class Recipe:
 
     def _apply_fit_transform(self, data=None, refit=False):
         # applies transform or fit and transform (when refit or not trained yet)
+        if data is None:
+            data = self.data
         for step in self.steps:
             data = self._apply_group(data, step)
             if refit or not step.trained:

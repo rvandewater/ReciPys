@@ -47,7 +47,6 @@ exclude = ["tests*", "benchmarking*", "docs*", "examples*", "icu_demo_data*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "--cov=src --cov-report=term-missing"
 
 [tool.setuptools_scm]
 

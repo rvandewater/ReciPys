@@ -1,6 +1,7 @@
 import pytest
+import polars as pl
 from src.recipies.constants import Backend
-
+import re
 from src.recipies.selector import (
     Selector,
     all_outcomes,
@@ -17,6 +18,7 @@ from src.recipies.selector import (
     all_predictors,
     intersection,
     enlist_str,
+    enlist_dt,
 )
 
 
@@ -133,3 +135,93 @@ def test_select_groups(example_ingredients):
 def test_select_sequence(example_ingredients):
     example_ingredients.update_role("time", "sequence")
     assert select_sequence(example_ingredients) == ["time"]
+
+
+def test_selector_len(example_ingredients):
+    selector = Selector("Test Selector", names=["x1", "x2"])
+    selector(example_ingredients)  # Call the selector with Ingredients
+    assert len(selector) == 2
+
+
+def test_selector_getitem(example_ingredients):
+    selector = Selector("Test Selector", names=["x1", "x2"])
+    selector(example_ingredients)  # Call the selector with Ingredients
+    assert selector[0] == "x1"
+
+
+def test_selector_set_names():
+    selector = Selector("Test Selector")
+    selector.set_names(["col1", "col2"])
+    assert selector.names == ["col1", "col2"]
+
+
+def test_selector_set_roles():
+    selector = Selector("Test Selector")
+    selector.set_roles(["role1", "role2"])
+    assert selector.roles == ["role1", "role2"]
+
+
+def test_selector_set_types():
+    selector = Selector("Test Selector")
+    selector.set_types(["type1", "type2"])
+    assert selector.types == ["type1", "type2"]
+
+
+def test_selector_set_pattern():
+    selector = Selector("Test Selector")
+    pattern = re.compile("col.*")
+    selector.set_pattern(pattern)
+    assert selector.pattern == pattern
+
+
+def test_selector_call(example_ingredients):
+    selector = Selector("Test Selector", names=["x1", "x2"])
+    selected = selector(example_ingredients)
+    assert selected == ["x1", "x2"]
+
+
+def test_selector_call_with_roles(example_ingredients):
+    selector = Selector("Test Selector", roles=["predictor"])
+    example_ingredients.update_role(["x1", "x2", "x3", "x4"], "predictor")
+    selected = selector(example_ingredients)
+    assert selected == ["x1", "x2", "x3", "x4"]  # Assuming these have the "predictor" role
+
+
+def test_selector_call_with_types(example_ingredients):
+    selector = Selector(
+        "Test Selector", types=["float64"] if example_ingredients.get_backend() == Backend.PANDAS else ["Float64"]
+    )
+    selected = selector(example_ingredients)
+    assert selected == ["y", "x1"]
+
+
+def test_selector_call_with_names(example_ingredients):
+    selector = Selector("Test Selector", names=["x1", "x3"])
+    selected = selector(example_ingredients)
+    assert selected == ["x1", "x3"]
+
+
+def test_selector_call_with_pattern(example_ingredients):
+    selector = Selector("Test Selector")
+    selector.set_pattern(re.compile(r"^x[1-3]$"))
+    selected = selector(example_ingredients)
+    assert selected == ["x1", "x2", "x3"]
+
+
+def test_selector_repr():
+    selector = Selector("Test Selector")
+    assert repr(selector) == "Test Selector"
+
+
+def test_enlist_dt():
+    # Test wrapping a single DataType
+    dt = pl.Float64  # Updated to use pl.Float64
+    assert enlist_dt(dt) == [dt]
+
+    # Test passing a list of DataTypes
+    dt_list = [pl.Float64, pl.Int64]  # Updated to use pl.Float64 and pl.Int64
+    assert enlist_dt(dt_list) == dt_list
+
+    # Test invalid input
+    with pytest.raises(TypeError):
+        enlist_dt("invalid")

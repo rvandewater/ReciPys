@@ -1,8 +1,11 @@
 import polars as pl
 from src.recipies.constants import Backend
 from src.recipies.recipe import Recipe
+from src.recipies.step import StepImputeFill
+from src.recipies.selector import all_predictors
 from collections import Counter
 from itertools import chain
+
 
 def test_empty_prep_return_df(example_pl_df):
     rec = Recipe(example_pl_df)
@@ -51,11 +54,10 @@ def test_backend_ingredients_recipe(example_ingredients):
     assert rec.get_backend() == example_ingredients.get_backend()
 
 
-
 def test_repr(example_pl_df):
     # Create a Recipe object with roles and steps
     rec = Recipe(example_pl_df, ["y"], ["x1", "x2", "x3"], ["id"], ["time"])
-    
+
     # Add a dummy step for testing
     class DummyStep:
         def __str__(self):
@@ -80,6 +82,7 @@ def test_repr(example_pl_df):
     # Check that the step is included in the operations section
     assert "DummyStep()" in repr_output
 
+
 def test_cache_method(example_pl_df):
     # Create a Recipe object with data
     rec = Recipe(example_pl_df, ["y"], ["x1", "x2", "x3"], ["id"], ["time"])
@@ -91,7 +94,7 @@ def test_cache_method(example_pl_df):
     rec.cache()
 
     # Ensure the data is deleted after caching
-    assert hasattr(rec, 'data') is False
+    assert hasattr(rec, "data") is False
 
 
 def test_roles_after_cache(example_pl_df):
@@ -100,7 +103,7 @@ def test_roles_after_cache(example_pl_df):
 
     # Ensure roles are accessible before caching
     assert hasattr(rec, "roles")
-    print (rec.roles)
+    print(rec.roles)
 
     # Check if the roles are in any of the lists of the roles dictionary
     assert any("group" in role_list for role_list in rec.roles.values())
@@ -130,3 +133,22 @@ def test_add_step(example_pl_df):
     # Ensure the step is added
     assert step in rec.steps
 
+
+def test_update_roles(example_pl_df):
+    rec = Recipe(example_pl_df, ["y"], ["x1", "x2"], ["id"], ["time"])
+    rec.update_roles("x1", new_role="feature")
+    assert "feature" in rec.roles["x1"]
+
+
+def test_bake(example_pl_df):
+    rec = Recipe(example_pl_df, ["y"], ["x1", "x2"], ["id"], ["time"])
+    rec.add_step(StepImputeFill(sel=all_predictors(), strategy="forward"))
+    baked_df = rec.bake()
+    assert baked_df is not None
+
+
+def test_apply_fit_transform(example_pl_df):
+    rec = Recipe(example_pl_df, ["y"], ["x1", "x2"], ["id"], ["time"])
+    rec.add_step(StepImputeFill(sel=all_predictors(), strategy="forward"))
+    transformed_df = rec._apply_fit_transform()
+    assert transformed_df is not None
