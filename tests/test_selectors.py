@@ -143,12 +143,6 @@ def test_selector_len(example_ingredients):
     assert len(selector) == 2
 
 
-def test_selector_getitem(example_ingredients):
-    selector = Selector("Test Selector", names=["x1", "x2"])
-    selector(example_ingredients)  # Call the selector with Ingredients
-    assert selector[0] == "x1"
-
-
 def test_selector_set_names():
     selector = Selector("Test Selector")
     selector.set_names(["col1", "col2"])
@@ -225,3 +219,21 @@ def test_enlist_dt():
     # Test invalid input
     with pytest.raises(TypeError):
         enlist_dt("invalid")
+
+
+def test_selector_iter(example_ingredients):
+    # Test __iter__ method
+    sel = all_of(["x1", "x2"])
+    selected = sel(example_ingredients)
+    assert list(sel) == selected  # Ensure iteration works
+    assert list(sel) == ["x1", "x2"]
+
+
+def test_selector_getitem(example_ingredients):
+    # Test __getitem__ method
+    sel = all_of(["x1", "x2"])
+    sel(example_ingredients)  # Call the selector with Ingredients
+    assert sel[0] == "x1"  # Ensure indexing works
+    assert sel[1] == "x2"
+    with pytest.raises(IndexError):
+        _ = sel[2]  # Ensure out-of-range indexing raises an error

@@ -152,3 +152,9 @@ def test_apply_fit_transform(example_pl_df):
     rec.add_step(StepImputeFill(sel=all_predictors(), strategy="forward"))
     transformed_df = rec._apply_fit_transform()
     assert transformed_df is not None
+
+
+def test_add_roles(example_pl_df):
+    rec = Recipe(example_pl_df, ["y"], ["x1", "x2"], ["id"], ["time"])
+    rec.add_roles("x2", new_role="feature")
+    assert "feature" in rec.roles["x2"]

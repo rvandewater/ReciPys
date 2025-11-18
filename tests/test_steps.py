@@ -507,3 +507,140 @@ def test_step_unsupported_backend(example_ingredients):
     example_ingredients.backend = Backend.POLARS
     with pytest.raises(ValueError):
         step.fit(example_ingredients)  # Should raise an error for unsupported backend
+
+
+def test_step_impute_fill_invalid_strategy(example_ingredients):
+    # Test invalid strategy in StepImputeFill
+    rec = Recipe(example_ingredients, ["y"], ["x1", "x2"])
+    step = StepImputeFill(strategy="invalid_strategy")
+    rec.add_step(step)
+    with pytest.raises(ValueError, match="No valid strategy provided. Strategy was: invalid_strategy"):
+        rec.prep()
+
+
+def test_step_scale_in_place_false(example_ingredients):
+    # Test StepScale with in_place=False
+    rec = Recipe(example_ingredients, ["y"], ["x1", "x2"])
+    step = StepScale(in_place=False)
+    rec.add_step(step)
+    prepped = rec.prep()
+    assert "x1" in prepped.columns and "StandardScaler_x1" in prepped.columns
+    assert "x2" in prepped.columns and "StandardScaler_x2" in prepped.columns
+
+
+# def test_step_function(example_ingredients):
+#     rec = Recipe(example_ingredients, ["y"], ["x1", "x2"])
+
+#     # Define a transformation function that increments numeric columns by 1
+#     def add_one(data, columns):
+#         df = data.get_df()
+#         print("Before incrementing:")
+#         print(type(df))
+#         print(df)
+#         print(columns)
+#         if isinstance(df, pd.DataFrame):
+#             df[columns] = df[columns] + 1
+#         elif isinstance(df, pl.DataFrame):
+#             df = df.with_columns([(df[col] + 1).alias(col) for col in columns])
+#         else:
+#             raise TypeError("Unsupported DataFrame type")
+#         print("After incrementing:")
+#         print(df)
+#         data.set_df(df)
+#         return data
+
+#     # Create the StepFunction instance
+#     step = StepFunction(sel=all_numeric_predictors(example_ingredients.get_backend()), function=add_one)
+
+#     # Add the step to the recipe and prepare the data
+#     rec.add_step(step)
+#     prepped = rec.prep()
+
+#     # Verify the transformation
+#     original_df = example_ingredients.get_df()
+#     if isinstance(original_df, pd.DataFrame):
+#         # For Pandas: Increment numeric columns in the expected DataFrame
+#         expected_df = original_df.copy()
+#         expected_df[["x1", "x2"]] += 1
+#         pd.testing.assert_frame_equal(prepped[["x1", "x2"]], expected_df[["x1", "x2"]])
+#     elif isinstance(original_df, pl.DataFrame):
+#         # For Polars: Increment numeric columns in the expected DataFrame
+#         expected_df = original_df.with_columns([(original_df[col] + 1).alias(col) for col in ["x1", "x2"]])
+#         assert prepped.equals(expected_df)
+
+
+def test_step_repr(example_ingredients):
+    # Create a dummy step
+    class DummyStep(Step):
+        def __init__(self, sel, desc="Dummy Step"):
+            super().__init__(sel=sel)
+            self.desc = desc
+
+        def do_fit(self, data):
+            pass
+
+        def transform(self, data):
+            return data
+
+    # Instantiate the step
+    step = DummyStep(sel=all_numeric_predictors(), desc="Test Step")
+
+    # Test __repr__ before training
+    repr_before_training = repr(step)
+    assert "Test Step for" in repr_before_training
+    assert "all numeric predictors" in repr_before_training
+    assert "[trained]" not in repr_before_training
+
+    # Fit the step
+    step.fit(example_ingredients)
+
+    # Test __repr__ after training
+    repr_after_training = repr(step)
+    assert "Test Step for" in repr_after_training
+    assert "[trained]" in repr_after_training
+    if len(step.columns) < 3:
+        assert str(step.columns) in repr_after_training
+    else:
+        assert str(step.columns[:2] + ["..."]) in repr_after_training
+
+
+# Create a dummy step
+class DummyStep(Step):
+    def do_fit(self, data):
+        pass
+
+    def transform(self, data):
+        return data
+
+
+def test_check_ingredients(example_ingredients):
+    # Instantiate the step
+    step = DummyStep()
+
+    # Test with valid input
+    validated_data = step._check_ingredients(example_ingredients)
+    assert isinstance(validated_data, Ingredients)
+
+    # Test with unsupported backend
+    step.supported_backends = [Backend.PANDAS]
+    example_ingredients.backend = Backend.POLARS
+    with pytest.raises(ValueError, match="Backend.POLARS not supported by this step."):
+        step._check_ingredients(example_ingredients)
+
+
+def test_check_ingredients_grouping(example_ingredients):
+    # Test with grouped data when grouping is not allowed
+    step = DummyStep()
+    step._group = False
+    if example_ingredients.get_backend() == Backend.PANDAS:
+        grouped_data = example_ingredients.get_df().groupby("id")
+        with pytest.raises(ValueError, match="Step does not accept grouped data."):
+            step._check_ingredients(grouped_data)
+    elif example_ingredients.get_backend() == Backend.POLARS:
+        grouped_data = example_ingredients.get_df().group_by("id")
+        with pytest.raises(ValueError, match="Step does not accept grouped data."):
+            step._check_ingredients(grouped_data)
+
+    # Test with invalid input type
+    with pytest.raises(ValueError, match="Expected Ingredients object, got <class 'str'>"):
+        step._check_ingredients("invalid_input")
