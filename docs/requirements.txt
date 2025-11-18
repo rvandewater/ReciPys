@@ -1,5 +1,0 @@
-sphinx
-sphinx_immaterial
-sphinx-autoapi
-sphinx-autobuild
-myst_parser

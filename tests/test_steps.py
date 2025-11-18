@@ -43,13 +43,13 @@ from src.recipies.constants import Backend
 
 @pytest.fixture()
 def example_recipe(example_ingredients):
-    return Recipe(example_ingredients, ["y"], ["x1", "x2", "x3", "x4"], ["id"], ["time"])  # FIXME: add squence when merged
+    return Recipe(example_ingredients, ["y"], ["x1", "x2", "x3", "x4"], ["id"], ["time"])
 
 
 @pytest.fixture()
 def example_recipe_w_nan(example_ingredients):
     example_ingredients[[2, 4, 6], "x2"] = np.nan
-    return Recipe(example_ingredients, ["y"], ["x1", "x2", "x3", "x4"], ["id"], ["time"])  # FIXME: add squence when merged
+    return Recipe(example_ingredients, ["y"], ["x1", "x2", "x3", "x4"], ["id"], ["time"])
 
 
 def test_no_group_for_group_step(example_ingredients):
@@ -127,12 +127,12 @@ class TestStepResampling:
 class TestStepHistorical:
     def test_step(self, example_df):
         rec = Recipe(Ingredients(example_df), ["y"], ["x1", "x2"], ["id"])
-        rec.add_step(StepHistorical(sel=all_of(["x1", "x2"]), fun=Accumulator.MIN, suffix="min"))
-        rec.add_step(StepHistorical(sel=all_of(["x1", "x2"]), fun=Accumulator.MAX, suffix="max"))
-        rec.add_step(StepHistorical(sel=all_of(["x1", "x2"]), fun=Accumulator.MEAN, suffix="mean"))
-        rec.add_step(StepHistorical(sel=all_of(["x1", "x2"]), fun=Accumulator.MEDIAN, suffix="median"))
-        rec.add_step(StepHistorical(sel=all_of(["x1", "x2"]), fun=Accumulator.COUNT, suffix="count"))
-        rec.add_step(StepHistorical(sel=all_of(["x1", "x2"]), fun=Accumulator.VAR, suffix="var"))
+        rec.add_step(StepHistorical(sel=all_of(["x1", "x2"]), fun=Accumulator.MIN, suffix="_min"))
+        rec.add_step(StepHistorical(sel=all_of(["x1", "x2"]), fun=Accumulator.MAX, suffix="_max"))
+        rec.add_step(StepHistorical(sel=all_of(["x1", "x2"]), fun=Accumulator.MEAN, suffix="_mean"))
+        rec.add_step(StepHistorical(sel=all_of(["x1", "x2"]), fun=Accumulator.MEDIAN, suffix="_median"))
+        rec.add_step(StepHistorical(sel=all_of(["x1", "x2"]), fun=Accumulator.COUNT, suffix="_count"))
+        rec.add_step(StepHistorical(sel=all_of(["x1", "x2"]), fun=Accumulator.VAR, suffix="_var"))
         df = rec.bake()
         if rec.get_backend() == Backend.POLARS:
             assert df["x1_min"][-1] == df.filter(pl.col("id") == 2).select(pl.col("x1")).min().item()
@@ -236,7 +236,7 @@ class TestSklearnStep:
             )
         else:
             example_df["y"] = pd.Categorical(["a", "b", "c", "a", "c", "b", "c", "a", "b", "c"])
-        return Recipe(Ingredients(example_df), ["y"], ["x1", "x2", "x3", "x4"], ["id"])  # FIXME: add squence when merged
+        return Recipe(Ingredients(example_df), ["y"], ["x1", "x2", "x3", "x4"], ["id"], ["time"])
 
     def test_simple_imputer(self, example_recipe_w_nan):
         backend = example_recipe_w_nan.get_backend()

@@ -24,7 +24,7 @@ class Recipe:
         outcomes: names of columns in data that are assigned the 'outcome' role
         predictors: names of columns in data that should be assigned the 'predictor' role
         groups: names of columns in data that should be assigned the 'group' role
-        sequence: names of columns in data that should be assigned the 'sequence' role
+        sequences: names of columns in data that should be assigned the 'sequence' role
     """
 
     columns = None
@@ -146,7 +146,7 @@ class Recipe:
             Transformed data.
         """
         data = self._check_data(data)
-        # Todo: check why the roles dissapear after copying
+        # Todo: check why the roles disappear after copying
         data = copy(data)
         data = self._apply_fit_transform(data, refit)
         # return pl.DataFrame(data)

@@ -1,0 +1,75 @@
+site_name: ReciPies Documentation
+site_description: Feature engineering and preprocessing for Pandas and Polars
+site_url: https://rvandewater.github.io/ReciPies/
+repo_url: https://github.com/rvandewater/ReciPies
+repo_name: ReciPies
+edit_uri: edit/main/docs/
+
+nav:
+  - Home: index.md
+  - API Reference: api.md
+  - Examples:
+      - Basics: examples/tutorial.ipynb
+      - ICU data: examples/icu_advanced.ipynb
+      - Pandas or Polars: examples/pandas_or_polars.ipynb
+  - Concepts: concepts.md
+
+theme:
+  name: material
+  logo: figures/recipies_logo.svg
+  favicon: figures/recipies_logo.svg
+  features:
+    - navigation.tabs
+    - navigation.instant
+    - navigation.tracking
+    - navigation.expand
+    - toc.integrate
+    - content.code.copy
+    - search.suggest
+    - search.highlight
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+
+plugins:
+  - search
+  - autorefs
+  - mkdocstrings:
+      default_handler: python
+  - mkdocs-jupyter:
+      execute: true
+      include_source: true
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+
+extra_css:
+  - styles/overrides.css
+
+watch:
+  - src/recipies
+  - docs
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/rvandewater/ReciPies
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/recipies/

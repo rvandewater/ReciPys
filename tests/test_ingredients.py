@@ -148,7 +148,7 @@ def test_update_role_explicit_multiple(example_ingredients):
 def test_update_role_typo(example_ingredients):
     example_ingredients.update_role("y", "first role")
     with pytest.raises(ValueError) as e_info:
-        example_ingredients.update_role("y", "updated role", "firs role")
+        example_ingredients.update_role("y", "updated role", "first ever role")
     assert e_info.match("not among current roles")
 
 
