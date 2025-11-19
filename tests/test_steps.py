@@ -38,6 +38,7 @@ from src.recipies.step import (
     StepImputeFastZeroFill,
     StepImputeFastForwardFill,
     StepFunction,
+    StepImputeModel,
     Step,
 )
 from src.recipies.constants import Backend
@@ -156,6 +157,37 @@ class TestStepHistorical:
             assert df["x1_median"].iloc[-1] == df["x1"].loc[df["id"] == 2].median()
             assert df["x1_count"].iloc[-1] == df["x1"].loc[df["id"] == 2].count()
             assert df["x2_var"].iloc[-1] == df["x2"].loc[df["id"] == 2].var()
+
+    def test_invalid_accumulator(self, example_df):
+        # Test with an invalid accumulator
+        rec = Recipe(Ingredients(example_df), ["y"], ["x1", "x2"], ["id"])
+        with pytest.raises(TypeError, match="Expected Accumulator enum"):
+            rec.add_step(StepHistorical(sel=all_of(["x1", "x2"]), fun="INVALID_ACCUMULATOR", suffix="_invalid"))
+
+    def test_no_selector(self, example_df):
+        # Test with no selector provided
+        rec = Recipe(Ingredients(example_df), ["y"], ["x1", "x2"], ["id"])
+        rec.add_step(StepHistorical(fun=Accumulator.MIN, suffix="_min"))
+        df = rec.bake()
+        assert "x1_min" in df.columns and "x2_min" in df.columns, "Columns with suffix '_min' should be created."
+
+    def test_non_numeric_columns(self, example_pd_df):
+        # Test with non-numeric columns
+        example_pd_df["x3"] = (["a", "b", "c", "d"] * (len(example_pd_df) // 4 + 1))[
+            : len(example_pd_df)
+        ]  # Ensure correct length
+        rec = Recipe(Ingredients(example_pd_df), ["y"], ["x1", "x2", "x3"], ["id"])
+        rec.add_step(StepHistorical(sel=all_of(["x1", "x2", "x3"]), fun=Accumulator.MIN, suffix="_min"))
+        with pytest.raises(NotImplementedError, match="function is not implemented for this dtype"):
+            rec.bake()
+
+    def test_different_roles(self, example_df):
+        # Test with a different role
+        rec = Recipe(Ingredients(example_df), ["y"], ["x1", "x2"], ["id"])
+        rec.add_step(StepHistorical(sel=all_of(["x1", "x2"]), fun=Accumulator.MIN, suffix="_min", role="feature"))
+        df = rec.bake()
+        assert "x1_min" in df.columns and "x2_min" in df.columns, "Columns with suffix '_min' should be created."
+        assert rec.roles["x1_min"] == ["feature"], "The role of the new columns should be 'feature'."
 
 
 class TestImputeSteps:
@@ -558,10 +590,6 @@ def test_step_function(example_ingredients):
         # For Pandas: Increment numeric columns in the expected DataFrame
         expected_df = original_df.copy()
         expected_df[["x1", "x2"]] += 1
-        print("Expected DataFrame:")
-        print(expected_df)
-        print("Prepped DataFrame:")
-        print(prepped)
         pd.testing.assert_frame_equal(
             prepped[["x1", "x2"]], expected_df[["x1", "x2"]], check_exact=False, rtol=1e-5, atol=1e-8
         )
@@ -616,18 +644,26 @@ class DummyStep(Step):
 
 def test_check_ingredients(example_ingredients):
     # Create a dummy step
+    class DummyStep(Step):
+        def __init__(self, supported_backends):
+            super().__init__()
+            self.supported_backends = supported_backends
 
-    # Instantiate the step
-    step = DummyStep()
+        def do_fit(self, data):
+            pass
+
+        def transform(self, data):
+            return data
 
     # Test with valid input
+    step = DummyStep(supported_backends=[example_ingredients.get_backend()])
     validated_data = step._check_ingredients(example_ingredients)
     assert isinstance(validated_data, Ingredients)
 
     # Test with unsupported backend
-    step.supported_backends = [Backend.PANDAS]
-    example_ingredients.backend = Backend.POLARS
-    with pytest.raises(ValueError, match="Backend.POLARS not supported by this step."):
+    unsupported_backend = Backend.PANDAS if example_ingredients.get_backend() == Backend.POLARS else Backend.POLARS
+    step = DummyStep(supported_backends=[unsupported_backend])
+    with pytest.raises(ValueError, match=f"Backend.{example_ingredients.get_backend().name} not supported by this step."):
         step._check_ingredients(example_ingredients)
 
 
@@ -647,3 +683,36 @@ def test_check_ingredients_grouping(example_ingredients):
     # Test with invalid input type
     with pytest.raises(ValueError, match="Expected Ingredients object, got <class 'str'>"):
         step._check_ingredients("invalid_input")
+
+
+def test_step_impute_model(example_pd_ingredients):
+    # Define a simple imputation model
+    def impute_model(data, groups):
+        df = data.copy()
+        for group, group_data in df.groupby(groups):
+            for col in df.columns:
+                if col not in groups:
+                    df.loc[df[groups] == group, col] = group_data[col].fillna(group_data[col].mean())
+        return df.drop(columns=groups)
+
+    step = StepImputeModel(model=impute_model)
+
+    # Apply the transformation
+    transformed_data = step.transform(example_pd_ingredients)
+
+    # Verify the transformation
+    original_df = example_pd_ingredients.get_df()
+    if isinstance(original_df, pd.DataFrame):
+        # Ensure the 'group' column exists in the DataFrame
+        if "group" not in original_df.columns:
+            group_values = [1, 1, 2, 2] * (len(original_df) // 4 + 1)  # Ensure enough values
+            original_df["group"] = group_values[: len(original_df)]  # Truncate to match length
+        # Expected DataFrame for Pandas
+        expected_df = original_df.copy()
+        for group, group_data in expected_df.groupby("group"):
+            for col in ["x1", "x2"]:
+                expected_df.loc[expected_df["group"] == group, col] = group_data[col].fillna(group_data[col].mean())
+        expected_df = expected_df.drop(columns=["group"])
+        # Drop the 'group' column from the transformed DataFrame before comparison
+        transformed_data = transformed_data.get_df().drop(columns=["group"])
+        pd.testing.assert_frame_equal(transformed_data, expected_df)

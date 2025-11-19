@@ -323,11 +323,12 @@ class StepHistorical(Step):
 
         self.desc = f"Create historical {fun}"
         self.fun = fun
+        if isinstance(self.fun, Accumulator):
+            pass
+        else:
+            raise TypeError(f"Expected Accumulator enum for function, got {self.fun.__class__}")
         if suffix is None:
-            try:
-                suffix = fun.value
-            except Exception:
-                raise TypeError(f"Expected Accumulator enum for function, got {self.fun.__class__}")
+            suffix = fun.value
         self.suffix = suffix
         self.role = role
 

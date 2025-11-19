@@ -73,17 +73,11 @@ class Ingredients:
             self.roles = {}
         elif not isinstance(roles, dict):
             raise TypeError(f"Expected dict object for roles, got {roles.__class__}")
-        # elif check_roles and not all(set(k).issubset(set(self.data.columns)) for k, v in roles.items()):
-        #     raise ValueError(
-        #         f"Roles contains variable names that are not in the data {list(roles.values())} {self.data.columns}."
-        #     )
         elif check_roles and not all(k in self.data.columns for k in roles.keys()):
             raise ValueError(
-                f"Roles contains variable names that are not in the data {list(roles.keys())} {self.data.columns}."
+                "Roles contains variable names that are not in the data. "
+                f"Got roles for {list(roles.keys())}, available columns: {list(self.data.columns)}"
             )
-        # Todo: do we want to allow ingredients without grouping columns?
-        # elif check_roles and select_groups(self) == []:
-        #     raise ValueError("Roles are given but no groups are found in the data.")
         else:
             if copy is None or copy is True:
                 self.roles = deepcopy(roles)
