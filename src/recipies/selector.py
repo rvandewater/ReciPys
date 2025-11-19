@@ -3,6 +3,7 @@ from .ingredients import Ingredients
 from typing import Union
 from polars import DataType
 from .constants import Backend
+import polars as pl
 
 
 class Selector:
@@ -137,10 +138,19 @@ def enlist_dt(x: Union[DataType, list[DataType], None]) -> Union[list[DataType],
     Returns:
         _description_
     """
-    if isinstance(x, DataType):
+    if (
+        isinstance(x, DataType)
+        or (isinstance(x, type) and issubclass(x, DataType))
+        or isinstance(x, pl.datatypes.DataTypeClass)
+    ):
         return [x]
     elif isinstance(x, list):
-        if not all(isinstance(i, DataType) for i in x):
+        if not all(
+            isinstance(x, DataType)
+            or (isinstance(x, type) and issubclass(x, DataType))
+            or isinstance(x, pl.datatypes.DataTypeClass)
+            for x in x
+        ):
             raise TypeError("Only lists of datatypes are allowed.")
         return x
     elif x is None:
