@@ -237,3 +237,76 @@ def test_selector_getitem(example_ingredients):
     assert sel[1] == "x2"
     with pytest.raises(IndexError):
         _ = sel[2]  # Ensure out-of-range indexing raises an error
+
+
+def test_selector_iter_error():
+    # Test __iter__ error when _last_selection is not set
+    sel = Selector(description="Test Selector")
+    with pytest.raises(AttributeError, match="Selector must be called with Ingredients before iteration."):
+        list(sel)
+
+
+def test_selector_len_error():
+    # Test __len__ error when _last_selection is not set
+    sel = Selector(description="Test Selector")
+    with pytest.raises(AttributeError, match="Selector must be called with Ingredients before getting length."):
+        len(sel)
+
+
+def test_selector_getitem_error():
+    # Test __getitem__ error when _last_selection is not set
+    sel = Selector(description="Test Selector")
+    with pytest.raises(AttributeError, match="Selector must be called with Ingredients before indexing."):
+        sel[0]
+
+
+def test_selector_call_type_error():
+    # Test __call__ error when input is not an Ingredients object
+    sel = Selector(description="Test Selector")
+    with pytest.raises(TypeError, match="Expected Ingredients, got <class 'str'>"):
+        sel("invalid_input")
+
+
+def test_enlist_str_type_error():
+    # Test enlist_str with invalid input
+    with pytest.raises(TypeError, match="Expected str or list of str, got <class 'int'>"):
+        from src.recipies.selector import enlist_str
+
+        enlist_str(123)
+
+
+def test_enlist_dt_type_error():
+    # Test enlist_dt with invalid input
+    with pytest.raises(TypeError, match="Expected a pl datatype, got <class 'int'>"):
+        from src.recipies.selector import enlist_dt
+
+        enlist_dt(123)
+
+
+def test_intersection_type_error():
+    # Test intersection with invalid input
+    with pytest.raises(TypeError, match="'int' object is not iterable"):
+        from src.recipies.selector import intersection
+
+        intersection(123, ["x1", "x2"])
+
+
+def test_selector_roles_invalid_role(example_ingredients):
+    # Test has_role with a role that doesn't exist
+    sel = has_role(["nonexistent_role"])
+    selected = sel(example_ingredients)
+    assert selected == []
+
+
+def test_selector_types_invalid_type(example_ingredients):
+    # Test has_type with a type that doesn't exist
+    sel = has_type(["nonexistent_type"])
+    selected = sel(example_ingredients)
+    assert selected == []
+
+
+def test_selector_pattern_no_match(example_ingredients):
+    # Test regex_names with a pattern that doesn't match any column
+    sel = regex_names(r"z.*")
+    selected = sel(example_ingredients)
+    assert selected == []

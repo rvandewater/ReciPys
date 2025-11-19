@@ -650,13 +650,14 @@ class StepScale(StepSklearn):
 class StepFunction(Step):
     """Provides a wrapper for a simple transformation function, without fitting."""
 
-    def __init__(self, sel: Selector, function):
+    def __init__(self, function, sel: Selector = all_predictors()):
+        print(f"sel: {sel}")
         super().__init__(sel=sel)
-        print(f"selector columns: {self.columns}")
         self.function = function
         self._trained = True
 
     def transform(self, data: Ingredients) -> Ingredients:
         new_data = self._check_ingredients(data)
+        self.columns = self.sel(new_data)
         new_data = self.function(new_data, self.columns)
         return new_data

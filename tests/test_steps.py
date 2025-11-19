@@ -37,6 +37,7 @@ from src.recipies.step import (
     StepResampling,
     StepImputeFastZeroFill,
     StepImputeFastForwardFill,
+    StepFunction,
     Step,
 )
 from src.recipies.constants import Backend
@@ -528,45 +529,50 @@ def test_step_scale_in_place_false(example_ingredients):
     assert "x2" in prepped.columns and "StandardScaler_x2" in prepped.columns
 
 
-# def test_step_function(example_ingredients):
-#     rec = Recipe(example_ingredients, ["y"], ["x1", "x2"])
+def test_step_function(example_ingredients):
+    rec = Recipe(example_ingredients, ["y"], ["x1", "x2"])
+    if isinstance(example_ingredients.get_df(), pd.DataFrame):
+        original_df = example_ingredients.get_df().copy()
+    elif isinstance(example_ingredients.get_df(), pl.DataFrame):
+        original_df = example_ingredients.get_df().clone()
+    else:
+        raise TypeError("Unsupported DataFrame type")
 
-#     # Define a transformation function that increments numeric columns by 1
-#     def add_one(data, columns):
-#         df = data.get_df()
-#         print("Before incrementing:")
-#         print(type(df))
-#         print(df)
-#         print(columns)
-#         if isinstance(df, pd.DataFrame):
-#             df[columns] = df[columns] + 1
-#         elif isinstance(df, pl.DataFrame):
-#             df = df.with_columns([(df[col] + 1).alias(col) for col in columns])
-#         else:
-#             raise TypeError("Unsupported DataFrame type")
-#         print("After incrementing:")
-#         print(df)
-#         data.set_df(df)
-#         return data
+    # Define a transformation function that increments numeric columns by 1
+    def add_one(data, columns):
+        df = data.get_df()
+        if isinstance(df, pd.DataFrame):
+            df[columns] = df[columns] + 1
+        elif isinstance(df, pl.DataFrame):
+            df = df.with_columns([(df[col] + 1).alias(col) for col in columns])
+        else:
+            raise TypeError("Unsupported DataFrame type")
+        data.set_df(df)
+        return data
 
-#     # Create the StepFunction instance
-#     step = StepFunction(sel=all_numeric_predictors(example_ingredients.get_backend()), function=add_one)
+    # Create the StepFunction instance
+    step = StepFunction(function=add_one, sel=all_numeric_predictors(example_ingredients.get_backend()))
 
-#     # Add the step to the recipe and prepare the data
-#     rec.add_step(step)
-#     prepped = rec.prep()
+    # Add the step to the recipe and prepare the data
+    rec.add_step(step)
+    prepped = rec.prep()
+    # Verify the transformation
 
-#     # Verify the transformation
-#     original_df = example_ingredients.get_df()
-#     if isinstance(original_df, pd.DataFrame):
-#         # For Pandas: Increment numeric columns in the expected DataFrame
-#         expected_df = original_df.copy()
-#         expected_df[["x1", "x2"]] += 1
-#         pd.testing.assert_frame_equal(prepped[["x1", "x2"]], expected_df[["x1", "x2"]])
-#     elif isinstance(original_df, pl.DataFrame):
-#         # For Polars: Increment numeric columns in the expected DataFrame
-#         expected_df = original_df.with_columns([(original_df[col] + 1).alias(col) for col in ["x1", "x2"]])
-#         assert prepped.equals(expected_df)
+    if isinstance(original_df, pd.DataFrame):
+        # For Pandas: Increment numeric columns in the expected DataFrame
+        expected_df = original_df.copy()
+        expected_df[["x1", "x2"]] += 1
+        print("Expected DataFrame:")
+        print(expected_df)
+        print("Prepped DataFrame:")
+        print(prepped)
+        pd.testing.assert_frame_equal(
+            prepped[["x1", "x2"]], expected_df[["x1", "x2"]], check_exact=False, rtol=1e-5, atol=1e-8
+        )
+    elif isinstance(original_df, pl.DataFrame):
+        # For Polars: Increment numeric columns in the expected DataFrame
+        expected_df = original_df.with_columns([(original_df[col] + 1).alias(col) for col in ["x1", "x2"]])
+        assert prepped.equals(expected_df)
 
 
 def test_step_repr(example_ingredients):
