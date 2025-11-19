@@ -533,20 +533,16 @@ def test_step_function(example_ingredients):
     rec = Recipe(example_ingredients, ["y"], ["x1", "x2"])
     if isinstance(example_ingredients.get_df(), pd.DataFrame):
         original_df = example_ingredients.get_df().copy()
-    elif isinstance(example_ingredients.get_df(), pl.DataFrame):
-        original_df = example_ingredients.get_df().clone()
     else:
-        raise TypeError("Unsupported DataFrame type")
+        original_df = example_ingredients.get_df().clone()
 
     # Define a transformation function that increments numeric columns by 1
     def add_one(data, columns):
         df = data.get_df()
         if isinstance(df, pd.DataFrame):
             df[columns] = df[columns] + 1
-        elif isinstance(df, pl.DataFrame):
-            df = df.with_columns([(df[col] + 1).alias(col) for col in columns])
         else:
-            raise TypeError("Unsupported DataFrame type")
+            df = df.with_columns([(df[col] + 1).alias(col) for col in columns])
         data.set_df(df)
         return data
 
@@ -610,7 +606,6 @@ def test_step_repr(example_ingredients):
         assert str(step.columns[:2] + ["..."]) in repr_after_training
 
 
-# Create a dummy step
 class DummyStep(Step):
     def do_fit(self, data):
         pass
@@ -620,6 +615,8 @@ class DummyStep(Step):
 
 
 def test_check_ingredients(example_ingredients):
+    # Create a dummy step
+
     # Instantiate the step
     step = DummyStep()
 
