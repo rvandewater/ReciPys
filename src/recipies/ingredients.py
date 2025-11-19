@@ -1,9 +1,11 @@
+from __future__ import annotations
+
 from copy import deepcopy
 import pandas as pd
 import polars as pl
 from typing import overload
 from .constants import Backend
-from __future__ import annotations
+
 
 class Ingredients:
     """Wrapper around either polars.DataFrame to store columns roles (e.g., predictor)
