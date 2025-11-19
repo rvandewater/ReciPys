@@ -1,3 +1,4 @@
+from __future__ import annotations
 from abc import abstractmethod
 from copy import deepcopy
 from typing import Union, Dict, get_args
