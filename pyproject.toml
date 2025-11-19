@@ -7,6 +7,7 @@ name = "recipies"
 dynamic = ["version"]
 description = "A modular preprocessing package for Pandas Dataframe"
 readme = "README.md"
+python_requires = ">=3.9"
 license = { text = "MIT license" }
 authors = [
     { name = "Robin van de Water", email = "robin.vandewater@hpi.de" },
