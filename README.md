@@ -58,13 +58,20 @@ uv add recipies
 
 ```bash
 # with conda (optional)
-conda env update -f environment.yml
+conda env create -n ReciPies python=3.12
 conda activate ReciPies
-# with pip
-pip install -e .
-# with uv venv
-uv venv && source .venv/bin/activate
+```
 
+Then, from the root of the repository, run with pip:
+
+```bash
+pip install -e .
+```
+
+Or with uv (if you have uv installed):
+
+```bash
+uv venv && source .venv/bin/activate
 ```
 
 ## Getting Start

@@ -7,13 +7,13 @@ edit_uri: edit/main/docs/
 
 nav:
   - Home: index.md
+  - Concepts: concepts.md
   - API Reference: api.md
   - Examples:
       - Basics: examples/tutorial.ipynb
       - ICU data: examples/icu_advanced.ipynb
       - Pandas or Polars: examples/pandas_or_polars.ipynb
-  - Concepts: concepts.md
-
+  - Benchmarking: benchmarking.md
 theme:
   name: material
   logo: figures/recipies_logo.svg
