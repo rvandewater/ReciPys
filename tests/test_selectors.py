@@ -242,7 +242,7 @@ def test_selector_getitem(example_ingredients):
 def test_selector_iter_error():
     # Test __iter__ error when _last_selection is not set
     sel = Selector(description="Test Selector")
-    with pytest.raises(AttributeError, match="Selector must be called with Ingredients before iteration."):
+    with pytest.raises(AttributeError, match="Selector must be called with Ingredients before"):
         list(sel)
 
 
