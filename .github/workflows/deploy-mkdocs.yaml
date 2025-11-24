@@ -28,7 +28,7 @@ jobs:
         with:
           python-version: "3.13"
       - name: Install dependencies
-        run: pip install .[mkdocs]
+        run: pip install .[docs]
       - name: Build MkDocs site
         run: mkdocs build
       - name: Upload artifact
