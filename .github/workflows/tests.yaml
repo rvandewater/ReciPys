@@ -5,6 +5,8 @@ on:
     branches: [main, development]
   pull_request:
     branches: [main, "release/*", "dev"]
+  schedule:
+    - cron: "0 0 */14 * *"  # Runs every two weeks at midnight UTC
 
 jobs:
   run_tests_ubuntu:
