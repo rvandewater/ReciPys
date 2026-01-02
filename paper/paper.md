@@ -1,6 +1,6 @@
 ---
 title: >-
-  `ReciPies`: A Lightweight Data Transformation Pipeline for Reproducible ML
+  ReciPies: A Lightweight Data Transformation Pipeline for Reproducible ML
 authors:
   - name: Robin P. van de Water
     email: robin.vandewater@hpi.de
@@ -39,16 +39,17 @@ researchers, engineering teams, and peer reviewers.
 
 # Statement of need
 
-Transparent and reproducible preprocessing remains a weak link in many scientific ML studies. The consequences are (1) confounded research results,
-(2) complicated peer review, and (3) poor reuse. Researchers and engineers working with longitudinal regulated data (e.g., in energy production, health, finance, or environmental monitoring) in particular need pipelines they can audit,
-serialize, and hand to collaborators without reverse‑engineering a tangle of imperative code [@10.1145/3641525]. The
+Transparent and reproducible preprocessing remains a weak link in many scientific ML studies. The consequences are (1) confounded research results [@gundersenStateArtReproducibility2018],
+(2) complicated peer review [@semmelrockReproducibilityMachinelearningbasedResearch2025], and (3) poor reuse [@samuelMachineLearningPipelines2021]. Researchers and engineers working with longitudinal regulated data (e.g., in energy production, health, finance, or environmental monitoring) in particular need pipelines they can audit,
+serialize, and hand to collaborators without reverse‑engineering a tangle of imperative code. The
 current lack of reproducibility has been documented extensively in the
-literature [@johnsonReproducibilityCriticalCare2017a; @kellyKeyChallengesDelivering2019a; @semmelrockReproducibilityMachinelearningbasedResearch2025].
+literature [@johnsonReproducibilityCriticalCare2017a; @gundersenStateArtReproducibility2018; @kellyKeyChallengesDelivering2019a; @raffStepQuantifyingIndependently2019; @semmelrockReproducibilityMachinelearningbasedResearch2025]; 
+moreover, scientific venues have begun to address this issue [@10.1145/3641525].
 
 # Related work
 
 Scikit-learn provides `Pipeline` and `ColumnTransformer`, along with a rich estimator ecosystem [@pedregosa_scikit-learn_2011], but lacks role-based variable grammar, limited human readability, and awkward serialization. Feature-engine [@galliFeatureenginePythonPackage2021], pyjanitor [@j.PyjanitorCleanerAPI2019], or
-scikit-lego[@warmerdamKoaningScikitlegoV0952025] add helpful transformers and data-cleaning verbs. However, none provide a
+scikit-lego [@warmerdamKoaningScikitlegoV0952025] add helpful transformers and data-cleaning verbs. However, none provide a
 unified, role-centric abstraction with backend flexibility. The R `recipes` package established the prep/bake pattern and a clean grammar for preprocessing [@kuhnRecipesPreprocessingFeature2024]. `ReciPies` brings these ideas to Python, extends them with backend-agnostic execution on Pandas and Polars, and emphasizes configuration-as-code artifacts suitable for a wide range of machine
 learning pipelines.
 

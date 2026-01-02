@@ -29,6 +29,20 @@
   file = {/Users/robin/Zotero/storage/V3LYVWF4/Galli - 2021 - Feature-engine A Python package for feature engineering for machine learning.pdf}
 }
 
+@inproceedings{gundersenStateArtReproducibility2018,
+  title = {State of the Art: Reproducibility in Artificial Intelligence},
+  shorttitle = {State of the Art},
+  booktitle = {Proceedings of the {{Thirty-Second AAAI Conference}} on {{Artificial Intelligence}} and {{Thirtieth Innovative Applications}} of {{Artificial Intelligence Conference}} and {{Eighth AAAI Symposium}} on {{Educational Advances}} in {{Artificial Intelligence}}},
+  author = {Gundersen, Odd Erik and Kjensmo, Sigbjørn},
+  date = {2018-02-02},
+  series = {{{AAAI}}'18/{{IAAI}}'18/{{EAAI}}'18},
+  pages = {1644--1651},
+  publisher = {AAAI Press},
+  location = {New Orleans, Louisiana, USA},
+  abstract = {Background: Research results in artificial intelligence (AI) are criticized for not being reproducible. Objective: To quantify the state of reproducibility of empirical AI research using six reproducibility metrics measuring three different degrees of reproducibility. Hypotheses: 1) AI research is not documented well enough to reproduce the reported results. 2) Documentation practices have improved over time. Method: The literature is reviewed and a set of variables that should be documented to enable reproducibility are grouped into three factors: Experiment, Data and Method. The metrics describe how well the factors have been documented for a paper. A total of 400 research papers from the conference series IJCAI and AAAI have been surveyed using the metrics. Findings: None of the papers document all of the variables. The metrics show that between 20\% and 30\% of the variables for each factor are documented. One of the metrics show statistically significant increase over time while the others show no change. Interpretation: The reproducibility scores decrease with increased documentation requirements. Improvement over time is found. Conclusion: Both hypotheses are supported.},
+  isbn = {978-1-57735-800-8}
+}
+
 @inproceedings{j.PyjanitorCleanerAPI2019,
   title = {Pyjanitor: {{A Cleaner API}} for {{Cleaning Data}}},
   shorttitle = {Pyjanitor},
@@ -80,7 +94,6 @@
   abstract = {Mortality prediction of intensive care unit (ICU) patients facilitates hospital benchmarking and has the opportunity to provide caregivers with useful summaries of patient health at the bedside. The development of novel models for mortality prediction is a popular task in machine learning, with researchers typically seeking to maximize measures such as the area under the receiver operator characteristic curve (AUROC). The number of ’researcher degrees of freedom’ that contribute to the performance of a model, however, presents a challenge when seeking to compare reported performance of such models. In this study, we review publications that have reported performance of mortality prediction models based on the Medical Information Mart for Intensive Care (MIMIC) database and attempt to reproduce the cohorts used in their studies. We then compare the performance reported in the studies against gradient boosting and logistic regression models using a simple set of features extracted from MIMIC. We demonstrate the large heterogeneity in studies that purport to conduct the single task of ’mortality prediction’, highlighting the need for improvements in the way that prediction tasks are reported to enable fairer comparison between models. We reproduced datasets for 38 experiments corresponding to 28 published studies using MIMIC. In half of the experiments, the sample size we acquired was 25\% greater or smaller than the sample size reported. The highest discrepancy was 11,767 patients. While accurate reproduction of each study cannot be guaranteed, we believe that these results highlight the need for more consistent reporting of model design and methodology to allow performance improvements to be compared. We discuss the challenges in reproducing the cohorts used in the studies, highlighting the importance of clearly reported methods (e.g. data cleansing, variable selection, cohort selection) and the need for open code and publicly available benchmarks.},
   eventtitle = {Machine {{Learning}} for {{Healthcare Conference}}},
   langid = {english},
-  doi = {10.1038/s41597-022-01899-x},
   file = {/Users/robin/Zotero/storage/5C74RYC5/Johnson et al. - 2017 - Reproducibility in critical care a mortality prediction case study.pdf}
 }
 
@@ -111,8 +124,7 @@
   urldate = {2024-07-09},
   abstract = {A recipe prepares your data for modeling. We provide an extensible framework for pipeable sequences of feature engineering steps provides preprocessing tools to be applied to data. Statistical parameters for the steps can be estimated from an initial data set and then applied to other data sets. The resulting processed output can then be used as inputs for statistical or machine learning models.},
   version = {1.1.0},
-  annotation = {10.32614/CRAN.package.recipes},
-  doi = {10.32614/CRAN.package.recipes},
+  annotation = {10.32614/CRAN.package.recipes}
 }
 
 @inproceedings{mckinney-proc-scipy-2010,
@@ -133,13 +145,23 @@
   eprinttype = {arXiv},
   eprintclass = {cs},
   url = {http://arxiv.org/abs/2312.11122},
-  doi = {10.48786/edbt.2025.27},
   urldate = {2024-07-09},
   abstract = {Data preparation is a trial-and-error process that typically involves countless iterations over the data to define the best pipeline of operators for a given task. With tabular data, practitioners often perform that burdensome activity on local machines by writing ad hoc scripts with libraries based on the Pandas dataframe API and testing them on samples of the entire dataset—the faster the library, the less idle time its users have.},
   langid = {english},
   pubstate = {prepublished},
   keywords = {Computer Science - Databases},
   file = {/Users/robin/Zotero/storage/B2KUGHJ3/Mozzillo et al. - 2024 - Evaluation of Dataframe Libraries for Data Prepara.pdf}
+}
+
+@inproceedings{NEURIPS2019_bdbca288,
+  title = {{{PyTorch}}: {{An}} Imperative Style, High-Performance Deep Learning Library},
+  booktitle = {Advances in Neural Information Processing Systems},
+  author = {Paszke, Adam and Gross, Sam and Massa, Francisco and Lerer, Adam and Bradbury, James and Chanan, Gregory and Killeen, Trevor and Lin, Zeming and Gimelshein, Natalia and Antiga, Luca and Desmaison, Alban and Kopf, Andreas and Yang, Edward and DeVito, Zachary and Raison, Martin and Tejani, Alykhan and Chilamkurthy, Sasank and Steiner, Benoit and Fang, Lu and Bai, Junjie and Chintala, Soumith},
+  editor = {Wallach, H. and Larochelle, H. and Beygelzimer, A. and family=Buc, given=F., prefix=dAlché-, useprefix=true and Fox, E. and Garnett, R.},
+  date = {2019},
+  volume = {32},
+  publisher = {Curran Associates, Inc.},
+  url = {https://proceedings.neurips.cc/paper_files/paper/2019/file/bdbca288fee7f92f2bfa9f7012727740-Paper.pdf}
 }
 
 @inproceedings{paszkePyTorchImperativeStyle2019,
@@ -158,7 +180,7 @@
 }
 
 @article{pedregosa_scikit-learn_2011,
-  title = {Scikit-Learn: {{Machine}} Learning in Python},
+  title = {Scikit-Learn: {{Machine Learning}} in {{Python}}},
   shorttitle = {Scikit-Learn},
   author = {Pedregosa, Fabian and Varoquaux, Gaël and Gramfort, Alexandre and Michel, Vincent and Thirion, Bertrand and Grisel, Olivier and Blondel, Mathieu and Prettenhofer, Peter and Weiss, Ron and Dubourg, Vincent and Vanderplas, Jake and Passos, Alexandre and Cournapeau, David and Brucher, Matthieu and Perrot, Matthieu and Duchesnay, Édouard},
   date = {2011},
@@ -169,11 +191,10 @@
   issn = {1533-7928},
   url = {http://jmlr.org/papers/v12/pedregosa11a.html},
   urldate = {2022-12-21},
-  doi = {10.48550/arXiv.1201.0490},
   abstract = {Scikit-learn is a Python module integrating a wide range of state-of-the-art machine learning algorithms for medium-scale supervised and unsupervised problems. This package focuses on bringing machine learning to non-specialists using a general-purpose high-level language. Emphasis is put on ease of use, performance, documentation, and API consistency. It has minimal dependencies and is distributed under the simplified BSD license, encouraging its use in both academic and commercial settings. Source code, binaries, and documentation can be downloaded from http://scikit-learn.sourceforge.net.}
 }
 
-@inproceedings{shenDataAdditionDilemma2024b,
+@inproceedings{pmlr-v252-shen24a,
   title = {The Data Addition Dilemma},
   booktitle = {Proceedings of the 9th Machine Learning for Healthcare Conference},
   author = {Shen, Judy Hanwen and Raji, Inioluwa Deborah and Chen, Irene Y.},
@@ -187,14 +208,16 @@
   abstract = {In many machine learning for healthcare tasks, standard datasets are constructed by amassing data across many, often fundamentally dissimilar, sources. But when does adding more data help, and when does it hinder progress on desired model outcomes in real-world settings? We identify this situation as the Data Addition Dilemma, demonstrating that adding training data in this multi-source scaling context can at times result in reduced overall accuracy, uncertain fairness outcomes and reduced worst-subgroup performance. We find that this possibly arises from an empirically observed trade-off between model performance improvements due to data scaling and model deterioration from distribution shift. We thus establish baseline strategies for navigating this dilemma, introducing distribution shift heuristics to guide decision-making for which data sources to add in order to yield the expected model performance improvements. We conclude with a discussion of the required considerations for data collection and suggestions for studying data composition and scale in the age of increasingly larger models.}
 }
 
-@online{Proceedings2ndACM,
-  title = {Proceedings of the 2nd {{ACM Conference}} on {{Reproducibility}} and {{Replicability}}},
-  url = {https://dl.acm.org/doi/proceedings/10.1145/3641525},
-  urldate = {2025-07-23},
-  langid = {english},
-  organization = {ACM Conferences},
-  doi = {10.1145/3641525},
-  file = {/Users/robin/Zotero/storage/DCPUI73M/3641525.html}
+@incollection{raffStepQuantifyingIndependently2019,
+  title = {A Step toward Quantifying Independently Reproducible Machine Learning Research},
+  booktitle = {Proceedings of the 33rd {{International Conference}} on {{Neural Information Processing Systems}}},
+  author = {Raff, Edward},
+  date = {2019-12-08},
+  number = {492},
+  pages = {5485--5495},
+  publisher = {Curran Associates Inc.},
+  location = {Red Hook, NY, USA},
+  abstract = {What makes a paper independently reproducible? Debates on reproducibility center around intuition or assumptions but lack empirical results. Our field focuses on releasing code, which is important, but is not sufficient for determining reproducibility. We take the first step toward a quantifiable answer by manually attempting to implement 255 papers published from 1984 until 2017, recording features of each paper, and performing statistical analysis of the results. For each paper, we did not look at the authors code, if released, in order to prevent bias toward discrepancies between code and paper.}
 }
 
 @inproceedings{rahmanWhatQuestionsProgrammers2018,
@@ -212,6 +235,24 @@
   abstract = {Configuration as code (CaC) tools, such as Ansible and Puppet, help software teams to implement continuous deployment and deploy software changes rapidly. CaC tools are growing in popularity, yet what challenges programmers encounter about CaC tools, have not been characterized. A systematic investigation on what questions are asked by programmers, can help us identify potential technical challenges about CaC, and can aid in successful use of CaC tools. The goal of this paper is to help current and potential configuration as code (CaC) adoptees in identifying the challenges related to CaC through an analysis of questions asked by programmers on a major question and answer website. We extract 2,758 Puppet-related questions asked by programmers from January 2010 to December 2016, posted on Stack Overflow. We apply qualitative analysis to identify the questions programmers ask about Puppet. We also investigate the trends in questions with unsatisfactory answers, and changes in question categories over time. From our empirical study, we synthesize 16 major categories of questions. The three most common question categories are: (i) syntax errors, (ii) provisioning instances; and (iii) assessing Puppet's feasibility to accomplish certain tasks. Three categories of questions that yield the most unsatisfactory answers are (i) installation, (ii) security, and (iii) data separation.},
   isbn = {978-1-4503-5745-6},
   file = {/Users/robin/Zotero/storage/NPUTS3V9/Rahman et al_2018_What questions do programmers ask about configuration as code.pdf}
+}
+
+@inproceedings{samuelMachineLearningPipelines2021,
+  title = {Machine {{Learning Pipelines}}: {{Provenance}}, {{Reproducibility}} and {{FAIR Data Principles}}},
+  shorttitle = {Machine {{Learning Pipelines}}},
+  booktitle = {Provenance and {{Annotation}} of {{Data}} and {{Processes}}},
+  author = {Samuel, Sheeba and Löffler, Frank and König-Ries, Birgitta},
+  editor = {Glavic, Boris and Braganholo, Vanessa and Koop, David},
+  date = {2021},
+  pages = {226--230},
+  publisher = {Springer International Publishing},
+  location = {Cham},
+  doi = {10.1007/978-3-030-80960-7_17},
+  abstract = {Machine learning (ML) is an increasingly important scientific tool supporting decision making and knowledge generation in numerous fields. With this, it also becomes more and more important that the results of ML experiments are reproducible. Unfortunately, that often is not the case. Rather, ML, similar to many other disciplines, faces a reproducibility crisis. In this paper, we describe our goals and initial steps in supporting the end-to-end reproducibility of ML pipelines. We investigate which factors beyond the availability of source code and datasets influence reproducibility of ML experiments. We propose ways to apply FAIR data practices to ML workflows. We present our preliminary results on the role of our tool, ProvBook, in capturing and comparing provenance of ML experiments and their reproducibility using Jupyter Notebooks. We also present the ReproduceMeGit tool to analyze the reproducibility of ML pipelines described in Jupyter Notebooks.},
+  isbn = {978-3-030-80960-7},
+  langid = {english},
+  keywords = {FAIR,Machine Learning,Provenance,ReproduceMe-ML,Reproducibility},
+  file = {/Users/robin/Zotero/storage/XEWK6GTB/Samuel et al. - 2021 - Machine Learning Pipelines Provenance, Reproducibility and FAIR Data Principles.pdf}
 }
 
 @online{santosImprovingRepresentationLearning2025,
@@ -299,7 +340,7 @@
 @software{warmerdamKoaningScikitlegoV0952025,
   title = {Koaning/Scikit-Lego: V0.9.5},
   shorttitle = {Koaning/Scikit-Lego},
-  author = {family=Warmerdam, given=Vincent, prefix=D, useprefix=false and Bruzzesi, Francesco and MBrouns and Collot, Stéphane and family=Boer, given=Josko, prefix=de, useprefix=false and Kübler, Robert and family=hoeven, prefix=pim-, useprefix=true and {mkalimeri} and Paulino, Arthur and Gorelli, Marco Edward and Verheijen, Peter and Borry, Maxime and Hoogland, Kay and Masip, David and Kowalczuk, Magdalena and {ktiamur} and AminaZ and Sharma, Gaurav and Lepelaars, Carlo and Rens and Cor and Hermans, Frits and Borrella, Tomas and Rose, Stephen Anthony and family=Dorsten, given=Sander, prefix=van, useprefix=false and Levitski, Hleb and Keromnes, Jan and Pérez-Lozao, Sergio Calderón and Payne, Skylar},
+  author = {Warmerdam, Vincent D and Bruzzesi, Francesco and MBrouns and Collot, Stéphane and family=Boer, given=Josko, prefix=de, useprefix=false and Kübler, Robert and family=hoeven, prefix=pim-, useprefix=true and {mkalimeri} and Paulino, Arthur and Gorelli, Marco Edward and Verheijen, Peter and Borry, Maxime and Hoogland, Kay and Masip, David and Kowalczuk, Magdalena and {ktiamur} and AminaZ and Sharma, Gaurav and Lepelaars, Carlo and Rens and Cor and Hermans, Frits and Borrella, Tomas and Rose, Stephen Anthony and family=Dorsten, given=Sander, prefix=van, useprefix=false and Levitski, Hleb and Keromnes, Jan and Pérez-Lozao, Sergio Calderón and Payne, Skylar},
   date = {2025-04-30},
   doi = {10.5281/zenodo.15313097},
   url = {https://zenodo.org/records/15313097},
@@ -308,22 +349,19 @@
   organization = {Zenodo},
   file = {/Users/robin/Zotero/storage/Y2T2RU6L/15313097.html}
 }
-@article{reynaEarlyPredictionSepsis2020a,
-  title = {Early {{Prediction}} of {{Sepsis From Clinical Data}}: {{The PhysioNet}}/{{Computing}} in {{Cardiology Challenge}} 2019},
-  shorttitle = {Early {{Prediction}} of {{Sepsis From Clinical Data}}},
-  author = {Reyna, Matthew A. and Josef, Christopher S. and Jeter, Russell and Shashikumar, Supreeth P. and Westover, M. Brandon and Nemati, Shamim and Clifford, Gari D. and Sharma, Ashish},
-  date = {2020-02},
-  journaltitle = {Critical Care Medicine},
-  shortjournal = {Crit Care Med},
-  volume = {48},
-  number = {2},
-  eprint = {31939789},
-  eprinttype = {pubmed},
-  pages = {210--217},
-  issn = {1530-0293},
-  doi = {10.1097/CCM.0000000000004145},
-  langid = {english},
-  pmcid = {PMC6964870},
-  keywords = {Algorithms,Early Diagnosis,Electronic Health Records,Female,Humans,Intensive Care Units,Male,Sepsis,Severity of Illness Index,Time Factors,United States},
-  file = {/Users/robin/Zotero/storage/GDGXT3SK/Reyna et al. - 2020 - Early Prediction of Sepsis From Clinical Data The PhysioNetComputing in Cardiology Challenge 2019.pdf}
+
+@article{zhaoDeepMultimodalData2024,
+  title = {Deep {{Multimodal Data Fusion}}},
+  author = {Zhao, Fei and Zhang, Chengcui and Geng, Baocheng},
+  date = {2024-04-24},
+  journaltitle = {ACM Comput. Surv.},
+  volume = {56},
+  number = {9},
+  pages = {216:1--216:36},
+  issn = {0360-0300},
+  doi = {10.1145/3649447},
+  url = {https://dl.acm.org/doi/10.1145/3649447},
+  urldate = {2025-10-16},
+  abstract = {Multimodal Artificial Intelligence (Multimodal AI), in general, involves various types of data (e.g., images, texts, or data collected from different sensors), feature engineering (e.g., extraction, combination/fusion), and decision-making (e.g., majority vote). As architectures become more and more sophisticated, multimodal neural networks can integrate feature extraction, feature fusion, and decision-making processes into one single model. The boundaries between those processes are increasingly blurred. The conventional multimodal data fusion taxonomy (e.g., early/late fusion), based on which the fusion occurs in, is no longer suitable for the modern deep learning era. Therefore, based on the main-stream techniques used, we propose a new fine-grained taxonomy grouping the state-of-the-art (SOTA) models into five classes: Encoder-Decoder methods, Attention Mechanism methods, Graph Neural Network methods, Generative Neural Network methods, and other Constraint-based methods. Most existing surveys on multimodal data fusion are only focused on one specific task with a combination of two specific modalities. Unlike those, this survey covers a broader combination of modalities, including Vision + Language (e.g., videos, texts), Vision + Sensors (e.g., images, LiDAR), and so on, and their corresponding tasks (e.g., video captioning, object detection). Moreover, a comparison among these methods is provided, as well as challenges and future directions in this area.},
+  file = {/Users/robin/Zotero/storage/YIF6XVTC/Zhao et al. - 2024 - Deep Multimodal Data Fusion.pdf}
 }
