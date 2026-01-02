@@ -26,6 +26,19 @@ date: 2025-11-13
 bibliography: paper.bib
 repository: https://github.com/rvandewater/ReciPies
 tags:
+  - reproducible-research
+  - data-preprocessing
+  - feature-engineering
+  - configuration-as-code
+  - preprocessing-pipelines
+  - recipes
+  - pandas
+  - polars
+  - provenance
+  - time-series
+  - benchmarking
+  - ml-ops
+  - python
 ---
 
 # Summary
