@@ -43,7 +43,7 @@ Transparent and reproducible preprocessing remains a weak link in many scientifi
 (2) complicated peer review [@semmelrockReproducibilityMachinelearningbasedResearch2025], and (3) poor reuse [@samuelMachineLearningPipelines2021]. Researchers and engineers working with longitudinal regulated data (e.g., in energy production, health, finance, or environmental monitoring) in particular need pipelines they can audit,
 serialize, and hand to collaborators without reverse‑engineering a tangle of imperative code. The
 current lack of reproducibility has been documented extensively in the
-literature [@johnsonReproducibilityCriticalCare2017a; @gundersenStateArtReproducibility2018; @kellyKeyChallengesDelivering2019a; @raffStepQuantifyingIndependently2019; @semmelrockReproducibilityMachinelearningbasedResearch2025]; 
+literature [@johnsonReproducibilityCriticalCare2017a; @gundersenStateArtReproducibility2018; @kellyKeyChallengesDelivering2019a; @raffStepQuantifyingIndependently2019; @semmelrockReproducibilityMachinelearningbasedResearch2025];
 moreover, scientific venues have begun to address this issue [@10.1145/3641525].
 
 # Related work
