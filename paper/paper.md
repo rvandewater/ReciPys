@@ -31,7 +31,6 @@ tags:
   - feature-engineering
   - configuration-as-code
   - preprocessing-pipelines
-  - recipes
   - pandas
   - polars
   - provenance
