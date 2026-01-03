@@ -39,6 +39,7 @@
   pages = {1644--1651},
   publisher = {AAAI Press},
   location = {New Orleans, Louisiana, USA},
+  doi = {10.1609/aaai.v32i1.11503},
   abstract = {Background: Research results in artificial intelligence (AI) are criticized for not being reproducible. Objective: To quantify the state of reproducibility of empirical AI research using six reproducibility metrics measuring three different degrees of reproducibility. Hypotheses: 1) AI research is not documented well enough to reproduce the reported results. 2) Documentation practices have improved over time. Method: The literature is reviewed and a set of variables that should be documented to enable reproducibility are grouped into three factors: Experiment, Data and Method. The metrics describe how well the factors have been documented for a paper. A total of 400 research papers from the conference series IJCAI and AAAI have been surveyed using the metrics. Findings: None of the papers document all of the variables. The metrics show that between 20\% and 30\% of the variables for each factor are documented. One of the metrics show statistically significant increase over time while the others show no change. Interpretation: The reproducibility scores decrease with increased documentation requirements. Improvement over time is found. Conclusion: Both hypotheses are supported.},
   isbn = {978-1-57735-800-8}
 }
@@ -137,33 +138,6 @@
   doi = {10.25080/Majora-92bf1922-00a}
 }
 
-@online{mozzilloEvaluationDataframeLibraries2024,
-  title = {Evaluation of {{Dataframe Libraries}} for {{Data Preparation}} on a {{Single Machine}}},
-  author = {Mozzillo, Angelo and Zecchini, Luca and Gagliardelli, Luca and Aslam, Adeel and Bergamaschi, Sonia and Simonini, Giovanni},
-  date = {2024-06-10},
-  eprint = {2312.11122},
-  eprinttype = {arXiv},
-  eprintclass = {cs},
-  url = {http://arxiv.org/abs/2312.11122},
-  urldate = {2024-07-09},
-  abstract = {Data preparation is a trial-and-error process that typically involves countless iterations over the data to define the best pipeline of operators for a given task. With tabular data, practitioners often perform that burdensome activity on local machines by writing ad hoc scripts with libraries based on the Pandas dataframe API and testing them on samples of the entire dataset—the faster the library, the less idle time its users have.},
-  langid = {english},
-  pubstate = {prepublished},
-  keywords = {Computer Science - Databases},
-  file = {/Users/robin/Zotero/storage/B2KUGHJ3/Mozzillo et al. - 2024 - Evaluation of Dataframe Libraries for Data Prepara.pdf}
-}
-
-@inproceedings{NEURIPS2019_bdbca288,
-  title = {{{PyTorch}}: {{An}} Imperative Style, High-Performance Deep Learning Library},
-  booktitle = {Advances in Neural Information Processing Systems},
-  author = {Paszke, Adam and Gross, Sam and Massa, Francisco and Lerer, Adam and Bradbury, James and Chanan, Gregory and Killeen, Trevor and Lin, Zeming and Gimelshein, Natalia and Antiga, Luca and Desmaison, Alban and Kopf, Andreas and Yang, Edward and DeVito, Zachary and Raison, Martin and Tejani, Alykhan and Chilamkurthy, Sasank and Steiner, Benoit and Fang, Lu and Bai, Junjie and Chintala, Soumith},
-  editor = {Wallach, H. and Larochelle, H. and Beygelzimer, A. and family=Buc, given=F., prefix=dAlché-, useprefix=true and Fox, E. and Garnett, R.},
-  date = {2019},
-  volume = {32},
-  publisher = {Curran Associates, Inc.},
-  url = {https://proceedings.neurips.cc/paper_files/paper/2019/file/bdbca288fee7f92f2bfa9f7012727740-Paper.pdf}
-}
-
 @inproceedings{paszkePyTorchImperativeStyle2019,
   title = {{{PyTorch}}: {{An Imperative Style}}, {{High-Performance Deep Learning Library}}},
   shorttitle = {{{PyTorch}}},
@@ -189,6 +163,7 @@
   number = {85},
   pages = {2825--2830},
   issn = {1533-7928},
+  doi = {10.5555/1953048.2078195},
   url = {http://jmlr.org/papers/v12/pedregosa11a.html},
   urldate = {2022-12-21},
   abstract = {Scikit-learn is a Python module integrating a wide range of state-of-the-art machine learning algorithms for medium-scale supervised and unsupervised problems. This package focuses on bringing machine learning to non-specialists using a general-purpose high-level language. Emphasis is put on ease of use, performance, documentation, and API consistency. It has minimal dependencies and is distributed under the simplified BSD license, encouraging its use in both academic and commercial settings. Source code, binaries, and documentation can be downloaded from http://scikit-learn.sourceforge.net.}
@@ -208,15 +183,15 @@
   abstract = {In many machine learning for healthcare tasks, standard datasets are constructed by amassing data across many, often fundamentally dissimilar, sources. But when does adding more data help, and when does it hinder progress on desired model outcomes in real-world settings? We identify this situation as the Data Addition Dilemma, demonstrating that adding training data in this multi-source scaling context can at times result in reduced overall accuracy, uncertain fairness outcomes and reduced worst-subgroup performance. We find that this possibly arises from an empirically observed trade-off between model performance improvements due to data scaling and model deterioration from distribution shift. We thus establish baseline strategies for navigating this dilemma, introducing distribution shift heuristics to guide decision-making for which data sources to add in order to yield the expected model performance improvements. We conclude with a discussion of the required considerations for data collection and suggestions for studying data composition and scale in the age of increasingly larger models.}
 }
 
-@incollection{raffStepQuantifyingIndependently2019,
+@inproceedings{raffStepQuantifyingIndependently2019,
   title = {A Step toward Quantifying Independently Reproducible Machine Learning Research},
   booktitle = {Proceedings of the 33rd {{International Conference}} on {{Neural Information Processing Systems}}},
   author = {Raff, Edward},
   date = {2019-12-08},
-  number = {492},
   pages = {5485--5495},
   publisher = {Curran Associates Inc.},
   location = {Red Hook, NY, USA},
+  doi = {10.5555/3454287.3454779},
   abstract = {What makes a paper independently reproducible? Debates on reproducibility center around intuition or assumptions but lack empirical results. Our field focuses on releasing code, which is important, but is not sufficient for determining reproducibility. We take the first step toward a quantifiable answer by manually attempting to implement 255 papers published from 1984 until 2017, recording features of each paper, and performing statistical analysis of the results. For each paper, we did not look at the authors code, if released, in order to prevent bias toward discrepancies between code and paper.}
 }
 
@@ -235,6 +210,24 @@
   abstract = {Configuration as code (CaC) tools, such as Ansible and Puppet, help software teams to implement continuous deployment and deploy software changes rapidly. CaC tools are growing in popularity, yet what challenges programmers encounter about CaC tools, have not been characterized. A systematic investigation on what questions are asked by programmers, can help us identify potential technical challenges about CaC, and can aid in successful use of CaC tools. The goal of this paper is to help current and potential configuration as code (CaC) adoptees in identifying the challenges related to CaC through an analysis of questions asked by programmers on a major question and answer website. We extract 2,758 Puppet-related questions asked by programmers from January 2010 to December 2016, posted on Stack Overflow. We apply qualitative analysis to identify the questions programmers ask about Puppet. We also investigate the trends in questions with unsatisfactory answers, and changes in question categories over time. From our empirical study, we synthesize 16 major categories of questions. The three most common question categories are: (i) syntax errors, (ii) provisioning instances; and (iii) assessing Puppet's feasibility to accomplish certain tasks. Three categories of questions that yield the most unsatisfactory answers are (i) installation, (ii) security, and (iii) data separation.},
   isbn = {978-1-4503-5745-6},
   file = {/Users/robin/Zotero/storage/NPUTS3V9/Rahman et al_2018_What questions do programmers ask about configuration as code.pdf}
+}
+
+@article{reynaEarlyPredictionSepsis2020b,
+  title = {Early {{Prediction}} of {{Sepsis From Clinical Data}}: {{The PhysioNet}}/{{Computing}} in {{Cardiology Challenge}} 2019},
+  shorttitle = {Early {{Prediction}} of {{Sepsis From Clinical Data}}},
+  author = {Reyna, Matthew A. and Josef, Christopher S. and Jeter, Russell and Shashikumar, Supreeth P. and Westover, M. Brandon and Nemati, Shamim and Clifford, Gari D. and Sharma, Ashish},
+  date = {2020-02},
+  journaltitle = {Critical Care Medicine},
+  volume = {48},
+  number = {2},
+  pages = {210},
+  issn = {1530-0293},
+  doi = {10.1097/CCM.0000000000004145},
+  url = {https://journals.lww.com/ccmjournal/fulltext/2020/02000/early_prediction_of_sepsis_from_clinical_data__the.10.aspx},
+  urldate = {2025-11-20},
+  abstract = {Objectives:~           Sepsis is a major public health concern with significant morbidity, mortality, and healthcare expenses. Early detection and antibiotic treatment of sepsis improve outcomes. However, although professional critical care societies have proposed new clinical criteria that aid sepsis recognition, the fundamental need for early detection and treatment remains unmet. In response, researchers have proposed algorithms for early sepsis detection, but directly comparing such methods has not been possible because of different patient cohorts, clinical variables and sepsis criteria, prediction tasks, evaluation metrics, and other differences. To address these issues, the PhysioNet/Computing in Cardiology Challenge 2019 facilitated the development of automated, open-source algorithms for the early detection of sepsis from clinical data.           Design:~           Participants submitted containerized algorithms to a cloud-based testing environment, where we graded entries for their binary classification performance using a novel clinical utility-based evaluation metric. We designed this scoring function specifically for the Challenge to reward algorithms for early predictions and penalize them for late or missed predictions and for false alarms.           Setting:~           ICUs in three separate hospital systems. We shared data from two systems publicly and sequestered data from all three systems for scoring.           Patients:~           We sourced over 60,000 ICU patients with up to 40 clinical variables for each hour of a patient’s ICU stay. We applied Sepsis-3 clinical criteria for sepsis onset.           Interventions:~           None.           Measurements and Main Results:~           A total of 104 groups from academia and industry participated, contributing 853 submissions. Furthermore, 90 abstracts based on Challenge entries were accepted for presentation at Computing in Cardiology.           Conclusions:~           Diverse computational approaches predict the onset of sepsis several hours before clinical recognition, but generalizability to different hospital systems remains a challenge.},
+  langid = {american},
+  file = {/Users/robin/Zotero/storage/FVUX432J/Reyna et al. - 2020 - Early Prediction of Sepsis From Clinical Data The PhysioNetComputing in Cardiology Challenge 2019.pdf;/Users/robin/Zotero/storage/PJ7UQGKP/early_prediction_of_sepsis_from_clinical_data__the.10.html}
 }
 
 @inproceedings{samuelMachineLearningPipelines2021,
