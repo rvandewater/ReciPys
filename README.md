@@ -13,7 +13,6 @@ alt="recipies logo" height="300">
 [![PyPI version shields.io](https://img.shields.io/pypi/v/recipies.svg)](https://pypi.python.org/pypi/recipies/)
 [![Python Version](https://img.shields.io/pypi/pyversions/recipies.svg)](https://pypi.python.org/pypi/recipies/)
 [![Downloads](https://pepy.tech/badge/recipies)](https://pepy.tech/project/recipies)
-[![arXiv](https://img.shields.io/badge/arXiv-2306.05109-b31b1b.svg)](http://arxiv.org/abs/2306.05109)
 [![codecov](https://codecov.io/gh/rvandewater/ReciPies/graph/badge.svg?token=5L5KUN8I3F)](https://codecov.io/gh/rvandewater/ReciPies)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/38ef991d72bd49cdb75aff91a5dee841)](https://app.codacy.com/gh/rvandewater/ReciPies/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![status](https://joss.theoj.org/papers/214eb70878afd0e4f5e3be9d7aadceae/status.svg)](https://joss.theoj.org/papers/214eb70878afd0e4f5e3be9d7aadceae)
