@@ -1,0 +1,50 @@
+cff-version: "1.2.0"
+authors:
+- email: robin.vandewater@hpi.de
+  family-names: Water
+  given-names: Robin P.
+  name-particle: van de
+  orcid: "https://orcid.org/0000-0002-2895-4872"
+- family-names: Schmidt
+  given-names: Hendrik
+  orcid: "https://orcid.org/0000-0001-7699-3983"
+- family-names: Rockenschaub
+  given-names: Patrick
+  orcid: "https://orcid.org/0000-0002-6499-7933"
+contact:
+- email: robin.vandewater@hpi.de
+  family-names: Water
+  given-names: Robin P.
+  name-particle: van de
+  orcid: "https://orcid.org/0000-0002-2895-4872"
+doi: 10.5281/zenodo.15863617
+message: If you use this software, please cite our article in the
+  Journal of Open Source Software.
+preferred-citation:
+  authors:
+  - email: robin.vandewater@hpi.de
+    family-names: Water
+    given-names: Robin P.
+    name-particle: van de
+    orcid: "https://orcid.org/0000-0002-2895-4872"
+  - family-names: Schmidt
+    given-names: Hendrik
+    orcid: "https://orcid.org/0000-0001-7699-3983"
+  - family-names: Rockenschaub
+    given-names: Patrick
+    orcid: "https://orcid.org/0000-0002-6499-7933"
+  date-published: 2026-01-05
+  doi: 10.21105/joss.09261
+  issn: 2475-9066
+  issue: 117
+  journal: Journal of Open Source Software
+  publisher:
+    name: Open Journals
+  start: 9261
+  title: "ReciPies: A Lightweight Data Transformation Pipeline for
+    Reproducible ML"
+  type: article
+  url: "https://joss.theoj.org/papers/10.21105/joss.09261"
+  volume: 11
+title: "ReciPies: A Lightweight Data Transformation Pipeline for
+  Reproducible ML"

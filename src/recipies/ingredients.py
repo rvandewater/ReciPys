@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from copy import deepcopy
 import pandas as pd
 import polars as pl
@@ -73,13 +75,11 @@ class Ingredients:
             self.roles = {}
         elif not isinstance(roles, dict):
             raise TypeError(f"Expected dict object for roles, got {roles.__class__}")
-        elif check_roles and not all(set(k).issubset(set(self.data.columns)) for k, v in roles.items()):
+        elif check_roles and not all(k in self.data.columns for k in roles.keys()):
             raise ValueError(
-                f"Roles contains variable names that are not in the data {list(roles.values())} {self.data.columns}."
+                "Roles contains variable names that are not in the data. "
+                f"Got roles for {list(roles.keys())}, available columns: {list(self.data.columns)}"
             )
-        # Todo: do we want to allow ingredients without grouping columns?
-        # elif check_roles and select_groups(self) == []:
-        #     raise ValueError("Roles are given but no groups are found in the data.")
         else:
             if copy is None or copy is True:
                 self.roles = deepcopy(roles)
@@ -153,6 +153,10 @@ class Ingredients:
                 If old_role is given but column has no role old_role.
                 If no old_role is given but column has multiple roles already.
         """
+        if isinstance(column, list):
+            for col in column:
+                self.update_role(col, new_role, old_role)
+            return self
         self._check_column(column)
         self._check_role(new_role)
         if old_role is not None:
@@ -209,7 +213,7 @@ class Ingredients:
 
     def groupby(self, by):
         if self.backend == Backend.POLARS:
-            self.data.group_by(by)
+            return self.data.group_by(by)
         else:
             return self.data.groupby(by)
 

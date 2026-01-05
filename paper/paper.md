@@ -1,6 +1,6 @@
 ---
 title: >-
-  `ReciPies`: A Lightweight Data Transformation Pipeline for Reproducible ML
+  ReciPies: A Lightweight Data Transformation Pipeline for Reproducible ML
 authors:
   - name: Robin P. van de Water
     email: robin.vandewater@hpi.de
@@ -26,6 +26,18 @@ date: 2025-11-13
 bibliography: paper.bib
 repository: https://github.com/rvandewater/ReciPies
 tags:
+  - reproducible-research
+  - data-preprocessing
+  - feature-engineering
+  - configuration-as-code
+  - preprocessing-pipelines
+  - pandas
+  - polars
+  - provenance
+  - time-series
+  - benchmarking
+  - ml-ops
+  - python
 ---
 
 # Summary
@@ -39,16 +51,17 @@ researchers, engineering teams, and peer reviewers.
 
 # Statement of need
 
-Transparent and reproducible preprocessing remains a weak link in many scientific ML studies. The consequences are (1) confounded research results,
-(2) complicated peer review, and (3) poor reuse. Researchers and engineers working with longitudinal regulated data (e.g., in energy production, health, finance, or environmental monitoring) in particular need pipelines they can audit,
-serialize, and hand to collaborators without reverse‑engineering a tangle of imperative code [@10.1145/3641525]. The
+Transparent and reproducible preprocessing remains a weak link in many scientific ML studies. The consequences are (1) confounded research results [@gundersenStateArtReproducibility2018],
+(2) complicated peer review [@semmelrockReproducibilityMachinelearningbasedResearch2025], and (3) poor reuse [@samuelMachineLearningPipelines2021]. Researchers and engineers working with longitudinal regulated data (e.g., in energy production, health, finance, or environmental monitoring) in particular need pipelines they can audit,
+serialize, and hand to collaborators without reverse‑engineering a tangle of imperative code. The
 current lack of reproducibility has been documented extensively in the
-literature [@johnsonReproducibilityCriticalCare2017a; @kellyKeyChallengesDelivering2019a; @semmelrockReproducibilityMachinelearningbasedResearch2025].
+literature [@johnsonReproducibilityCriticalCare2017a; @gundersenStateArtReproducibility2018; @kellyKeyChallengesDelivering2019a; @raffStepQuantifyingIndependently2019; @semmelrockReproducibilityMachinelearningbasedResearch2025];
+moreover, scientific venues have begun to address this issue [@10.1145/3641525].
 
 # Related work
 
 Scikit-learn provides `Pipeline` and `ColumnTransformer`, along with a rich estimator ecosystem [@pedregosa_scikit-learn_2011], but lacks role-based variable grammar, limited human readability, and awkward serialization. Feature-engine [@galliFeatureenginePythonPackage2021], pyjanitor [@j.PyjanitorCleanerAPI2019], or
-scikit-lego[@warmerdamKoaningScikitlegoV0952025] add helpful transformers and data-cleaning verbs. However, none provide a
+scikit-lego [@warmerdamKoaningScikitlegoV0952025] add helpful transformers and data-cleaning verbs. However, none provide a
 unified, role-centric abstraction with backend flexibility. The R `recipes` package established the prep/bake pattern and a clean grammar for preprocessing [@kuhnRecipesPreprocessingFeature2024]. `ReciPies` brings these ideas to Python, extends them with backend-agnostic execution on Pandas and Polars, and emphasizes configuration-as-code artifacts suitable for a wide range of machine
 learning pipelines.
 
@@ -58,7 +71,7 @@ learning pipelines.
 ![recipies flowchart](../docs/figures/recipies_flow.pdf)
 A typical workflow 1) loads a Pandas or Polars training `DataFrame`, 2) wraps it as an `Ingredients` object that records role metadata, 3) defines a `Recipe` from `Steps` operating on columns selected based on roles by `Selectors`, 4) preps the recipe on the training split to estimate parameters, and 5) bakes it on the held-out split to apply those parameters without leakage. The baked outputs feed downstream modeling and evaluation. Figure 1 gives an overview of this workflow.
 ![physionet code snippet](../docs/figures/recipies_code_snippet.pdf)
-Figure 2 demonstrates usage on the PhysioNet Computing in Cardiology 2019 dataset [@reynaEarlyPredictionSepsis2020a], including role assignment, temporal imputation, and normalization. The prepped recipe serializes to JSON or YAML, and reloading the artifact reproduces the transforms across supported platforms.
+Figure 2 demonstrates usage on the PhysioNet Computing in Cardiology 2019 dataset [@reynaEarlyPredictionSepsis2020b], including role assignment, temporal imputation, and normalization. The prepped recipe serializes to JSON or YAML, and reloading the artifact reproduces the transforms across supported platforms.
 
 Complete code and interactive notebooks are available in the project documentation. `ReciPies` also provides a benchmarking suite comparing the performance of different preprocessing steps
 on (generated) data.
@@ -76,7 +89,8 @@ time-series operations and large-scale aggregations, where Polars shows signific
 transition from research to production.
 
 # Acknowledgements
+
 Robin P. van de Water is funded by the European Commission in the Horizon 2020 project INTERVENE (Grant agreement ID: 101016775).
-This work has been edited with the help of Large Language Models (LLMs) to improve readability. 
+This work has been edited with the help of Large Language Models (LLMs) to improve readability.
 
 # References

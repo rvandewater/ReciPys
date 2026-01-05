@@ -169,6 +169,8 @@ class Recipe:
 
     def _apply_fit_transform(self, data=None, refit=False):
         # applies transform or fit and transform (when refit or not trained yet)
+        if data is None:
+            data = self.data
         for step in self.steps:
             data = self._apply_group(data, step)
             if refit or not step.trained:
@@ -182,7 +184,9 @@ class Recipe:
 
         # Print all existing roles and how many variables are assigned to each
         num_roles = Counter(chain.from_iterable(self.data.roles.values()))
-        num_roles = pl.DataFrame({"role": [r for r in num_roles.keys()], "#variables": [n for n in num_roles.values()]})
+        num_roles = pd.DataFrame(
+            {"role": [r for r in num_roles.keys()], "amount of variables": [n for n in num_roles.values()]}
+        )
         repr += "Inputs:\n\n" + num_roles.__repr__() + "\n\n"
 
         # Print all steps

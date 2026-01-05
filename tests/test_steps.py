@@ -37,6 +37,9 @@ from src.recipies.step import (
     StepResampling,
     StepImputeFastZeroFill,
     StepImputeFastForwardFill,
+    StepFunction,
+    StepImputeModel,
+    Step,
 )
 from src.recipies.constants import Backend
 
@@ -154,6 +157,37 @@ class TestStepHistorical:
             assert df["x1_median"].iloc[-1] == df["x1"].loc[df["id"] == 2].median()
             assert df["x1_count"].iloc[-1] == df["x1"].loc[df["id"] == 2].count()
             assert df["x2_var"].iloc[-1] == df["x2"].loc[df["id"] == 2].var()
+
+    def test_invalid_accumulator(self, example_df):
+        # Test with an invalid accumulator
+        rec = Recipe(Ingredients(example_df), ["y"], ["x1", "x2"], ["id"])
+        with pytest.raises(TypeError, match="Expected Accumulator enum"):
+            rec.add_step(StepHistorical(sel=all_of(["x1", "x2"]), fun="INVALID_ACCUMULATOR", suffix="_invalid"))
+
+    def test_no_selector(self, example_df):
+        # Test with no selector provided
+        rec = Recipe(Ingredients(example_df), ["y"], ["x1", "x2"], ["id"])
+        rec.add_step(StepHistorical(fun=Accumulator.MIN, suffix="_min"))
+        df = rec.bake()
+        assert "x1_min" in df.columns and "x2_min" in df.columns, "Columns with suffix '_min' should be created."
+
+    def test_non_numeric_columns(self, example_pd_df):
+        # Test with non-numeric columns
+        example_pd_df["x3"] = (["a", "b", "c", "d"] * (len(example_pd_df) // 4 + 1))[
+            : len(example_pd_df)
+        ]  # Ensure correct length
+        rec = Recipe(Ingredients(example_pd_df), ["y"], ["x1", "x2", "x3"], ["id"])
+        rec.add_step(StepHistorical(sel=all_of(["x1", "x2", "x3"]), fun=Accumulator.MIN, suffix="_min"))
+        with pytest.raises(NotImplementedError, match="function is not implemented for this dtype"):
+            rec.bake()
+
+    def test_different_roles(self, example_df):
+        # Test with a different role
+        rec = Recipe(Ingredients(example_df), ["y"], ["x1", "x2"], ["id"])
+        rec.add_step(StepHistorical(sel=all_of(["x1", "x2"]), fun=Accumulator.MIN, suffix="_min", role="feature"))
+        df = rec.bake()
+        assert "x1_min" in df.columns and "x2_min" in df.columns, "Columns with suffix '_min' should be created."
+        assert rec.roles["x1_min"] == ["feature"], "The role of the new columns should be 'feature'."
 
 
 class TestImputeSteps:
@@ -483,3 +517,202 @@ class TestSklearnStep:
         with pytest.raises(TypeError) as exc_info:
             example_recipe.prep()
         assert "sparse_output=False" in str(exc_info.value)
+
+
+def test_step_trained_property():
+    step = Step()
+    assert not step.trained  # Default should be False
+
+
+def test_step_group_property():
+    step = Step()
+    assert step.group  # Default should be True
+
+
+def test_step_fit(example_ingredients):
+    step = Step()
+    step.fit(example_ingredients)
+    assert step.trained  # Ensure the step is marked as trained after fitting
+
+
+def test_step_unsupported_backend(example_ingredients):
+    step = Step(supported_backends=[Backend.PANDAS])
+    example_ingredients.backend = Backend.POLARS
+    with pytest.raises(ValueError):
+        step.fit(example_ingredients)  # Should raise an error for unsupported backend
+
+
+def test_step_impute_fill_invalid_strategy(example_ingredients):
+    # Test invalid strategy in StepImputeFill
+    rec = Recipe(example_ingredients, ["y"], ["x1", "x2"])
+    step = StepImputeFill(strategy="invalid_strategy")
+    rec.add_step(step)
+    with pytest.raises(ValueError, match="No valid strategy provided. Strategy was: invalid_strategy"):
+        rec.prep()
+
+
+def test_step_scale_in_place_false(example_ingredients):
+    # Test StepScale with in_place=False
+    rec = Recipe(example_ingredients, ["y"], ["x1", "x2"])
+    step = StepScale(in_place=False)
+    rec.add_step(step)
+    prepped = rec.prep()
+    assert "x1" in prepped.columns and "StandardScaler_x1" in prepped.columns
+    assert "x2" in prepped.columns and "StandardScaler_x2" in prepped.columns
+
+
+def test_step_function(example_ingredients):
+    rec = Recipe(example_ingredients, ["y"], ["x1", "x2"])
+    if isinstance(example_ingredients.get_df(), pd.DataFrame):
+        original_df = example_ingredients.get_df().copy()
+    else:
+        original_df = example_ingredients.get_df().clone()
+
+    # Define a transformation function that increments numeric columns by 1
+    def add_one(data, columns):
+        df = data.get_df()
+        if isinstance(df, pd.DataFrame):
+            df[columns] = df[columns] + 1
+        else:
+            df = df.with_columns([(df[col] + 1).alias(col) for col in columns])
+        data.set_df(df)
+        return data
+
+    # Create the StepFunction instance
+    step = StepFunction(function=add_one, sel=all_numeric_predictors(example_ingredients.get_backend()))
+
+    # Add the step to the recipe and prepare the data
+    rec.add_step(step)
+    prepped = rec.prep()
+    # Verify the transformation
+
+    if isinstance(original_df, pd.DataFrame):
+        # For Pandas: Increment numeric columns in the expected DataFrame
+        expected_df = original_df.copy()
+        expected_df[["x1", "x2"]] += 1
+        pd.testing.assert_frame_equal(
+            prepped[["x1", "x2"]], expected_df[["x1", "x2"]], check_exact=False, rtol=1e-5, atol=1e-8
+        )
+    elif isinstance(original_df, pl.DataFrame):
+        # For Polars: Increment numeric columns in the expected DataFrame
+        expected_df = original_df.with_columns([(original_df[col] + 1).alias(col) for col in ["x1", "x2"]])
+        assert prepped.equals(expected_df)
+
+
+def test_step_repr(example_ingredients):
+    # Create a dummy step
+    class DummyStep(Step):
+        def __init__(self, sel, desc="Dummy Step"):
+            super().__init__(sel=sel)
+            self.desc = desc
+
+        def do_fit(self, data):
+            pass
+
+        def transform(self, data):
+            return data
+
+    # Instantiate the step
+    step = DummyStep(sel=all_numeric_predictors(), desc="Test Step")
+
+    # Test __repr__ before training
+    repr_before_training = repr(step)
+    assert "Test Step for" in repr_before_training
+    assert "all numeric predictors" in repr_before_training
+    assert "[trained]" not in repr_before_training
+
+    # Fit the step
+    step.fit(example_ingredients)
+
+    # Test __repr__ after training
+    repr_after_training = repr(step)
+    assert "Test Step for" in repr_after_training
+    assert "[trained]" in repr_after_training
+    if len(step.columns) < 3:
+        assert str(step.columns) in repr_after_training
+    else:
+        assert str(step.columns[:2] + ["..."]) in repr_after_training
+
+
+class DummyStep(Step):
+    def do_fit(self, data):
+        pass
+
+    def transform(self, data):
+        return data
+
+
+def test_check_ingredients(example_ingredients):
+    # Create a dummy step
+    class DummyStep(Step):
+        def __init__(self, supported_backends):
+            super().__init__()
+            self.supported_backends = supported_backends
+
+        def do_fit(self, data):
+            pass
+
+        def transform(self, data):
+            return data
+
+    # Test with valid input
+    step = DummyStep(supported_backends=[example_ingredients.get_backend()])
+    validated_data = step._check_ingredients(example_ingredients)
+    assert isinstance(validated_data, Ingredients)
+
+    # Test with unsupported backend
+    unsupported_backend = Backend.PANDAS if example_ingredients.get_backend() == Backend.POLARS else Backend.POLARS
+    step = DummyStep(supported_backends=[unsupported_backend])
+    with pytest.raises(ValueError, match=f"Backend.{example_ingredients.get_backend().name} not supported by this step."):
+        step._check_ingredients(example_ingredients)
+
+
+def test_check_ingredients_grouping(example_ingredients):
+    # Test with grouped data when grouping is not allowed
+    step = DummyStep()
+    step._group = False
+    if example_ingredients.get_backend() == Backend.PANDAS:
+        grouped_data = example_ingredients.get_df().groupby("id")
+        with pytest.raises(ValueError, match="Step does not accept grouped data."):
+            step._check_ingredients(grouped_data)
+    elif example_ingredients.get_backend() == Backend.POLARS:
+        grouped_data = example_ingredients.get_df().group_by("id")
+        with pytest.raises(ValueError, match="Step does not accept grouped data."):
+            step._check_ingredients(grouped_data)
+
+    # Test with invalid input type
+    with pytest.raises(ValueError, match="Expected Ingredients object, got <class 'str'>"):
+        step._check_ingredients("invalid_input")
+
+
+def test_step_impute_model(example_pd_ingredients):
+    # Define a simple imputation model
+    def impute_model(data, groups):
+        df = data.copy()
+        for group, group_data in df.groupby(groups):
+            for col in df.columns:
+                if col not in groups:
+                    df.loc[df[groups] == group, col] = group_data[col].fillna(group_data[col].mean())
+        return df.drop(columns=groups)
+
+    step = StepImputeModel(model=impute_model)
+
+    # Apply the transformation
+    transformed_data = step.transform(example_pd_ingredients)
+
+    # Verify the transformation
+    original_df = example_pd_ingredients.get_df()
+    if isinstance(original_df, pd.DataFrame):
+        # Ensure the 'group' column exists in the DataFrame
+        if "group" not in original_df.columns:
+            group_values = [1, 1, 2, 2] * (len(original_df) // 4 + 1)  # Ensure enough values
+            original_df["group"] = group_values[: len(original_df)]  # Truncate to match length
+        # Expected DataFrame for Pandas
+        expected_df = original_df.copy()
+        for group, group_data in expected_df.groupby("group"):
+            for col in ["x1", "x2"]:
+                expected_df.loc[expected_df["group"] == group, col] = group_data[col].fillna(group_data[col].mean())
+        expected_df = expected_df.drop(columns=["group"])
+        # Drop the 'group' column from the transformed DataFrame before comparison
+        transformed_data = transformed_data.get_df().drop(columns=["group"])
+        pd.testing.assert_frame_equal(transformed_data, expected_df)

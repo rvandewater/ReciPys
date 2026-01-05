@@ -83,10 +83,10 @@ repos:
       - id: nbstripout
 
   # jupyter notebook linting with ruff
-  - repo: https://github.com/nbQA-dev/nbQA
-    rev: 1.9.1
-    hooks:
-      - id: nbqa-ruff
-        args: ["--fix", "--ignore=E402"]
-      - id: nbqa-ruff-format
-        args: ["--line-length=110"]
+  # - repo: https://github.com/nbQA-dev/nbQA
+  #   rev: 1.9.1
+  #   hooks:
+  #     - id: nbqa-ruff
+  #       args: ["--fix", "--ignore=E402"]
+  #     - id: nbqa-ruff-format
+  #       args: ["--line-length=110"]

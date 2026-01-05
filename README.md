@@ -13,8 +13,9 @@ alt="recipies logo" height="300">
 [![PyPI version shields.io](https://img.shields.io/pypi/v/recipies.svg)](https://pypi.python.org/pypi/recipies/)
 [![Python Version](https://img.shields.io/pypi/pyversions/recipies.svg)](https://pypi.python.org/pypi/recipies/)
 [![Downloads](https://pepy.tech/badge/recipies)](https://pepy.tech/project/recipies)
-[![arXiv](https://img.shields.io/badge/arXiv-2306.05109-b31b1b.svg)](http://arxiv.org/abs/2306.05109)
 [![codecov](https://codecov.io/gh/rvandewater/ReciPies/graph/badge.svg?token=5L5KUN8I3F)](https://codecov.io/gh/rvandewater/ReciPies)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/38ef991d72bd49cdb75aff91a5dee841)](https://app.codacy.com/gh/rvandewater/ReciPies/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![status](https://joss.theoj.org/papers/214eb70878afd0e4f5e3be9d7aadceae/status.svg)](https://joss.theoj.org/papers/214eb70878afd0e4f5e3be9d7aadceae)
 
 Modern machine learning (ML) workflows live or die by their data‑preprocessing steps, yet in Python—a language with a
 rich ecosystem for data science and ML—these steps are often scattered across ad‑hoc scripts or opaque Scikit-Learn
@@ -57,13 +58,20 @@ uv add recipies
 
 ```bash
 # with conda (optional)
-conda env update -f environment.yml
+conda env create -n ReciPies python=3.12
 conda activate ReciPies
-# with pip
-pip install -e .
-# with uv venv
-uv venv && source .venv/bin/activate
+```
 
+Then, from the root of the repository, run with pip:
+
+```bash
+pip install -e .
+```
+
+Or with uv (if you have uv installed):
+
+```bash
+uv venv && source .venv/bin/activate
 ```
 
 ## Getting Start
@@ -166,8 +174,22 @@ This project is licensed under the MIT License. See the [LICENSE](https://github
 
 ## How to cite
 
-If you use this code in your research, please cite the following publication which uses ReciPys extensively to create a
-customisable preprocessing pipeline (a standalone paper is in preparation):
+If you use ReciPies in your work, please cite the newly accepted JOSS publication. Use 'Cite this repository', or:
+
+```bibtex
+@article{van_de_Water2026,
+doi = {10.21105/joss.09261},
+url = {https://doi.org/10.21105/joss.09261},
+year = {2026},
+publisher = {The Open Journal},
+volume = {11},
+number = {117},
+pages = {9261},
+author = {van de Water, Robin P. and Schmidt, Hendrik and Rockenschaub, Patrick},
+title = {ReciPies: A Lightweight Data Transformation Pipeline for Reproducible ML}, journal = {Journal of Open Source Software} }
+```
+
+If you use Yet Another ICU Benchmark in your research, please cite the following:
 
 ```
 @inproceedings{vandewaterYetAnotherICUBenchmark2024,

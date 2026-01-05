@@ -1,6 +1,7 @@
+from __future__ import annotations
 from abc import abstractmethod
 from copy import deepcopy
-from typing import Union, Dict
+from typing import Union, Dict, get_args
 
 from pandas.core.groupby import DataFrameGroupBy
 import polars as pl
@@ -81,14 +82,13 @@ class Step:
         Returns:
             Validated input
         """
-        if self.supported_backends is not None and data.get_backend() not in self.supported_backends:
-            raise ValueError(f"{data.get_backend()} not supported by this step.")
         if isinstance(data, GroupBy) or isinstance(data, DataFrameGroupBy):
             if not self._group:
                 raise ValueError("Step does not accept grouped data.")
-            # data = data.apply(lambda df: df)
         if not isinstance(data, Ingredients):
             raise ValueError(f"Expected Ingredients object, got {data.__class__}")
+        if self.supported_backends is not None and data.get_backend() not in self.supported_backends:
+            raise ValueError(f"{data.get_backend()} not supported by this step.")
         return data
 
     def transform(self, data: Ingredients) -> Ingredients:
@@ -134,13 +134,19 @@ class StepImputeFill(Step):
         new_data = self._check_ingredients(data)
         groups = select_groups(new_data)
         if data.get_backend() == Backend.POLARS:
-            if len(groups) > 0:
-                new_data.data = data.data.with_columns(
-                    pl.col(self.columns).fill_null(self.value, strategy=self.strategy, limit=self.limit).over(groups)
-                )
+            available_strategies = list(get_args(pl._typing.FillNullStrategy))
+            if self.strategy in available_strategies or self.value is not None:
+                if len(groups) > 0:
+                    new_data.data = data.data.with_columns(
+                        pl.col(self.columns).fill_null(self.value, strategy=self.strategy, limit=self.limit).over(groups)
+                    )
+                else:
+                    new_data.data = data.data.with_columns(
+                        pl.col(self.columns).fill_null(self.value, strategy=self.strategy, limit=self.limit)
+                    )
             else:
-                new_data.data = data.data.with_columns(
-                    pl.col(self.columns).fill_null(self.value, strategy=self.strategy, limit=self.limit)
+                raise ValueError(
+                    f"No valid strategy provided. Strategy was: {self.strategy}, valid strategies are: {available_strategies}"
                 )
         else:
             # Pandas syntax
@@ -318,11 +324,12 @@ class StepHistorical(Step):
 
         self.desc = f"Create historical {fun}"
         self.fun = fun
+        if isinstance(self.fun, Accumulator):
+            pass
+        else:
+            raise TypeError(f"Expected Accumulator enum for function, got {self.fun.__class__}")
         if suffix is None:
-            try:
-                suffix = fun.value
-            except Exception:
-                raise TypeError(f"Expected Accumulator enum for function, got {self.fun.__class__}")
+            suffix = fun.value
         self.suffix = suffix
         self.role = role
 
@@ -504,7 +511,7 @@ class StepResampling(Step):
     def __init__(
         self,
         new_resolution: str = "1h",
-        accumulator_dict: Dict[Selector, Accumulator] = {all_predictors(): Accumulator.LAST},
+        accumulator_dict: Dict[Selector, Accumulator] = None,
         default_accumulator: Accumulator = Accumulator.LAST,
     ):
         """This class represents a resampling step in a recipe.
@@ -516,7 +523,7 @@ class StepResampling(Step):
         """
         super().__init__()
         self.new_resolution = new_resolution
-        self.acc_dict = accumulator_dict
+        self.acc_dict = accumulator_dict or {all_predictors(): Accumulator.LAST}
         self.default_accumulator = default_accumulator
         self._group = True
 
@@ -645,12 +652,14 @@ class StepScale(StepSklearn):
 class StepFunction(Step):
     """Provides a wrapper for a simple transformation function, without fitting."""
 
-    def __init__(self, sel: Selector, function):
+    def __init__(self, function, sel: Selector = all_predictors()):
+        print(f"sel: {sel}")
         super().__init__(sel=sel)
         self.function = function
         self._trained = True
 
     def transform(self, data: Ingredients) -> Ingredients:
         new_data = self._check_ingredients(data)
-        new_data = self.function(new_data)
+        self.columns = self.sel(new_data)
+        new_data = self.function(new_data, self.columns)
         return new_data

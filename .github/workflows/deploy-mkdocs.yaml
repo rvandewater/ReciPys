@@ -21,12 +21,14 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: development # Specify the branch to check out
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
+          python-version: "3.13"
       - name: Install dependencies
-        run: pip install mkdocs mkdocs-material mkdocstrings[python] mkdocs-jupyter recipies
+        run: pip install .[docs]
       - name: Build MkDocs site
         run: mkdocs build
       - name: Upload artifact

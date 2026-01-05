@@ -71,22 +71,6 @@ def example_ingredients(request):
     return request.getfixturevalue(request.param)
 
 
-# @pytest.fixture
-# def example_ingredients(example_pl_df):
-#     return Ingredients(example_pl_df, backend=Backend.PANDAS)
-
-
 @pytest.fixture()
 def example_pl_recipe(example_pl_df):
     return Recipe(example_pl_df, ["y"], ["x1", "x2", "x3", "x4"], ["id"], ["time"])
-
-
-@pytest.fixture()
-def example_pd_recipe(example_pd_df):
-    return Recipe(example_pd_df, ["y"], ["x1", "x2", "x3", "x4"], ["id"], ["time"])
-
-
-@pytest.fixture()
-def example_recipe_w_nan(example_df):
-    example_df.loc[[1, 2, 4, 7], "x1"] = np.nan
-    return Recipe(example_df, ["y"], ["x1", "x2", "x3", "x4"], ["id"], ["time"])
