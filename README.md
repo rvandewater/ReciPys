@@ -173,7 +173,9 @@ Contributions are welcome! Please see our contributing guidelines and open an is
 This project is licensed under the MIT License. See the [LICENSE](https://github.com/rvandewater/ReciPies/blob/main/LICENSE) file for details.
 
 ## How to cite
+
 If you use ReciPies in your work, please cite the newly accepted JOSS publication. Use 'Cite this repository', or:
+
 ```bibtex
 @article{van_de_Water2026,
 doi = {10.21105/joss.09261},
@@ -186,7 +188,9 @@ pages = {9261},
 author = {van de Water, Robin P. and Schmidt, Hendrik and Rockenschaub, Patrick},
 title = {ReciPies: A Lightweight Data Transformation Pipeline for Reproducible ML}, journal = {Journal of Open Source Software} }
 ```
+
 If you use Yet Another ICU Benchmark in your research, please cite the following:
+
 ```
 @inproceedings{vandewaterYetAnotherICUBenchmark2024,
   title = {Yet Another ICU Benchmark: A Flexible Multi-Center Framework for Clinical ML},
